@@ -89,34 +89,57 @@
         const scriptURL = 'https://script.google.com/macros/s/AKfycby7t3jTFcBOWIzwruxri1-9fsBRVZx2iiFhHT9P9Ci1vkPV69rTIl5-oPajAkfB5XXNCA/exec';
 
         // --- 2. Funktion der henter data fra Google Sheets og bygger tabellen ---
-        async function loadProgrammer() {
-            try {
-                const response = await fetch(scriptURL);
-                const data = await response.json();
-                
-                const tbody = document.querySelector('table tbody');
-                tbody.innerHTML = ''; // Ryd tabellen, så vi ikke får dobbelt op
 
-                // Kører igennem alle rækker i Google Sheets og sætter dem ind
-                data.forEach(program => {
-                    const tr = document.createElement('tr');
-                    // Nøglerne (f.eks. program.Dato) SKAL matche overskrifterne i dit Sheet præcist
-                    tr.innerHTML = `
-                        <td>${program.Dato || ''} (${program.Ugedag || ''})</td>
-                        <td>${program.Kanal || ''}</td>
-                        <td>${program.Sportsgren || ''}</td>
-                        <td>${program.Programtitel || ''}</td>
-                        <td>${program.Lokation || ''}</td>
-                        <td>${program.Tidspunkt || ''}</td>
-                        <td>${program.Unit || ''}</td>
-                        <td><button class="btn action-btn">Rediger</button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (error) {
-                console.error('Fejl ved indlæsning af produktioner:', error);
+async function loadProgrammer() {
+    try {
+        const response = await fetch(scriptURL);
+        const data = await response.json();
+        
+        const tbody = document.querySelector('table tbody');
+        tbody.innerHTML = ''; // Ryd tabellen
+
+        data.forEach(program => {
+            // Hent data uanset om kolonneoverskriften er med stort eller småt begyndelsesbogstav
+            let pDato = program.Dato || program.dato || '';
+            const pUgedag = program.Ugedag || program.ugedag || '';
+            const pKanal = program.Kanal || program.kanal || '';
+            const pSportsgren = program.Sportsgren || program.sportsgren || '';
+            const pProgramtitel = program.Programtitel || program.programtitel || '';
+            const pLokation = program.Lokation || program.lokation || '';
+            let pTidspunkt = program.Tidspunkt || program.tidspunkt || '';
+            const pUnit = program.Unit || program.unit || '';
+
+            // Formater datoen, hvis den kommer i det maskinlæsbare format med "T"
+            if (pDato && pDato.includes('T')) {
+                const d = new Date(pDato);
+                // Giver formatet DD/MM-YYYY (f.eks. 27/03-2026)
+                pDato = d.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\./g, '/');
             }
-        }
+
+            // Formater tidspunktet, da Sheets af og til også sender tider som fulde dato-strenge
+            if (pTidspunkt && pTidspunkt.includes('T')) {
+                const t = new Date(pTidspunkt);
+                // Viser kun timer og minutter (f.eks. 18:00)
+                pTidspunkt = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${pDato} ${pUgedag ? '(' + pUgedag + ')' : ''}</td>
+                <td>${pKanal}</td>
+                <td>${pSportsgren}</td>
+                <td>${pProgramtitel}</td>
+                <td>${pLokation}</td>
+                <td>${pTidspunkt}</td>
+                <td>${pUnit}</td>
+                <td><button class="btn action-btn">Rediger</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error('Fejl ved indlæsning af produktioner:', error);
+    }
+}
 
         // --- 3. Funktion der sender ny data til dit Sheet, når man trykker Gem ---
         async function gemProgram() {
