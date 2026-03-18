@@ -44,9 +44,10 @@
     </div>
 
     <table id="programTable">
-        <thead>
+       <thead>
             <tr>
-                <th>Dato & Tid</th>
+                <th>Dato</th>
+                <th>Tid</th>
                 <th>Kanal</th>
                 <th>Sportsgren</th>
                 <th>Programtitel</th>
@@ -127,8 +128,9 @@ table.querySelectorAll('tbody').forEach(tb => tb.remove());
                     // Øverste linje (Hovedinfo)
                     const trMain = document.createElement('tr');
                     trMain.className = 'main-row';
-                    trMain.innerHTML = `
-                        <td>${pDato} ${pUgedag ? '<br>(' + pUgedag + ')' : ''}<br><b>${pTid}</b></td>
+                 trMain.innerHTML = `
+                        <td>${pDato} ${pUgedag ? '<br>(' + pUgedag + ')' : ''}</td>
+                        <td><b>${pTid}</b></td>
                         <td>${program["Kanal"] || ''}</td>
                         <td>${program["Sportsgren"] || ''}</td>
                         <td>${program["Programtitel"] || ''}</td>
@@ -141,7 +143,7 @@ table.querySelectorAll('tbody').forEach(tb => tb.remove());
                     const trDetail = document.createElement('tr');
                     trDetail.className = 'detail-row';
                     trDetail.innerHTML = `
-                        <td colspan="7">
+                        <td colspan="8">
                             <span class="detail-item"><span class="detail-label">Format:</span> ${program["Format"] || '-'}</span>
                             <span class="detail-item"><span class="detail-label">RX:</span> ${program["RX"] || '-'}</span>
                             <span class="detail-item"><span class="detail-label">P-plan:</span> ${program["P-plan"] || '-'}</span>
