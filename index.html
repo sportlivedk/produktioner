@@ -39,7 +39,10 @@
 <body>
 
     <div class="header">
-        <h1>Produktionsoversigt</h1>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <img src="logo.png" alt="SPORT LIVE Logo" style="height: 45px; width: auto;">
+            <h1 style="margin: 0;">Produktionsoversigt</h1>
+        </div>
         <button class="btn" onclick="openModal()">+ Tilføj Nyt Program</button>
     </div>
 
@@ -47,10 +50,11 @@
        <thead>
             <tr>
                 <th>Dato</th>
+                <th>Ugedag</th>
                 <th>Tid</th>
                 <th>Kanal</th>
                 <th>Sportsgren</th>
-                <th>Programtitel</th>
+                <th style="max-width: 150px; word-wrap: break-word;">Programtitel</th>
                 <th>Lokation</th>
                 <th>Unit</th>
                 <th>Handling</th>
@@ -128,8 +132,9 @@ table.querySelectorAll('tbody').forEach(tb => tb.remove());
                     // Øverste linje (Hovedinfo)
                     const trMain = document.createElement('tr');
                     trMain.className = 'main-row';
-                 trMain.innerHTML = `
-                        <td>${pDato} ${pUgedag ? '<br>(' + pUgedag + ')' : ''}</td>
+                trMain.innerHTML = `
+                        <td>${pDato}</td>
+                        <td>${pUgedag}</td>
                         <td><b>${pTid}</b></td>
                         <td>${program["Kanal"] || ''}</td>
                         <td>${program["Sportsgren"] || ''}</td>
@@ -143,7 +148,7 @@ table.querySelectorAll('tbody').forEach(tb => tb.remove());
                     const trDetail = document.createElement('tr');
                     trDetail.className = 'detail-row';
                     trDetail.innerHTML = `
-                        <td colspan="8">
+                        <td colspan="9">
                             <span class="detail-item"><span class="detail-label">Format:</span> ${program["Format"] || '-'}</span>
                             <span class="detail-item"><span class="detail-label">RX:</span> ${program["RX"] || '-'}</span>
                             <span class="detail-item"><span class="detail-label">P-plan:</span> ${program["P-plan"] || '-'}</span>
