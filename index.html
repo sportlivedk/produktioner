@@ -106,6 +106,14 @@
                 const response = await fetch(scriptURL);
                 const data = await response.json();
                 
+                // --- NYT: Sorterer programmerne kronologisk efter dato ---
+                data.sort((a, b) => {
+                    const datoA = new Date(a["Dato"] || 0);
+                    const datoB = new Date(b["Dato"] || 0);
+                    return datoA - datoB; // Sorterer fra ældst til nyest
+                });
+                // ---------------------------------------------------------
+
                 const table = document.getElementById('programTable');
                 table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
 
@@ -171,7 +179,7 @@
 
             if (valgtDato) {
                 const datoObjekt = new Date(valgtDato);
-                const ugedage = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
+                const ugedage = ["S\u00f8ndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "L\u00f8rdag"];
                 beregnetUgedag = ugedage[datoObjekt.getDay()];
             }
 
