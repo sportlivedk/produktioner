@@ -43,7 +43,7 @@
         <button class="btn" onclick="openModal()">+ Tilføj Nyt Program</button>
     </div>
 
-    <table>
+    <table id="programTable">
         <thead>
             <tr>
                 <th>Dato & Tid</th>
@@ -55,7 +55,7 @@
                 <th>Handling</th>
             </tr>
         </thead>
-        <tbody id="table-body"></tbody>
+        </table>
     </table>
 
     <div id="programModal" class="modal">
@@ -102,8 +102,9 @@
                 const response = await fetch(scriptURL);
                 const data = await response.json();
                 
-                const tableContainer = document.getElementById('table-body');
-                tableContainer.innerHTML = ''; 
+                const table = document.getElementById('programTable');
+// Rydder alle gamle rækker, men lader overskrifterne (thead) stå
+table.querySelectorAll('tbody').forEach(tb => tb.remove());
 
                 data.forEach(program => {
                     let pDato = program["Dato"] || '';
@@ -155,7 +156,7 @@
 
                     tbody.appendChild(trMain);
                     tbody.appendChild(trDetail);
-                    tableContainer.appendChild(tbody);
+                    table.appendChild(tbody);
                 });
             } catch (error) {
                 console.error('Fejl ved indlæsning:', error);
