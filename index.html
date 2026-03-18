@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPORT LIVE - Produktionsplan</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { color: #333; }
+        .btn { background-color: #0056b3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background-color: #004494; }
+        table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
+        th { background-color: #e9ecef; color: #333; font-weight: 600; }
+        tr:hover { background-color: #f1f1f1; }
+        .action-btn { background-color: #28a745; margin-right: 5px; }
+        
+        /* Modal (Pop-up formular) styling */
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 800px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .form-group input, .form-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Produktionsoversigt</h1>
+        <button class="btn" onclick="openModal()">+ Tilføj Nyt Program</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Dato</th>
+                <th>Kanal</th>
+                <th>Sportsgren</th>
+                <th>Programtitel</th>
+                <th>Lokation</th>
+                <th>Tid</th>
+                <th>Unit</th>
+                <th>Handling</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+
+    <div id="programModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Programdetaljer</h2>
+            <form id="programForm">
+                <div class="form-grid">
+                    <div class="form-group"><label>Dato</label><input type="date" id="dato"></div>
+                    <div class="form-group"><label>Ugedag</label><input type="text" id="ugedag" placeholder="F.eks. Lørdag"></div>
+                    <div class="form-group"><label>Kanal</label><input type="text" id="kanal" placeholder="F.eks. SPORT LIVE"></div>
+                    
+                    <div class="form-group"><label>Sportsgren</label><input type="text" id="sportsgren"></div>
+                    <div class="form-group"><label>Programtitel</label><input type="text" id="programtitel"></div>
+                    <div class="form-group"><label>Lokation</label><input type="text" id="lokation"></div>
+                    
+                    <div class="form-group"><label>Tidspunkt</label><input type="time" id="tidspunkt"></div>
+                    <div class="form-group"><label>Unit</label><input type="text" id="unit" placeholder="F.eks. Studie eller OB1"></div>
+                    <div class="form-group"><label>Format</label><input type="text" id="format" placeholder="F.eks. i50 / p50"></div>
+                    
+                    <div class="form-group"><label>RX</label><input type="text" id="rx" placeholder="F.eks. SRT / LiveU"></div>
+                    <div class="form-group"><label>Producer</label><input type="text" id="producer"></div>
+                    <div class="form-group"><label>Kommentator</label><input type="text" id="kommentator"></div>
+                    
+                    <div class="form-group"><label>Ekspert</label><input type="text" id="ekspert"></div>
+                    <div class="form-group"><label>Reporter</label><input type="text" id="reporter"></div>
+                    <div class="form-group"><label>Link / Noter</label><input type="text" id="noter"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="gemProgram()">Gem Program</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. SÆT DIN WEB-APP URL IND HER MELLEM ANFØRSELSTEGNENE ---
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby7t3jTFcBOWIzwruxri1-9fsBRVZx2iiFhHT9P9Ci1vkPV69rTIl5-oPajAkfB5XXNCA/exec';
+
+        // --- 2. Funktion der henter data fra Google Sheets og bygger tabellen ---
+        async function loadProgrammer() {
+            try {
+                const response = await fetch(scriptURL);
+                const data = await response.json();
+                
+                const tbody = document.querySelector('table tbody');
+                tbody.innerHTML = ''; // Ryd tabellen, så vi ikke får dobbelt op
+
+                // Kører igennem alle rækker i Google Sheets og sætter dem ind
+                data.forEach(program => {
+                    const tr = document.createElement('tr');
+                    // Nøglerne (f.eks. program.Dato) SKAL matche overskrifterne i dit Sheet præcist
+                    tr.innerHTML = `
+                        <td>${program.Dato || ''} (${program.Ugedag || ''})</td>
+                        <td>${program.Kanal || ''}</td>
+                        <td>${program.Sportsgren || ''}</td>
+                        <td>${program.Programtitel || ''}</td>
+                        <td>${program.Lokation || ''}</td>
+                        <td>${program.Tidspunkt || ''}</td>
+                        <td>${program.Unit || ''}</td>
+                        <td><button class="btn action-btn">Rediger</button></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Fejl ved indlæsning af produktioner:', error);
+            }
+        }
+
+        // --- 3. Funktion der sender ny data til dit Sheet, når man trykker Gem ---
+        async function gemProgram() {
+            // Saml data fra alle input-felterne (via deres id)
+            const nyProduktion = {
+                dato: document.getElementById('dato').value,
+                ugedag: document.getElementById('ugedag').value,
+                kanal: document.getElementById('kanal').value,
+                sportsgren: document.getElementById('sportsgren').value,
+                programtitel: document.getElementById('programtitel').value,
+                lokation: document.getElementById('lokation').value,
+                tidspunkt: document.getElementById('tidspunkt').value,
+                unit: document.getElementById('unit').value,
+                format: document.getElementById('format').value,
+                rx: document.getElementById('rx').value,
+                producer: document.getElementById('producer').value,
+                kommentator: document.getElementById('kommentator').value,
+                ekspert: document.getElementById('ekspert').value,
+                reporter: document.getElementById('reporter').value,
+                noter: document.getElementById('noter').value
+            };
+
+            try {
+                // Send dataene afsted
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify(nyProduktion),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                
+                closeModal(); // Luk pop-up
+                document.getElementById('programForm').reset(); // Tøm felterne
+                loadProgrammer(); // Opdater oversigten, så det nye program vises
+                alert("Programmet er gemt i oversigten!");
+            } catch (error) {
+                console.error('Fejl ved gemning:', error);
+                alert("Der skete en fejl. Tjek at din Web-App URL er korrekt.");
+            }
+        }
+
+        // --- 4. Hent data automatisk når siden åbnes ---
+        window.onload = loadProgrammer;
+
+        // --- 5. Modal-styring (åbn/luk pop-up) ---
+        var modal = document.getElementById("programModal");
+        function openModal() { modal.style.display = "block"; }
+        function closeModal() { modal.style.display = "none"; }
+        window.onclick = function(event) {
+            if (event.target == modal) { modal.style.display = "none"; }
+        }
+    </script>
+</body>
+</html>
