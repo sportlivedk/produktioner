@@ -7,7 +7,7 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        h1 { color: #333; }
+        h1 { color: #333; font-size: 24px; }
         .btn { background-color: #0056b3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
         .btn:hover { background-color: #004494; }
         
@@ -47,7 +47,7 @@
     </div>
 
     <table id="programTable">
-       <thead>
+        <thead>
             <tr>
                 <th>Dato</th>
                 <th>Ugedag</th>
@@ -60,7 +60,6 @@
                 <th>Handling</th>
             </tr>
         </thead>
-        </table>
     </table>
 
     <div id="programModal" class="modal">
@@ -69,26 +68,24 @@
             <h2>Programdetaljer</h2>
             <form id="programForm">
                 <div class="form-grid">
-                <div class="form-group"><label>Dato (Kolonne A)</label><input type="date" id="Dato" onchange="opdaterUgedag()"></div>
-		<div class="form-group"><label>Ugedag (Kolonne B)</label><input type="text" id="Ugedag" readonly style="background-color: #e9ecef;"></div>
+                    <div class="form-group"><label>Dato (Kolonne A)</label><input type="date" id="Dato"></div>
                     <div class="form-group"><label>Tid (Kolonne G)</label><input type="time" id="Tid"></div>
                     <div class="form-group"><label>Kanal (Kolonne C)</label><input type="text" id="Kanal"></div>
-                    
                     <div class="form-group"><label>Sportsgren (Kolonne D)</label><input type="text" id="Sportsgren"></div>
+                    
                     <div class="form-group"><label>Programtitel (Kolonne E)</label><input type="text" id="Programtitel"></div>
                     <div class="form-group"><label>Lokation (Kolonne F)</label><input type="text" id="Lokation"></div>
                     <div class="form-group"><label>Unit (Kolonne H)</label><input type="text" id="Unit"></div>
-                    
                     <div class="form-group"><label>Format (Kolonne I)</label><input type="text" id="Format"></div>
+                    
                     <div class="form-group"><label>RX (Kolonne J)</label><input type="text" id="RX"></div>
                     <div class="form-group"><label>P-plan (Kolonne K)</label><input type="text" id="P-plan"></div>
                     <div class="form-group"><label>Sling (Kolonne L)</label><input type="text" id="Sling"></div>
-                    
                     <div class="form-group"><label>Producer (Kolonne M)</label><input type="text" id="Producer"></div>
+                    
                     <div class="form-group"><label>Kommentator (Kolonne N)</label><input type="text" id="Kommentator"></div>
                     <div class="form-group"><label>Ekspert (Kolonne O)</label><input type="text" id="Ekspert"></div>
                     <div class="form-group"><label>Reporter (Kolonne P)</label><input type="text" id="Reporter"></div>
-                    
                     <div class="form-group full-width"><label>Link / Noter (Kolonne Q)</label><input type="text" id="Link_Noter"></div>
                 </div>
                 <div class="form-actions">
@@ -108,8 +105,8 @@
                 const data = await response.json();
                 
                 const table = document.getElementById('programTable');
-// Rydder alle gamle rækker, men lader overskrifterne (thead) stå
-table.querySelectorAll('tbody').forEach(tb => tb.remove());
+                // Ryd gamle rækker, men lad thead stå
+                table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
 
                 data.forEach(program => {
                     let pDato = program["Dato"] || '';
@@ -125,14 +122,13 @@ table.querySelectorAll('tbody').forEach(tb => tb.remove());
                         pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
                     }
 
-                    // Vi bygger en samlet "blok" (tbody) for hvert program, som indeholder 2 rækker
                     const tbody = document.createElement('tbody');
                     tbody.className = 'program-block';
 
-                    // Øverste linje (Hovedinfo)
+                    // Øverste linje med 9 kolonner
                     const trMain = document.createElement('tr');
                     trMain.className = 'main-row';
-                trMain.innerHTML = `
+                    trMain.innerHTML = `
                         <td>${pDato}</td>
                         <td>${pUgedag}</td>
                         <td><b>${pTid}</b></td>
@@ -144,7 +140,7 @@ table.querySelectorAll('tbody').forEach(tb => tb.remove());
                         <td><button class="btn action-btn">Rediger</button></td>
                     `;
                     
-                    // Nederste linje (Teknik og Bemanding - spænder over alle 7 kolonner)
+                    // Nederste linje, der nu spænder over alle 9 kolonner
                     const trDetail = document.createElement('tr');
                     trDetail.className = 'detail-row';
                     trDetail.innerHTML = `
@@ -171,9 +167,20 @@ table.querySelectorAll('tbody').forEach(tb => tb.remove());
         }
 
         async function gemProgram() {
+            // Hent den valgte dato
+            const valgtDato = document.getElementById('Dato').value;
+            let beregnetUgedag = "";
+
+            // Beregn ugedagen automatisk, hvis der er valgt en dato
+            if (valgtDato) {
+                const datoObjekt = new Date(valgtDato);
+                const ugedage = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
+                beregnetUgedag = ugedage[datoObjekt.getDay()];
+            }
+
             const nyProduktion = {
-                "Dato": document.getElementById('Dato').value,
-                "Ugedag": document.getElementById('Ugedag').value,
+                "Dato": valgtDato,
+                "Ugedag": beregnetUgedag, // Sender den beregnede ugedag afsted til Google Sheets
                 "Kanal": document.getElementById('Kanal').value,
                 "Sportsgren": document.getElementById('Sportsgren').value,
                 "Programtitel": document.getElementById('Programtitel').value,
@@ -206,18 +213,7 @@ table.querySelectorAll('tbody').forEach(tb => tb.remove());
                 alert("Der skete en fejl.");
             }
         }
-	// --- NY FUNKTION: Udregner ugedag automatisk ---
-        function opdaterUgedag() {
-            const datoFelt = document.getElementById('Dato').value;
-            if (!datoFelt) return; // Gør intet, hvis feltet er tomt
-            
-            const datoObjekt = new Date(datoFelt);
-            const ugedage = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
-            
-            document.getElementById('Ugedag').value = ugedage[datoObjekt.getDay()];
-        }
 
-        window.onload = loadProgrammer;
         window.onload = loadProgrammer;
 
         var modal = document.getElementById("programModal");
