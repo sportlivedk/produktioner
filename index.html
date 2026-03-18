@@ -10,20 +10,29 @@
         h1 { color: #333; }
         .btn { background-color: #0056b3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
         .btn:hover { background-color: #004494; }
-        table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
-        th { background-color: #e9ecef; color: #333; font-weight: 600; }
-        tr:hover { background-color: #f1f1f1; }
-        .action-btn { background-color: #28a745; margin-right: 5px; }
         
-        /* Modal (Pop-up formular) styling */
-        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: white; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 800px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
+        th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; }
+        
+        /* Styling af to-linjers layoutet */
+        tbody.program-block:hover { background-color: #f8faff; }
+        .main-row td { border-bottom: none; font-weight: 500; color: #222; }
+        .detail-row td { border-bottom: 2px solid #ddd; padding-top: 2px; padding-bottom: 15px; font-size: 13px; color: #555; }
+        .detail-item { margin-right: 15px; display: inline-block; margin-bottom: 4px; }
+        .detail-label { font-weight: 600; color: #777; }
+        
+        .action-btn { background-color: #28a745; padding: 6px 12px; }
+        
+        /* Modal Formular styling */
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
+        .modal-content { background-color: white; margin: 3% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 900px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
         .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: span 4; }
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .form-group input, .form-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .form-group input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
         .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
     </style>
 </head>
@@ -37,18 +46,16 @@
     <table>
         <thead>
             <tr>
-                <th>Dato</th>
+                <th>Dato & Tid</th>
                 <th>Kanal</th>
                 <th>Sportsgren</th>
                 <th>Programtitel</th>
                 <th>Lokation</th>
-                <th>Tid</th>
                 <th>Unit</th>
                 <th>Handling</th>
             </tr>
         </thead>
-        <tbody>
-            </tbody>
+        <tbody id="table-body"></tbody>
     </table>
 
     <div id="programModal" class="modal">
@@ -57,25 +64,27 @@
             <h2>Programdetaljer</h2>
             <form id="programForm">
                 <div class="form-grid">
-                    <div class="form-group"><label>Dato</label><input type="date" id="dato"></div>
-                    <div class="form-group"><label>Ugedag</label><input type="text" id="ugedag" placeholder="F.eks. Lørdag"></div>
-                    <div class="form-group"><label>Kanal</label><input type="text" id="kanal" placeholder="F.eks. SPORT LIVE"></div>
+                    <div class="form-group"><label>Dato (Kolonne A)</label><input type="date" id="Dato"></div>
+                    <div class="form-group"><label>Ugedag (Kolonne B)</label><input type="text" id="Ugedag"></div>
+                    <div class="form-group"><label>Tid (Kolonne G)</label><input type="time" id="Tid"></div>
+                    <div class="form-group"><label>Kanal (Kolonne C)</label><input type="text" id="Kanal"></div>
                     
-                    <div class="form-group"><label>Sportsgren</label><input type="text" id="sportsgren"></div>
-                    <div class="form-group"><label>Programtitel</label><input type="text" id="programtitel"></div>
-                    <div class="form-group"><label>Lokation</label><input type="text" id="lokation"></div>
+                    <div class="form-group"><label>Sportsgren (Kolonne D)</label><input type="text" id="Sportsgren"></div>
+                    <div class="form-group"><label>Programtitel (Kolonne E)</label><input type="text" id="Programtitel"></div>
+                    <div class="form-group"><label>Lokation (Kolonne F)</label><input type="text" id="Lokation"></div>
+                    <div class="form-group"><label>Unit (Kolonne H)</label><input type="text" id="Unit"></div>
                     
-                    <div class="form-group"><label>Tidspunkt</label><input type="time" id="tidspunkt"></div>
-                    <div class="form-group"><label>Unit</label><input type="text" id="unit" placeholder="F.eks. Studie eller OB1"></div>
-                    <div class="form-group"><label>Format</label><input type="text" id="format" placeholder="F.eks. i50 / p50"></div>
+                    <div class="form-group"><label>Format (Kolonne I)</label><input type="text" id="Format"></div>
+                    <div class="form-group"><label>RX (Kolonne J)</label><input type="text" id="RX"></div>
+                    <div class="form-group"><label>P-plan (Kolonne K)</label><input type="text" id="P-plan"></div>
+                    <div class="form-group"><label>Sling (Kolonne L)</label><input type="text" id="Sling"></div>
                     
-                    <div class="form-group"><label>RX</label><input type="text" id="rx" placeholder="F.eks. SRT / LiveU"></div>
-                    <div class="form-group"><label>Producer</label><input type="text" id="producer"></div>
-                    <div class="form-group"><label>Kommentator</label><input type="text" id="kommentator"></div>
+                    <div class="form-group"><label>Producer (Kolonne M)</label><input type="text" id="Producer"></div>
+                    <div class="form-group"><label>Kommentator (Kolonne N)</label><input type="text" id="Kommentator"></div>
+                    <div class="form-group"><label>Ekspert (Kolonne O)</label><input type="text" id="Ekspert"></div>
+                    <div class="form-group"><label>Reporter (Kolonne P)</label><input type="text" id="Reporter"></div>
                     
-                    <div class="form-group"><label>Ekspert</label><input type="text" id="ekspert"></div>
-                    <div class="form-group"><label>Reporter</label><input type="text" id="reporter"></div>
-                    <div class="form-group"><label>Link / Noter</label><input type="text" id="noter"></div>
+                    <div class="form-group full-width"><label>Link / Noter (Kolonne Q)</label><input type="text" id="Link_Noter"></div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn" onclick="gemProgram()">Gem Program</button>
@@ -85,111 +94,117 @@
     </div>
 
     <script>
-        // --- 1. SÆT DIN WEB-APP URL IND HER MELLEM ANFØRSELSTEGNENE ---
+        // --- SÆT DIN WEB-APP URL IND HER ---
         const scriptURL = 'https://script.google.com/macros/s/AKfycby7t3jTFcBOWIzwruxri1-9fsBRVZx2iiFhHT9P9Ci1vkPV69rTIl5-oPajAkfB5XXNCA/exec';
 
-        // --- 2. Funktion der henter data fra Google Sheets og bygger tabellen ---
+        async function loadProgrammer() {
+            try {
+                const response = await fetch(scriptURL);
+                const data = await response.json();
+                
+                const tableContainer = document.getElementById('table-body');
+                tableContainer.innerHTML = ''; 
 
-async function loadProgrammer() {
-    try {
-        const response = await fetch(scriptURL);
-        const data = await response.json();
-        
-        const tbody = document.querySelector('table tbody');
-        tbody.innerHTML = ''; // Ryd tabellen
+                data.forEach(program => {
+                    let pDato = program["Dato"] || '';
+                    const pUgedag = program["Ugedag"] || '';
+                    let pTid = program["Tid"] || '';
+                    
+                    if (pDato && pDato.includes('T')) {
+                        const d = new Date(pDato);
+                        pDato = d.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\./g, '/');
+                    }
+                    if (pTid && pTid.includes('T')) {
+                        const t = new Date(pTid);
+                        pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                    }
 
-        data.forEach(program => {
-            // Hent data uanset om kolonneoverskriften er med stort eller småt begyndelsesbogstav
-            let pDato = program.Dato || program.dato || '';
-            const pUgedag = program.Ugedag || program.ugedag || '';
-            const pKanal = program.Kanal || program.kanal || '';
-            const pSportsgren = program.Sportsgren || program.sportsgren || '';
-            const pProgramtitel = program.Programtitel || program.programtitel || '';
-            const pLokation = program.Lokation || program.lokation || '';
-            let pTidspunkt = program.Tidspunkt || program.tidspunkt || '';
-            const pUnit = program.Unit || program.unit || '';
+                    // Vi bygger en samlet "blok" (tbody) for hvert program, som indeholder 2 rækker
+                    const tbody = document.createElement('tbody');
+                    tbody.className = 'program-block';
 
-            // Formater datoen, hvis den kommer i det maskinlæsbare format med "T"
-            if (pDato && pDato.includes('T')) {
-                const d = new Date(pDato);
-                // Giver formatet DD/MM-YYYY (f.eks. 27/03-2026)
-                pDato = d.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\./g, '/');
+                    // Øverste linje (Hovedinfo)
+                    const trMain = document.createElement('tr');
+                    trMain.className = 'main-row';
+                    trMain.innerHTML = `
+                        <td>${pDato} ${pUgedag ? '<br>(' + pUgedag + ')' : ''}<br><b>${pTid}</b></td>
+                        <td>${program["Kanal"] || ''}</td>
+                        <td>${program["Sportsgren"] || ''}</td>
+                        <td>${program["Programtitel"] || ''}</td>
+                        <td>${program["Lokation"] || ''}</td>
+                        <td>${program["Unit"] || ''}</td>
+                        <td><button class="btn action-btn">Rediger</button></td>
+                    `;
+                    
+                    // Nederste linje (Teknik og Bemanding - spænder over alle 7 kolonner)
+                    const trDetail = document.createElement('tr');
+                    trDetail.className = 'detail-row';
+                    trDetail.innerHTML = `
+                        <td colspan="7">
+                            <span class="detail-item"><span class="detail-label">Format:</span> ${program["Format"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">RX:</span> ${program["RX"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">P-plan:</span> ${program["P-plan"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Sling:</span> ${program["Sling"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Producer:</span> ${program["Producer"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Komm.:</span> ${program["Kommentator"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Ekspert:</span> ${program["Ekspert"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Reporter:</span> ${program["Reporter"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Noter:</span> ${program["Link / Noter"] || '-'}</span>
+                        </td>
+                    `;
+
+                    tbody.appendChild(trMain);
+                    tbody.appendChild(trDetail);
+                    tableContainer.appendChild(tbody);
+                });
+            } catch (error) {
+                console.error('Fejl ved indlæsning:', error);
             }
+        }
 
-            // Formater tidspunktet, da Sheets af og til også sender tider som fulde dato-strenge
-            if (pTidspunkt && pTidspunkt.includes('T')) {
-                const t = new Date(pTidspunkt);
-                // Viser kun timer og minutter (f.eks. 18:00)
-                pTidspunkt = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
-            }
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${pDato} ${pUgedag ? '(' + pUgedag + ')' : ''}</td>
-                <td>${pKanal}</td>
-                <td>${pSportsgren}</td>
-                <td>${pProgramtitel}</td>
-                <td>${pLokation}</td>
-                <td>${pTidspunkt}</td>
-                <td>${pUnit}</td>
-                <td><button class="btn action-btn">Rediger</button></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } catch (error) {
-        console.error('Fejl ved indlæsning af produktioner:', error);
-    }
-}
-
-        // --- 3. Funktion der sender ny data til dit Sheet, når man trykker Gem ---
         async function gemProgram() {
-            // Saml data fra alle input-felterne (via deres id)
             const nyProduktion = {
-                dato: document.getElementById('dato').value,
-                ugedag: document.getElementById('ugedag').value,
-                kanal: document.getElementById('kanal').value,
-                sportsgren: document.getElementById('sportsgren').value,
-                programtitel: document.getElementById('programtitel').value,
-                lokation: document.getElementById('lokation').value,
-                tidspunkt: document.getElementById('tidspunkt').value,
-                unit: document.getElementById('unit').value,
-                format: document.getElementById('format').value,
-                rx: document.getElementById('rx').value,
-                producer: document.getElementById('producer').value,
-                kommentator: document.getElementById('kommentator').value,
-                ekspert: document.getElementById('ekspert').value,
-                reporter: document.getElementById('reporter').value,
-                noter: document.getElementById('noter').value
+                "Dato": document.getElementById('Dato').value,
+                "Ugedag": document.getElementById('Ugedag').value,
+                "Kanal": document.getElementById('Kanal').value,
+                "Sportsgren": document.getElementById('Sportsgren').value,
+                "Programtitel": document.getElementById('Programtitel').value,
+                "Lokation": document.getElementById('Lokation').value,
+                "Tid": document.getElementById('Tid').value,
+                "Unit": document.getElementById('Unit').value,
+                "Format": document.getElementById('Format').value,
+                "RX": document.getElementById('RX').value,
+                "P-plan": document.getElementById('P-plan').value,
+                "Sling": document.getElementById('Sling').value,
+                "Producer": document.getElementById('Producer').value,
+                "Kommentator": document.getElementById('Kommentator').value,
+                "Ekspert": document.getElementById('Ekspert').value,
+                "Reporter": document.getElementById('Reporter').value,
+                "Link / Noter": document.getElementById('Link_Noter').value
             };
 
             try {
-                // Send dataene afsted
                 await fetch(scriptURL, {
                     method: 'POST',
                     body: JSON.stringify(nyProduktion),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 
-                closeModal(); // Luk pop-up
-                document.getElementById('programForm').reset(); // Tøm felterne
-                loadProgrammer(); // Opdater oversigten, så det nye program vises
-                alert("Programmet er gemt i oversigten!");
+                closeModal();
+                document.getElementById('programForm').reset();
+                loadProgrammer();
             } catch (error) {
                 console.error('Fejl ved gemning:', error);
-                alert("Der skete en fejl. Tjek at din Web-App URL er korrekt.");
+                alert("Der skete en fejl.");
             }
         }
 
-        // --- 4. Hent data automatisk når siden åbnes ---
         window.onload = loadProgrammer;
 
-        // --- 5. Modal-styring (åbn/luk pop-up) ---
         var modal = document.getElementById("programModal");
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
-        window.onclick = function(event) {
-            if (event.target == modal) { modal.style.display = "none"; }
-        }
+        window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }
     </script>
 </body>
 </html>
