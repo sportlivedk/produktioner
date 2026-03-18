@@ -69,8 +69,8 @@
             <h2>Programdetaljer</h2>
             <form id="programForm">
                 <div class="form-grid">
-                    <div class="form-group"><label>Dato (Kolonne A)</label><input type="date" id="Dato"></div>
-                    <div class="form-group"><label>Ugedag (Kolonne B)</label><input type="text" id="Ugedag"></div>
+                <div class="form-group"><label>Dato (Kolonne A)</label><input type="date" id="Dato" onchange="opdaterUgedag()"></div>
+		<div class="form-group"><label>Ugedag (Kolonne B)</label><input type="text" id="Ugedag" readonly style="background-color: #e9ecef;"></div>
                     <div class="form-group"><label>Tid (Kolonne G)</label><input type="time" id="Tid"></div>
                     <div class="form-group"><label>Kanal (Kolonne C)</label><input type="text" id="Kanal"></div>
                     
@@ -206,7 +206,18 @@ table.querySelectorAll('tbody').forEach(tb => tb.remove());
                 alert("Der skete en fejl.");
             }
         }
+	// --- NY FUNKTION: Udregner ugedag automatisk ---
+        function opdaterUgedag() {
+            const datoFelt = document.getElementById('Dato').value;
+            if (!datoFelt) return; // Gør intet, hvis feltet er tomt
+            
+            const datoObjekt = new Date(datoFelt);
+            const ugedage = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
+            
+            document.getElementById('Ugedag').value = ugedage[datoObjekt.getDay()];
+        }
 
+        window.onload = loadProgrammer;
         window.onload = loadProgrammer;
 
         var modal = document.getElementById("programModal");
