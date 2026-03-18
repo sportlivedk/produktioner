@@ -18,8 +18,10 @@
         /* Styling af to-linjers layoutet */
         tbody.program-block:hover { background-color: #f8faff; }
         .main-row td { border-bottom: none; font-weight: 500; color: #222; }
-        .detail-row td { border-bottom: 2px solid #ddd; padding-top: 2px; padding-bottom: 15px; font-size: 13px; color: #555; }
-        .detail-item { margin-right: 15px; display: inline-block; margin-bottom: 4px; }
+        .detail-row td { border-bottom: 2px solid #ddd; padding-top: 4px; padding-bottom: 15px; font-size: 13px; color: #555; }
+        
+        /* Her er afstanden øget fra 15px til 35px for at give mere luft */
+        .detail-item { margin-right: 35px; display: inline-block; margin-bottom: 6px; }
         .detail-label { font-weight: 600; color: #777; }
         
         .action-btn { background-color: #28a745; padding: 6px 12px; }
@@ -32,7 +34,7 @@
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: span 4; }
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .form-group input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .form-group input, .form-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
         .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
     </style>
 </head>
@@ -105,7 +107,6 @@
                 const data = await response.json();
                 
                 const table = document.getElementById('programTable');
-                // Ryd gamle rækker, men lad thead stå
                 table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
 
                 data.forEach(program => {
@@ -125,7 +126,6 @@
                     const tbody = document.createElement('tbody');
                     tbody.className = 'program-block';
 
-                    // Øverste linje med 9 kolonner
                     const trMain = document.createElement('tr');
                     trMain.className = 'main-row';
                     trMain.innerHTML = `
@@ -140,7 +140,6 @@
                         <td><button class="btn action-btn">Rediger</button></td>
                     `;
                     
-                    // Nederste linje, der nu spænder over alle 9 kolonner
                     const trDetail = document.createElement('tr');
                     trDetail.className = 'detail-row';
                     trDetail.innerHTML = `
@@ -167,11 +166,9 @@
         }
 
         async function gemProgram() {
-            // Hent den valgte dato
             const valgtDato = document.getElementById('Dato').value;
             let beregnetUgedag = "";
 
-            // Beregn ugedagen automatisk, hvis der er valgt en dato
             if (valgtDato) {
                 const datoObjekt = new Date(valgtDato);
                 const ugedage = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
@@ -180,7 +177,7 @@
 
             const nyProduktion = {
                 "Dato": valgtDato,
-                "Ugedag": beregnetUgedag, // Sender den beregnede ugedag afsted til Google Sheets
+                "Ugedag": beregnetUgedag,
                 "Kanal": document.getElementById('Kanal').value,
                 "Sportsgren": document.getElementById('Sportsgren').value,
                 "Programtitel": document.getElementById('Programtitel').value,
