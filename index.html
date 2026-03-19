@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="da">
 <head>
     <meta charset="UTF-8">
@@ -11,25 +11,30 @@
         .btn { background-color: #0056b3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
         .btn:hover { background-color: #004494; }
         
-        /* Månedsfilter styling */
         .month-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
         .month-btn { background-color: white; border: 1px solid #ccc; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: #555; }
         .month-btn:hover { background-color: #e9ecef; }
         .month-btn.active { background-color: #0056b3; color: white; border-color: #0056b3; }
 
-        table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; /* Fjernet overflow: hidden for at sticky virker */ }
+        table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; }
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
-        
-        /* Sticky (frossen) header */
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
         tbody.program-block:hover { background-color: #f8faff; }
-        .main-row td { border-bottom: none; font-weight: 500; color: #222; }
-        .detail-row td { border-bottom: 2px solid #ddd; padding-top: 4px; padding-bottom: 15px; font-size: 13px; color: #555; }
+        .main-row td { border-bottom: 2px solid #f4f6f8; font-weight: 500; color: #222; }
         
-        .detail-item { margin-right: 35px; display: inline-block; margin-bottom: 6px; }
+        /* Skjuler detaljerÃ¦kken som standard */
+        .detail-row { display: none; }
+        .detail-row td { border-bottom: 2px solid #ddd; padding-top: 10px; padding-bottom: 20px; font-size: 13px; color: #555; background-color: #fafbfc; }
+        
+        /* CSS Grid til at sikre faste kolonner i linje 2 */
+        .detail-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px 20px; }
+        .detail-item { display: block; }
         .detail-label { font-weight: 600; color: #777; }
         
+        /* Knapper i tabellen */
+        .toggle-btn { background-color: #6c757d; padding: 6px 10px; margin-right: 5px; font-size: 12px; }
+        .toggle-btn:hover { background-color: #5a6268; }
         .action-btn { background-color: #28a745; padding: 6px 12px; }
         
         .modal { display: none; position: fixed; z-index: 20; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
@@ -124,7 +129,6 @@
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycby7t3jTFcBOWIzwruxri1-9fsBRVZx2iiFhHT9P9Ci1vkPV69rTIl5-oPajAkfB5XXNCA/exec';
         
-        // Gemmer alle data globalt, så vi kan filtrere uden at hente fra Google igen
         let alleProgrammerGlobal = [];
 
         async function loadProgrammer() {
@@ -135,7 +139,6 @@
                 alleProgrammerGlobal = jsonData.programmer || [];
                 const dropdowns = jsonData.dropdowns || {};
 
-                // Udfyld dropdown-menuer
                 for (const [feltNavn, muligheder] of Object.entries(dropdowns)) {
                     const selectElement = document.getElementById(feltNavn);
                     if (selectElement && selectElement.tagName === 'SELECT') {
@@ -149,44 +152,50 @@
                     }
                 }
 
-                // Sorterer kronologisk
                 alleProgrammerGlobal.sort((a, b) => {
                     const datoA = new Date(a["Dato"] || 0);
                     const datoB = new Date(b["Dato"] || 0);
                     return datoA - datoB;
                 });
 
-                // Viser "ALLE" som standard ved første indlæsning
                 filtrerMaaned(-1);
 
             } catch (error) {
-                console.error('Fejl ved indlæsning:', error);
+                console.error('Fejl ved indlÃ¦sning:', error);
             }
         }
 
-        // Funktion til at filtrere efter måned
         function filtrerMaaned(maanedIndex) {
-            // Opdaterer knap-farverne
             document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('btn-month-' + maanedIndex).classList.add('active');
 
             let programmerDerSkalVises = alleProgrammerGlobal;
 
-            // Hvis det ikke er "ALLE" (-1), så filtrer vi
             if (maanedIndex !== -1) {
                 programmerDerSkalVises = alleProgrammerGlobal.filter(program => {
                     if (!program["Dato"]) return false;
                     const d = new Date(program["Dato"]);
-                    // GetMonth() returnerer 0 for Januar, 1 for Februar osv.
                     return d.getMonth() === maanedIndex;
                 });
             }
 
-            // Tegn tabellen med de filtrerede data
             tegnTabel(programmerDerSkalVises);
         }
 
-        // Funktion der bygger selve HTML-rækkerne
+        // JS Funktion til at folde detaljer ind og ud
+        function toggleDetails(btn) {
+            const trMain = btn.closest('tr');
+            const trDetail = trMain.nextElementSibling;
+            
+            if (trDetail.style.display === 'none' || trDetail.style.display === '') {
+                trDetail.style.display = 'table-row';
+                btn.textContent = 'â–²'; // Skifter pil op
+            } else {
+                trDetail.style.display = 'none';
+                btn.textContent = 'â–¼'; // Skifter pil ned
+            }
+        }
+
         function tegnTabel(programmer) {
             const table = document.getElementById('programTable');
             table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
@@ -219,22 +228,27 @@
                     <td>${program["Programtitel"] || ''}</td>
                     <td>${program["Lokation"] || ''}</td>
                     <td>${program["Unit"] || ''}</td>
-                    <td><button class="btn action-btn">Rediger</button></td>
+                    <td style="white-space: nowrap;">
+                        <button class="btn toggle-btn" onclick="toggleDetails(this)">â–¼</button>
+                        <button class="btn action-btn">Rediger</button>
+                    </td>
                 `;
                 
                 const trDetail = document.createElement('tr');
                 trDetail.className = 'detail-row';
                 trDetail.innerHTML = `
                     <td colspan="9">
-                        <span class="detail-item"><span class="detail-label">Format:</span> ${program["Format"] || '-'}</span>
-                        <span class="detail-item"><span class="detail-label">RX:</span> ${program["RX"] || '-'}</span>
-                        <span class="detail-item"><span class="detail-label">P-plan:</span> ${program["P-plan"] || '-'}</span>
-                        <span class="detail-item"><span class="detail-label">Sling:</span> ${program["Sling"] || '-'}</span>
-                        <span class="detail-item"><span class="detail-label">Producer:</span> ${program["Producer"] || '-'}</span>
-                        <span class="detail-item"><span class="detail-label">Komm.:</span> ${program["Kommentator"] || '-'}</span>
-                        <span class="detail-item"><span class="detail-label">Ekspert:</span> ${program["Ekspert"] || '-'}</span>
-                        <span class="detail-item"><span class="detail-label">Reporter:</span> ${program["Reporter"] || '-'}</span>
-                        <span class="detail-item"><span class="detail-label">Noter:</span> ${program["Link / Noter"] || '-'}</span>
+                        <div class="detail-grid">
+                            <span class="detail-item"><span class="detail-label">Format:</span> ${program["Format"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">RX:</span> ${program["RX"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">P-plan:</span> ${program["P-plan"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Sling:</span> ${program["Sling"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Producer:</span> ${program["Producer"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Komm.:</span> ${program["Kommentator"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Ekspert:</span> ${program["Ekspert"] || '-'}</span>
+                            <span class="detail-item"><span class="detail-label">Reporter:</span> ${program["Reporter"] || '-'}</span>
+                            <span class="detail-item" style="grid-column: span 2;"><span class="detail-label">Noter:</span> ${program["Link / Noter"] || '-'}</span>
+                        </div>
                     </td>
                 `;
 
@@ -283,7 +297,6 @@
                 
                 closeModal();
                 document.getElementById('programForm').reset();
-                // Genindlæser data for at få det nye program med og gå tilbage til "ALLE"
                 loadProgrammer(); 
             } catch (error) {
                 console.error('Fejl ved gemning:', error);
