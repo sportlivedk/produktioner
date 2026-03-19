@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPORT LIVE - Produktionsplan</title>
+    <title>Produktioner 2026</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -20,10 +20,8 @@
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
-        /* Zebra-striber til tabellen */
         tbody.program-block:nth-of-type(odd) td { background-color: #ffffff; }
         tbody.program-block:nth-of-type(even) td { background-color: #f0f3f5; }
-        /* Marker rækken ved hover */
         tbody.program-block:hover td { background-color: #e8f0fe; }
         
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
@@ -31,8 +29,8 @@
         .detail-row { display: none; }
         .detail-row td { border-bottom: 2px solid #ddd; padding-top: 10px; padding-bottom: 20px; font-size: 13px; color: #555; }
         
-        /* Opdateret grid til detaljerækken med mindre og fast luft */
-        .detail-grid { display: grid; grid-template-columns: repeat(5, max-content); justify-content: start; gap: 8px 45px; }
+        /* Afstanden er øget fra 45px til 65px for lidt mere luft */
+        .detail-grid { display: grid; grid-template-columns: repeat(5, max-content); justify-content: start; gap: 8px 65px; }
         .detail-item { display: block; }
         .detail-label { font-weight: 600; color: #777; }
         
@@ -56,7 +54,7 @@
     <div class="header">
         <div style="display: flex; align-items: center; gap: 15px;">
             <img src="logo.png" alt="SPORT LIVE Logo" style="height: 45px; width: auto;">
-            <h1 style="margin: 0;">Produktionsoversigt</h1>
+            <h1 style="margin: 0;">Produktioner 2026</h1>
         </div>
         <button class="btn" onclick="openModal()">+ Tilf&oslash;j Nyt Program</button>
     </div>
@@ -224,7 +222,7 @@
                 } else if (kanalNavn === 'Ekstra Bladet+') {
                     kanalStyling = 'color: #ff0000; font-weight: bold;';
                 } else if (kanalNavn === 'Pluto TV') {
-                    kanalStyling = 'color: #ffb63a; font-weight: bold;';
+                    kanalStyling = 'color: #4169E1; font-weight: bold;';
                 } else if (kanalNavn === 'SPORT LIVE') {
                     kanalStyling = 'color: #dd5f12; font-weight: bold;';
                 }
