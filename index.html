@@ -15,18 +15,15 @@
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; }
         
-        /* Styling af to-linjers layoutet */
         tbody.program-block:hover { background-color: #f8faff; }
         .main-row td { border-bottom: none; font-weight: 500; color: #222; }
         .detail-row td { border-bottom: 2px solid #ddd; padding-top: 4px; padding-bottom: 15px; font-size: 13px; color: #555; }
         
-        /* Her er afstanden øget fra 15px til 35px for at give mere luft */
         .detail-item { margin-right: 35px; display: inline-block; margin-bottom: 6px; }
         .detail-label { font-weight: 600; color: #777; }
         
         .action-btn { background-color: #28a745; padding: 6px 12px; }
         
-        /* Modal Formular styling */
         .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
         .modal-content { background-color: white; margin: 3% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 900px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
@@ -34,7 +31,7 @@
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: span 4; }
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .form-group input, .form-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .form-group input, .form-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
         .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
     </style>
 </head>
@@ -72,22 +69,23 @@
                 <div class="form-grid">
                     <div class="form-group"><label>Dato (Kolonne A)</label><input type="date" id="Dato"></div>
                     <div class="form-group"><label>Tid (Kolonne G)</label><input type="time" id="Tid"></div>
-                    <div class="form-group"><label>Kanal (Kolonne C)</label><input type="text" id="Kanal"></div>
-                    <div class="form-group"><label>Sportsgren (Kolonne D)</label><input type="text" id="Sportsgren"></div>
+                    
+                    <div class="form-group"><label>Kanal (Kolonne C)</label><select id="Kanal"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>Sportsgren (Kolonne D)</label><select id="Sportsgren"><option value="">Vælg...</option></select></div>
                     
                     <div class="form-group"><label>Programtitel (Kolonne E)</label><input type="text" id="Programtitel"></div>
                     <div class="form-group"><label>Lokation (Kolonne F)</label><input type="text" id="Lokation"></div>
-                    <div class="form-group"><label>Unit (Kolonne H)</label><input type="text" id="Unit"></div>
-                    <div class="form-group"><label>Format (Kolonne I)</label><input type="text" id="Format"></div>
                     
-                    <div class="form-group"><label>RX (Kolonne J)</label><input type="text" id="RX"></div>
-                    <div class="form-group"><label>P-plan (Kolonne K)</label><input type="text" id="P-plan"></div>
-                    <div class="form-group"><label>Sling (Kolonne L)</label><input type="text" id="Sling"></div>
-                    <div class="form-group"><label>Producer (Kolonne M)</label><input type="text" id="Producer"></div>
+                    <div class="form-group"><label>Unit (Kolonne H)</label><select id="Unit"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>Format (Kolonne I)</label><select id="Format"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>RX (Kolonne J)</label><select id="RX"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>P-plan (Kolonne K)</label><select id="P-plan"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>Sling (Kolonne L)</label><select id="Sling"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>Producer (Kolonne M)</label><select id="Producer"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>Kommentator (Kolonne N)</label><select id="Kommentator"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>Ekspert (Kolonne O)</label><select id="Ekspert"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>Reporter (Kolonne P)</label><select id="Reporter"><option value="">Vælg...</option></select></div>
                     
-                    <div class="form-group"><label>Kommentator (Kolonne N)</label><input type="text" id="Kommentator"></div>
-                    <div class="form-group"><label>Ekspert (Kolonne O)</label><input type="text" id="Ekspert"></div>
-                    <div class="form-group"><label>Reporter (Kolonne P)</label><input type="text" id="Reporter"></div>
                     <div class="form-group full-width"><label>Link / Noter (Kolonne Q)</label><input type="text" id="Link_Noter"></div>
                 </div>
                 <div class="form-actions">
@@ -98,26 +96,43 @@
     </div>
 
     <script>
-        // --- SÆT DIN WEB-APP URL IND HER ---
         const scriptURL = 'https://script.google.com/macros/s/AKfycby7t3jTFcBOWIzwruxri1-9fsBRVZx2iiFhHT9P9Ci1vkPV69rTIl5-oPajAkfB5XXNCA/exec';
 
         async function loadProgrammer() {
             try {
                 const response = await fetch(scriptURL);
-                const data = await response.json();
+                const jsonData = await response.json();
                 
-                // --- NYT: Sorterer programmerne kronologisk efter dato ---
-                data.sort((a, b) => {
+                // Udtræk de to dele af pakken
+                const programmer = jsonData.programmer || [];
+                const dropdowns = jsonData.dropdowns || {};
+
+                // --- Udfyld dropdown-menuer automatisk ---
+                // Koden kigger på alle listerne fra dit 'Dropdowns'-ark og sætter dem ind i de rigtige felter
+                for (const [feltNavn, muligheder] of Object.entries(dropdowns)) {
+                    const selectElement = document.getElementById(feltNavn);
+                    if (selectElement && selectElement.tagName === 'SELECT') {
+                        selectElement.innerHTML = '<option value="">Vælg...</option>'; // Nulstil feltet først
+                        muligheder.forEach(mulighed => {
+                            const option = document.createElement('option');
+                            option.value = mulighed;
+                            option.textContent = mulighed;
+                            selectElement.appendChild(option);
+                        });
+                    }
+                }
+
+                // Sorterer programmerne kronologisk
+                programmer.sort((a, b) => {
                     const datoA = new Date(a["Dato"] || 0);
                     const datoB = new Date(b["Dato"] || 0);
-                    return datoA - datoB; // Sorterer fra ældst til nyest
+                    return datoA - datoB;
                 });
-                // ---------------------------------------------------------
 
                 const table = document.getElementById('programTable');
                 table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
 
-                data.forEach(program => {
+                programmer.forEach(program => {
                     let pDato = program["Dato"] || '';
                     const pUgedag = program["Ugedag"] || '';
                     let pTid = program["Tid"] || '';
