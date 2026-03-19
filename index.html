@@ -20,19 +20,22 @@
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
-        tbody.program-block:hover { background-color: #f8faff; }
-        .main-row td { border-bottom: 2px solid #f4f6f8; font-weight: 500; color: #222; }
+        /* Zebra-striber til tabellen */
+        tbody.program-block:nth-of-type(odd) td { background-color: #ffffff; }
+        tbody.program-block:nth-of-type(even) td { background-color: #f0f3f5; }
+        /* Marker rækken ved hover */
+        tbody.program-block:hover td { background-color: #e8f0fe; }
         
-        /* Skjuler detaljerækken som standard */
+        .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
+        
         .detail-row { display: none; }
-        .detail-row td { border-bottom: 2px solid #ddd; padding-top: 10px; padding-bottom: 20px; font-size: 13px; color: #555; background-color: #fafbfc; }
+        .detail-row td { border-bottom: 2px solid #ddd; padding-top: 10px; padding-bottom: 20px; font-size: 13px; color: #555; }
         
-        /* CSS Grid til at sikre faste kolonner i linje 2 */
-        .detail-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px 20px; }
+        /* Opdateret grid til detaljerækken med mindre og fast luft */
+        .detail-grid { display: grid; grid-template-columns: repeat(5, max-content); justify-content: start; gap: 8px 45px; }
         .detail-item { display: block; }
         .detail-label { font-weight: 600; color: #777; }
         
-        /* Knapper i tabellen */
         .toggle-btn { background-color: #6c757d; padding: 6px 10px; margin-right: 5px; font-size: 12px; }
         .toggle-btn:hover { background-color: #5a6268; }
         .action-btn { background-color: #28a745; padding: 6px 12px; }
@@ -182,17 +185,16 @@
             tegnTabel(programmerDerSkalVises);
         }
 
-        // JS Funktion til at folde detaljer ind og ud
         function toggleDetails(btn) {
             const trMain = btn.closest('tr');
             const trDetail = trMain.nextElementSibling;
             
             if (trDetail.style.display === 'none' || trDetail.style.display === '') {
                 trDetail.style.display = 'table-row';
-                btn.textContent = '▲'; // Skifter pil op
+                btn.textContent = '▲'; 
             } else {
                 trDetail.style.display = 'none';
-                btn.textContent = '▼'; // Skifter pil ned
+                btn.textContent = '▼'; 
             }
         }
 
@@ -204,6 +206,7 @@
                 let pDato = program["Dato"] || '';
                 const pUgedag = program["Ugedag"] || '';
                 let pTid = program["Tid"] || '';
+                let kanalNavn = program["Kanal"] || '';
                 
                 if (pDato && pDato.includes('T')) {
                     const d = new Date(pDato);
@@ -212,6 +215,18 @@
                 if (pTid && pTid.includes('T')) {
                     const t = new Date(pTid);
                     pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                // Opsætning af kanal-farver
+                let kanalStyling = '';
+                if (kanalNavn === 'Bold+') {
+                    kanalStyling = 'color: #4be241; font-weight: bold;';
+                } else if (kanalNavn === 'Ekstra Bladet+') {
+                    kanalStyling = 'color: #ff0000; font-weight: bold;';
+                } else if (kanalNavn === 'Pluto TV') {
+                    kanalStyling = 'color: #ffb63a; font-weight: bold;';
+                } else if (kanalNavn === 'SPORT LIVE') {
+                    kanalStyling = 'color: #dd5f12; font-weight: bold;';
                 }
 
                 const tbody = document.createElement('tbody');
@@ -223,7 +238,7 @@
                     <td>${pDato}</td>
                     <td>${pUgedag}</td>
                     <td><b>${pTid}</b></td>
-                    <td>${program["Kanal"] || ''}</td>
+                    <td style="${kanalStyling}">${kanalNavn}</td>
                     <td>${program["Sportsgren"] || ''}</td>
                     <td>${program["Programtitel"] || ''}</td>
                     <td>${program["Lokation"] || ''}</td>
