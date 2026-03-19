@@ -67,26 +67,28 @@
             <h2>Programdetaljer</h2>
             <form id="programForm">
                 <div class="form-grid">
-                    <div class="form-group"><label>Dato (Kolonne A)</label><input type="date" id="Dato"></div>
-                    <div class="form-group"><label>Tid (Kolonne G)</label><input type="time" id="Tid"></div>
+                    <div class="form-group"><label>Dato</label><input type="date" id="Dato"></div>
+                    <div class="form-group"><label>Tid</label><input type="time" id="Tid"></div>
                     
-                    <div class="form-group"><label>Kanal (Kolonne C)</label><select id="Kanal"><option value="">Vælg...</option></select></div>
-                    <div class="form-group"><label>Sportsgren (Kolonne D)</label><select id="Sportsgren"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>Kanal</label><select id="Kanal"><option value="">V&aelig;lg...</option></select></div>
+                    <div class="form-group"><label>Sportsgren</label><select id="Sportsgren"><option value="">V&aelig;lg...</option></select></div>
                     
-                    <div class="form-group"><label>Programtitel (Kolonne E)</label><input type="text" id="Programtitel"></div>
-                    <div class="form-group"><label>Lokation (Kolonne F)</label><input type="text" id="Lokation"></div>
+                    <div class="form-group"><label>Programtitel</label><input type="text" id="Programtitel"></div>
+                    <div class="form-group"><label>Lokation</label><select id="Lokation"><option value="">V&aelig;lg...</option></select></div>
                     
-                    <div class="form-group"><label>Unit (Kolonne H)</label><select id="Unit"><option value="">Vælg...</option></select></div>
-                    <div class="form-group"><label>Format (Kolonne I)</label><select id="Format"><option value="">Vælg...</option></select></div>
-                    <div class="form-group"><label>RX (Kolonne J)</label><select id="RX"><option value="">Vælg...</option></select></div>
-                    <div class="form-group"><label>P-plan (Kolonne K)</label><select id="P-plan"><option value="">Vælg...</option></select></div>
-                    <div class="form-group"><label>Sling (Kolonne L)</label><select id="Sling"><option value="">Vælg...</option></select></div>
-                    <div class="form-group"><label>Producer (Kolonne M)</label><select id="Producer"><option value="">Vælg...</option></select></div>
-                    <div class="form-group"><label>Kommentator (Kolonne N)</label><select id="Kommentator"><option value="">Vælg...</option></select></div>
-                    <div class="form-group"><label>Ekspert (Kolonne O)</label><select id="Ekspert"><option value="">Vælg...</option></select></div>
-                    <div class="form-group"><label>Reporter (Kolonne P)</label><select id="Reporter"><option value="">Vælg...</option></select></div>
+                    <div class="form-group"><label>Unit</label><select id="Unit"><option value="">V&aelig;lg...</option></select></div>
+                    <div class="form-group"><label>Format</label><select id="Format"><option value="">V&aelig;lg...</option></select></div>
                     
-                    <div class="form-group full-width"><label>Link / Noter (Kolonne Q)</label><input type="text" id="Link_Noter"></div>
+                    <div class="form-group"><label>RX</label><input type="text" id="RX"></div>
+                    <div class="form-group"><label>P-plan</label><input type="text" id="P-plan"></div>
+                    <div class="form-group"><label>Sling</label><input type="text" id="Sling"></div>
+                    
+                    <div class="form-group"><label>Producer</label><select id="Producer"><option value="">V&aelig;lg...</option></select></div>
+                    <div class="form-group"><label>Kommentator</label><select id="Kommentator"><option value="">V&aelig;lg...</option></select></div>
+                    <div class="form-group"><label>Ekspert</label><select id="Ekspert"><option value="">V&aelig;lg...</option></select></div>
+                    <div class="form-group"><label>Reporter</label><select id="Reporter"><option value="">V&aelig;lg...</option></select></div>
+                    
+                    <div class="form-group full-width"><label>Link / Noter</label><input type="text" id="Link_Noter"></div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn" onclick="gemProgram()">Gem Program</button>
@@ -103,16 +105,14 @@
                 const response = await fetch(scriptURL);
                 const jsonData = await response.json();
                 
-                // Udtræk de to dele af pakken
                 const programmer = jsonData.programmer || [];
                 const dropdowns = jsonData.dropdowns || {};
 
-                // --- Udfyld dropdown-menuer automatisk ---
-                // Koden kigger på alle listerne fra dit 'Dropdowns'-ark og sætter dem ind i de rigtige felter
                 for (const [feltNavn, muligheder] of Object.entries(dropdowns)) {
                     const selectElement = document.getElementById(feltNavn);
                     if (selectElement && selectElement.tagName === 'SELECT') {
-                        selectElement.innerHTML = '<option value="">Vælg...</option>'; // Nulstil feltet først
+                        // Vælg skrives med &aelig; for at sikre korrekt visning af æ
+                        selectElement.innerHTML = '<option value="">V&aelig;lg...</option>'; 
                         muligheder.forEach(mulighed => {
                             const option = document.createElement('option');
                             option.value = mulighed;
@@ -122,7 +122,6 @@
                     }
                 }
 
-                // Sorterer programmerne kronologisk
                 programmer.sort((a, b) => {
                     const datoA = new Date(a["Dato"] || 0);
                     const datoB = new Date(b["Dato"] || 0);
