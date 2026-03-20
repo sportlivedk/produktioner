@@ -26,14 +26,11 @@
         
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
         
-        /* Den skjulte detaljerække */
         .detail-row { display: none; }
         .detail-row td { border-bottom: 2px solid #ddd; padding: 20px; background-color: #fafbfc; }
         
-        /* Nyt layout til detaljer (tre kolonner) */
         .detail-container { display: flex; gap: 20px; }
         
-        /* Design af informationskortene */
         .detail-card { 
             flex: 1; 
             background-color: white; 
@@ -54,7 +51,6 @@
             letter-spacing: 0.5px;
         }
         
-        /* Farvede top-striber til at inddele visuelt */
         .detail-card.bemanding { border-top: 4px solid #0056b3; }
         .detail-card.teknik { border-top: 4px solid #28a745; }
         .detail-card.ekstra { border-top: 4px solid #fd7e14; }
@@ -279,7 +275,6 @@
                 const trDetail = document.createElement('tr');
                 trDetail.className = 'detail-row';
                 
-                // Nyt detaljelayout opdelt i 3 kasser/kolonner
                 trDetail.innerHTML = `
                     <td colspan="9">
                         <div class="detail-container">
@@ -296,6 +291,7 @@
                             <div class="detail-card teknik">
                                 <h4>Tekniske specifikationer</h4>
                                 <div class="detail-list">
+                                    <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${program["Unit"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Format:</span> <span class="detail-value">${program["Format"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">RX:</span> <span class="detail-value">${program["RX"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">P-plan:</span> <span class="detail-value">${program["P-plan"] || '-'}</span></div>
@@ -306,10 +302,10 @@
                                 <h4>Ekstra information</h4>
                                 <div class="detail-list">
                                     <div class="detail-list-item"><span class="detail-label">Sling:</span> <span class="detail-value">${program["Sling"] || '-'}</span></div>
-                                    <div class="detail-list-item" style="flex-direction: column; text-align: left; gap: 4px; border-top: 1px dashed #eee; margin-top: 5px; padding-top: 8px;">
-                                        <span class="detail-label">Link / Noter:</span> 
-                                        <span class="detail-value" style="text-align: left;">${program["Link / Noter"] || '-'}</span>
-                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
+                                    <div class="detail-label" style="margin-bottom: 4px;">Link / Noter:</div>
+                                    <div class="detail-value" style="text-align: left; font-weight: normal; font-size: 13px;">${program["Link / Noter"] || '-'}</div>
                                 </div>
                             </div>
                         </div>
