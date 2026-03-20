@@ -71,7 +71,9 @@
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: span 4; }
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .form-group input, .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
+        
+        /* Opdateret så tekstfelter med datalist ser ens ud */
+        .form-group input { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
         .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
     </style>
 </head>
@@ -126,23 +128,65 @@
                     <div class="form-group"><label>Dato</label><input type="date" id="Dato"></div>
                     <div class="form-group"><label>Tid</label><input type="time" id="Tid"></div>
                     
-                    <div class="form-group"><label>Kanal</label><select id="Kanal"><option value="">V&aelig;lg...</option></select></div>
-                    <div class="form-group"><label>Sportsgren</label><select id="Sportsgren"><option value="">V&aelig;lg...</option></select></div>
+                    <div class="form-group">
+                        <label>Kanal</label>
+                        <input type="text" id="Kanal" list="liste-Kanal" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-Kanal"></datalist>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sportsgren</label>
+                        <input type="text" id="Sportsgren" list="liste-Sportsgren" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-Sportsgren"></datalist>
+                    </div>
                     
                     <div class="form-group"><label>Programtitel</label><input type="text" id="Programtitel"></div>
-                    <div class="form-group"><label>Lokation</label><select id="Lokation"><option value="">V&aelig;lg...</option></select></div>
                     
-                    <div class="form-group"><label>Unit</label><select id="Unit"><option value="">V&aelig;lg...</option></select></div>
-                    <div class="form-group"><label>Format</label><select id="Format"><option value="">V&aelig;lg...</option></select></div>
+                    <div class="form-group">
+                        <label>Lokation</label>
+                        <input type="text" id="Lokation" list="liste-Lokation" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-Lokation"></datalist>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Unit</label>
+                        <input type="text" id="Unit" list="liste-Unit" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-Unit"></datalist>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Format</label>
+                        <input type="text" id="Format" list="liste-Format" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-Format"></datalist>
+                    </div>
                     
                     <div class="form-group"><label>RX</label><input type="text" id="RX"></div>
                     <div class="form-group"><label>P-plan</label><input type="text" id="P-plan"></div>
                     <div class="form-group"><label>Sling</label><input type="text" id="Sling"></div>
                     
-                    <div class="form-group"><label>Producer</label><select id="Producer"><option value="">V&aelig;lg...</option></select></div>
-                    <div class="form-group"><label>Kommentator</label><select id="Kommentator"><option value="">V&aelig;lg...</option></select></div>
-                    <div class="form-group"><label>Ekspert</label><select id="Ekspert"><option value="">V&aelig;lg...</option></select></div>
-                    <div class="form-group"><label>Reporter</label><select id="Reporter"><option value="">V&aelig;lg...</option></select></div>
+                    <div class="form-group">
+                        <label>Producer</label>
+                        <input type="text" id="Producer" list="liste-Producer" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-Producer"></datalist>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Kommentator</label>
+                        <input type="text" id="Kommentator" list="liste-Kommentator" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-Kommentator"></datalist>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ekspert</label>
+                        <input type="text" id="Ekspert" list="liste-Ekspert" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-Ekspert"></datalist>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Reporter</label>
+                        <input type="text" id="Reporter" list="liste-Reporter" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-Reporter"></datalist>
+                    </div>
                     
                     <div class="form-group full-width"><label>Link/noter</label><input type="text" id="Link_Noter"></div>
                 </div>
@@ -166,15 +210,15 @@
                 alleProgrammerGlobal = jsonData.programmer || [];
                 const dropdowns = jsonData.dropdowns || {};
 
+                // Opdateret JavaScript: Nu fylder vi datalist-elementerne med valgmulighederne
                 for (const [feltNavn, muligheder] of Object.entries(dropdowns)) {
-                    const selectElement = document.getElementById(feltNavn);
-                    if (selectElement && selectElement.tagName === 'SELECT') {
-                        selectElement.innerHTML = '<option value="">V&aelig;lg...</option>'; 
+                    const datalistElement = document.getElementById('liste-' + feltNavn);
+                    if (datalistElement) {
+                        datalistElement.innerHTML = ''; 
                         muligheder.forEach(mulighed => {
                             const option = document.createElement('option');
                             option.value = mulighed;
-                            option.textContent = mulighed;
-                            selectElement.appendChild(option);
+                            datalistElement.appendChild(option);
                         });
                     }
                 }
@@ -241,7 +285,6 @@
                     pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
                 }
 
-                // Opdateret farvepalet med alle ønskede kanaler
                 let kanalStyling = '';
                 if (kanalNavn === 'Bold+') {
                     kanalStyling = 'color: #6ce859; font-weight: bold;';
