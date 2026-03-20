@@ -281,25 +281,20 @@
             }
         }
 
-        // Funktion til at nulstille formularen til "Nyt program"
         function opretNytProgram() {
             document.getElementById('programForm').reset();
-            document.getElementById('RowId').value = ""; // Rydder det skjulte ID
+            document.getElementById('RowId').value = ""; 
             document.getElementById('modalTitle').textContent = "Tilføj nyt program";
             document.getElementById('submitBtn').textContent = "Gem program";
             openModal();
         }
 
-        // Funktion der henter data til Rediger-formularen
         function redigerProgram(rowId) {
-            // Finder programmet i vores data ud fra RowId
             const program = alleProgrammerGlobal.find(p => p.RowId === rowId);
             if (!program) return;
 
-            // Indsætter ID i det skjulte felt
             document.getElementById('RowId').value = program.RowId;
             
-            // Håndtering af Dato formatering for <input type="date">
             if (program["Dato"]) {
                 const d = new Date(program["Dato"]);
                 document.getElementById('Dato').value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
@@ -307,7 +302,6 @@
                 document.getElementById('Dato').value = "";
             }
             
-            // Håndtering af Tid formatering for <input type="time">
             if (program["Tid"]) {
                 const t = new Date(program["Tid"]);
                 if (!isNaN(t.getTime()) && String(program["Tid"]).includes('T')) {
@@ -319,7 +313,6 @@
                 document.getElementById('Tid').value = "";
             }
 
-            // Udfylder alle de andre felter
             document.getElementById('Kanal').value = program["Kanal"] || '';
             document.getElementById('Sportsgren').value = program["Sportsgren"] || '';
             document.getElementById('Programtitel').value = program["Programtitel"] || '';
@@ -335,10 +328,8 @@
             document.getElementById('Reporter').value = program["Reporter"] || '';
             document.getElementById('Link_Noter').value = program["Link / Noter"] || '';
             
-            // Sætter TBC krydset hvis værdien er "X"
             document.getElementById('TBC').checked = (program["TBC"] && program["TBC"].toUpperCase() === 'X');
 
-            // Ændrer overskrift og knaptekst, så man ved, man redigerer
             document.getElementById('modalTitle').textContent = "Rediger program";
             document.getElementById('submitBtn').textContent = "Opdater program";
             
@@ -396,7 +387,8 @@
 
                 let visProgramtitel = program["Programtitel"] || '';
                 if (program["TBC"] && program["TBC"].toUpperCase() === 'X') {
-                    visProgramtitel += ' <span style="color: red; font-weight: bold;">(TBC)</span>';
+                    // Justeret så kun selve "TBC" er i rød, mens parenteserne er standardfarve
+                    visProgramtitel += ' (<span style="color: red; font-weight: bold;">TBC</span>)';
                 }
 
                 const tbody = document.createElement('tbody');
@@ -404,7 +396,6 @@
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
-                // Rediger-knappen kalder nu redigerProgram() og sender RowId med
                 trMain.innerHTML = `
                     <td>${pDato}</td>
                     <td>${pUgedag}</td>
@@ -467,7 +458,6 @@
         }
 
         async function gemProgram() {
-            // Fanger knappen, så vi kan vise "Gemmer..." til brugeren
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.textContent;
             submitBtn.textContent = "Gemmer...";
@@ -483,12 +473,10 @@
             }
 
             const tbcStatus = document.getElementById('TBC').checked ? "X" : "";
-            
-            // Henter RowId for at se om vi skal opdatere eller oprette ny
             const rowId = document.getElementById('RowId').value;
 
             const nyProduktion = {
-                "RowId": rowId, // Dette sendes nu med til backend
+                "RowId": rowId, 
                 "Dato": valgtDato,
                 "Ugedag": beregnetUgedag,
                 "Kanal": document.getElementById('Kanal').value,
@@ -518,12 +506,11 @@
                 
                 closeModal();
                 document.getElementById('programForm').reset();
-                await loadProgrammer(); // Genindlæser listen med de friske data
+                await loadProgrammer(); 
             } catch (error) {
                 console.error('Fejl ved gemning:', error);
                 alert("Der skete en fejl.");
             } finally {
-                // Nulstiller knappen
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             }
