@@ -73,7 +73,6 @@
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
         .form-group input:not([type="checkbox"]), .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
         
-        /* Speciel styling til checkbox-rækken for at holde den pæn */
         .checkbox-group { display: flex; flex-direction: row; align-items: center; gap: 10px; margin-top: 10px; }
         .checkbox-group input { width: auto; margin: 0; cursor: pointer; width: 16px; height: 16px; }
         .checkbox-group label { margin: 0; cursor: pointer; font-size: 14px; font-weight: normal; color: #333; }
@@ -88,7 +87,7 @@
             <img src="logo.png" alt="SPORT LIVE Logo" style="height: 45px; width: auto;">
             <h1 style="margin: 0;">Produktioner 2026</h1>
         </div>
-        <button class="btn" onclick="openModal()">+ Tilf&oslash;j nyt program</button>
+        <button class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
     </div>
 
     <div class="month-filter">
@@ -126,8 +125,10 @@
     <div id="programModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Programdetaljer</h2>
+            <h2 id="modalTitle">Tilf&oslash;j nyt program</h2>
             <form id="programForm">
+                <input type="hidden" id="RowId">
+                
                 <div class="form-grid">
                     <div class="form-group"><label>Dato</label><input type="date" id="Dato"></div>
                     <div class="form-group"><label>Tid</label><input type="time" id="Tid"></div>
@@ -206,7 +207,7 @@
                     
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn" onclick="gemProgram()">Gem program</button>
+                    <button type="button" id="submitBtn" class="btn" onclick="gemProgram()">Gem program</button>
                 </div>
             </form>
         </div>
@@ -280,6 +281,70 @@
             }
         }
 
+        // Funktion til at nulstille formularen til "Nyt program"
+        function opretNytProgram() {
+            document.getElementById('programForm').reset();
+            document.getElementById('RowId').value = ""; // Rydder det skjulte ID
+            document.getElementById('modalTitle').textContent = "Tilføj nyt program";
+            document.getElementById('submitBtn').textContent = "Gem program";
+            openModal();
+        }
+
+        // Funktion der henter data til Rediger-formularen
+        function redigerProgram(rowId) {
+            // Finder programmet i vores data ud fra RowId
+            const program = alleProgrammerGlobal.find(p => p.RowId === rowId);
+            if (!program) return;
+
+            // Indsætter ID i det skjulte felt
+            document.getElementById('RowId').value = program.RowId;
+            
+            // Håndtering af Dato formatering for <input type="date">
+            if (program["Dato"]) {
+                const d = new Date(program["Dato"]);
+                document.getElementById('Dato').value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+            } else {
+                document.getElementById('Dato').value = "";
+            }
+            
+            // Håndtering af Tid formatering for <input type="time">
+            if (program["Tid"]) {
+                const t = new Date(program["Tid"]);
+                if (!isNaN(t.getTime()) && String(program["Tid"]).includes('T')) {
+                    document.getElementById('Tid').value = String(t.getHours()).padStart(2, '0') + ":" + String(t.getMinutes()).padStart(2, '0');
+                } else {
+                    document.getElementById('Tid').value = program["Tid"];
+                }
+            } else {
+                document.getElementById('Tid').value = "";
+            }
+
+            // Udfylder alle de andre felter
+            document.getElementById('Kanal').value = program["Kanal"] || '';
+            document.getElementById('Sportsgren').value = program["Sportsgren"] || '';
+            document.getElementById('Programtitel').value = program["Programtitel"] || '';
+            document.getElementById('Lokation').value = program["Lokation"] || '';
+            document.getElementById('Unit').value = program["Unit"] || '';
+            document.getElementById('Format').value = program["Format"] || '';
+            document.getElementById('RX').value = program["RX"] || '';
+            document.getElementById('P-plan').value = program["P-plan"] || '';
+            document.getElementById('Sling').value = program["Sling"] || '';
+            document.getElementById('Producer').value = program["Producer"] || '';
+            document.getElementById('Kommentator').value = program["Kommentator"] || '';
+            document.getElementById('Ekspert').value = program["Ekspert"] || '';
+            document.getElementById('Reporter').value = program["Reporter"] || '';
+            document.getElementById('Link_Noter').value = program["Link / Noter"] || '';
+            
+            // Sætter TBC krydset hvis værdien er "X"
+            document.getElementById('TBC').checked = (program["TBC"] && program["TBC"].toUpperCase() === 'X');
+
+            // Ændrer overskrift og knaptekst, så man ved, man redigerer
+            document.getElementById('modalTitle').textContent = "Rediger program";
+            document.getElementById('submitBtn').textContent = "Opdater program";
+            
+            openModal();
+        }
+
         function tegnTabel(programmer) {
             const table = document.getElementById('programTable');
             table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
@@ -329,7 +394,6 @@
                     });
                 }
 
-                // Opbygning af programtitel med eventuel TBC-markering
                 let visProgramtitel = program["Programtitel"] || '';
                 if (program["TBC"] && program["TBC"].toUpperCase() === 'X') {
                     visProgramtitel += ' <span style="color: red; font-weight: bold;">(TBC)</span>';
@@ -340,6 +404,7 @@
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
+                // Rediger-knappen kalder nu redigerProgram() og sender RowId med
                 trMain.innerHTML = `
                     <td>${pDato}</td>
                     <td>${pUgedag}</td>
@@ -351,7 +416,7 @@
                     <td>${program["Unit"] || ''}</td>
                     <td style="white-space: nowrap;">
                         <button class="btn toggle-btn" onclick="toggleDetails(this)">▼</button>
-                        <button class="btn action-btn">Rediger</button>
+                        <button class="btn action-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
                     </td>
                 `;
                 
@@ -402,6 +467,12 @@
         }
 
         async function gemProgram() {
+            // Fanger knappen, så vi kan vise "Gemmer..." til brugeren
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = "Gemmer...";
+            submitBtn.disabled = true;
+
             const valgtDato = document.getElementById('Dato').value;
             let beregnetUgedag = "";
 
@@ -411,10 +482,13 @@
                 beregnetUgedag = ugedage[datoObjekt.getDay()];
             }
 
-            // Aflæser nu TBC-feltet
             const tbcStatus = document.getElementById('TBC').checked ? "X" : "";
+            
+            // Henter RowId for at se om vi skal opdatere eller oprette ny
+            const rowId = document.getElementById('RowId').value;
 
             const nyProduktion = {
+                "RowId": rowId, // Dette sendes nu med til backend
                 "Dato": valgtDato,
                 "Ugedag": beregnetUgedag,
                 "Kanal": document.getElementById('Kanal').value,
@@ -432,7 +506,7 @@
                 "Ekspert": document.getElementById('Ekspert').value,
                 "Reporter": document.getElementById('Reporter').value,
                 "Link / Noter": document.getElementById('Link_Noter').value,
-                "TBC": tbcStatus // Sender TBC til Google Sheets
+                "TBC": tbcStatus 
             };
 
             try {
@@ -444,10 +518,14 @@
                 
                 closeModal();
                 document.getElementById('programForm').reset();
-                loadProgrammer(); 
+                await loadProgrammer(); // Genindlæser listen med de friske data
             } catch (error) {
                 console.error('Fejl ved gemning:', error);
                 alert("Der skete en fejl.");
+            } finally {
+                // Nulstiller knappen
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             }
         }
 
