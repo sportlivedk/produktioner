@@ -71,9 +71,7 @@
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: span 4; }
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        
-        /* Opdateret så tekstfelter med datalist ser ens ud */
-        .form-group input { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
+        .form-group input, .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
         .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
     </style>
 </head>
@@ -191,7 +189,7 @@
                     <div class="form-group full-width"><label>Link/noter</label><input type="text" id="Link_Noter"></div>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn" onclick="gemProgram()">Gem Program</button>
+                    <button type="button" class="btn" onclick="gemProgram()">Gem program</button>
                 </div>
             </form>
         </div>
@@ -210,7 +208,6 @@
                 alleProgrammerGlobal = jsonData.programmer || [];
                 const dropdowns = jsonData.dropdowns || {};
 
-                // Opdateret JavaScript: Nu fylder vi datalist-elementerne med valgmulighederne
                 for (const [feltNavn, muligheder] of Object.entries(dropdowns)) {
                     const datalistElement = document.getElementById('liste-' + feltNavn);
                     if (datalistElement) {
@@ -306,6 +303,16 @@
                     kanalStyling = 'color: #5d441f; font-weight: bold;';
                 }
 
+                // Håndtering af klikbare links i Link/noter feltet
+                let noterTekst = program["Link / Noter"] || '-';
+                let formateretNoter = noterTekst;
+                if (noterTekst !== '-') {
+                    const urlRegex = /(https?:\/\/[^\s]+)/g;
+                    formateretNoter = noterTekst.replace(urlRegex, function(url) {
+                        return `<a href="${url}" target="_blank" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${url}</a>`;
+                    });
+                }
+
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block';
 
@@ -359,7 +366,7 @@
                                 </div>
                                 <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
                                     <div class="detail-label" style="margin-bottom: 4px;">Link/noter:</div>
-                                    <div class="detail-value" style="text-align: left; font-weight: normal; font-size: 13px;">${program["Link / Noter"] || '-'}</div>
+                                    <div class="detail-value" style="text-align: left; font-weight: normal; font-size: 13px;">${formateretNoter}</div>
                                 </div>
                             </div>
                         </div>
