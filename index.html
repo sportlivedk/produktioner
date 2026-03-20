@@ -241,15 +241,26 @@
                     pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
                 }
 
+                // Opdateret farvepalet med alle ønskede kanaler
                 let kanalStyling = '';
                 if (kanalNavn === 'Bold+') {
-                    kanalStyling = 'color: #4be241; font-weight: bold;';
+                    kanalStyling = 'color: #6ce859; font-weight: bold;';
                 } else if (kanalNavn === 'Ekstra Bladet+') {
-                    kanalStyling = 'color: #ff0000; font-weight: bold;';
-                } else if (kanalNavn === 'Pluto TV') {
-                    kanalStyling = 'color: #fff200; font-weight: bold;'; // Ny Pluto TV farve indsat her
+                    kanalStyling = 'color: #f93b3d; font-weight: bold;';
+                } else if (kanalNavn === 'Feltet+') {
+                    kanalStyling = 'color: #ff1a8e; font-weight: bold;';
+                } else if (kanalNavn === 'JFM') {
+                    kanalStyling = 'color: #175b30; font-weight: bold;';
+                } else if (kanalNavn === 'Optagelse') {
+                    kanalStyling = 'color: #090000; font-weight: bold;';
+                } else if (kanalNavn.includes('Pluto TV')) { // Fanger alle "Pluto TV"-varianter
+                    kanalStyling = 'color: #ffbf4b; font-weight: bold;';
                 } else if (kanalNavn === 'SPORT LIVE') {
                     kanalStyling = 'color: #dd5f12; font-weight: bold;';
+                } else if (kanalNavn === 'Viaplay') {
+                    kanalStyling = 'color: #3b62d3; font-weight: bold;';
+                } else if (kanalNavn === 'YouTube') {
+                    kanalStyling = 'color: #5d441f; font-weight: bold;';
                 }
 
                 const tbody = document.createElement('tbody');
