@@ -78,6 +78,33 @@
         .checkbox-group label { margin: 0; cursor: pointer; font-size: 14px; font-weight: normal; color: #333; }
         
         .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
+
+        /* Nye Custom Dialog Styles */
+        .custom-dialog-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); z-index: 9999;
+            display: none; align-items: center; justify-content: center;
+        }
+        .custom-dialog-box {
+            background-color: white; padding: 25px 30px; border-radius: 8px;
+            width: 90%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .custom-dialog-message {
+            font-size: 15px; color: #333; margin-bottom: 25px; line-height: 1.5;
+            white-space: pre-wrap; /* Gør at linjeskift respekteres */
+        }
+        .custom-dialog-actions {
+            display: flex; justify-content: center; gap: 15px;
+        }
+        .btn-dialog {
+            padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;
+            font-size: 14px; font-weight: 600; transition: background-color 0.2s;
+        }
+        .btn-dialog.primary { background-color: #0056b3; color: white; }
+        .btn-dialog.primary:hover { background-color: #004494; }
+        .btn-dialog.secondary { background-color: #e9ecef; color: #333; }
+        .btn-dialog.secondary:hover { background-color: #dde0e3; }
     </style>
 </head>
 <body>
@@ -88,6 +115,13 @@
             <h1 style="margin: 0;">Produktioner 2026</h1>
         </div>
         <button class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
+    </div>
+
+    <div id="customDialog" class="custom-dialog-overlay">
+        <div class="custom-dialog-box">
+            <div id="dialogMessage" class="custom-dialog-message"></div>
+            <div id="dialogActions" class="custom-dialog-actions"></div>
+        </div>
     </div>
 
     <div class="month-filter">
@@ -217,6 +251,41 @@
         const scriptURL = 'https://script.google.com/macros/s/AKfycby7t3jTFcBOWIzwruxri1-9fsBRVZx2iiFhHT9P9Ci1vkPV69rTIl5-oPajAkfB5XXNCA/exec';
         
         let alleProgrammerGlobal = [];
+
+        // Funktion til at vise pæne advarsler og "Bekræft"-beskeder
+        function visCustomDialog(message, type) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('customDialog');
+                const msgEl = document.getElementById('dialogMessage');
+                const actionsEl = document.getElementById('dialogActions');
+                
+                msgEl.textContent = message;
+                actionsEl.innerHTML = ''; 
+                
+                if (type === 'alert') {
+                    const btnOk = document.createElement('button');
+                    btnOk.className = 'btn-dialog primary';
+                    btnOk.textContent = 'OK';
+                    btnOk.onclick = () => { overlay.style.display = 'none'; resolve(true); };
+                    actionsEl.appendChild(btnOk);
+                } else if (type === 'confirm') {
+                    const btnNo = document.createElement('button');
+                    btnNo.className = 'btn-dialog secondary';
+                    btnNo.textContent = 'Nej, annuller';
+                    btnNo.onclick = () => { overlay.style.display = 'none'; resolve(false); };
+                    
+                    const btnYes = document.createElement('button');
+                    btnYes.className = 'btn-dialog primary';
+                    btnYes.textContent = 'Ja, fortsæt';
+                    btnYes.onclick = () => { overlay.style.display = 'none'; resolve(true); };
+                    
+                    actionsEl.appendChild(btnNo);
+                    actionsEl.appendChild(btnYes);
+                }
+                
+                overlay.style.display = 'flex';
+            });
+        }
 
         async function loadProgrammer() {
             try {
@@ -457,7 +526,6 @@
         }
 
         async function gemProgram() {
-            // Hent værdier til validering
             const valgtDato = document.getElementById('Dato').value;
             const valgtKanal = document.getElementById('Kanal').value;
             const valgtSportsgren = document.getElementById('Sportsgren').value;
@@ -465,42 +533,37 @@
             const valgtTid = document.getElementById('Tid').value;
             const rowId = document.getElementById('RowId').value;
 
-            // LOGIK 1: Tjek om obligatoriske felter er udfyldt (Kanal tilføjet)
+            // LOGIK 1: Tjekker via den nye custom dialog
             if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
-                alert("Du skal som minimum vælge en dato, kanal og sportsgren samt indtaste en programtitel.");
+                await visCustomDialog("Du skal som minimum vælge en dato, kanal og sportsgren samt indtaste en programtitel.", 'alert');
                 return; 
             }
 
-            // LOGIK 2: Tjek om datoen er i fortiden
+            // LOGIK 2: Datotjek med den nye custom dialog
             const inputDate = new Date(valgtDato);
             inputDate.setHours(0, 0, 0, 0); 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
             if (inputDate < today) {
-                const confirmPast = confirm("Du er i gang med at tilføje et program i fortiden. Ønsker du at fortsætte?");
+                const confirmPast = await visCustomDialog("Du er i gang med at tilføje et program i fortiden. Ønsker du at fortsætte?", 'confirm');
                 if (!confirmPast) {
                     return; 
                 }
             }
 
-            // LOGIK 3: Kollisions-advarsel for SPORT LIVE
+            // LOGIK 3: Kollisions-advarsel
             if (valgtKanal === "SPORT LIVE" && valgtDato && valgtTid) {
                 const collision = alleProgrammerGlobal.find(p => {
-                    // Hvis vi redigerer, skal den ignorere sig selv
                     if (rowId && String(p.RowId) === String(rowId)) return false;
-                    
-                    // Kigger kun efter SPORT LIVE kollisioner
                     if (p.Kanal !== "SPORT LIVE") return false;
 
-                    // Formater dato fra arket til YYYY-MM-DD
                     let pDatoFormatted = "";
                     if (p.Dato) {
                         const d = new Date(p.Dato);
                         pDatoFormatted = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
                     }
 
-                    // Formater tid fra arket til HH:MM
                     let pTidFormatted = "";
                     if (p.Tid) {
                         const t = new Date(p.Tid);
@@ -511,21 +574,18 @@
                         }
                     }
 
-                    // Normaliser input-tid til HH:MM
                     const vTidFormatted = valgtTid.substring(0, 5);
-
                     return (pDatoFormatted === valgtDato) && (pTidFormatted === vTidFormatted);
                 });
 
                 if (collision) {
-                    const confirmCollision = confirm(`Hov! Der ligger allerede et program på SPORT LIVE på denne dato og tidspunkt:\n\n"${collision.Programtitel}"\n\nEr du sikker på, at du vil gemme alligevel?`);
+                    const confirmCollision = await visCustomDialog(`Hov! Der ligger allerede et program på SPORT LIVE på denne dato og tidspunkt:\n\n"${collision.Programtitel}"\n\nEr du sikker på, at du vil gemme alligevel?`, 'confirm');
                     if (!confirmCollision) {
                         return; 
                     }
                 }
             }
 
-            // --- Hvis alle valideringer godkendes, låser vi knappen og gemmer ---
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.textContent;
             submitBtn.textContent = "Gemmer...";
@@ -574,7 +634,7 @@
                 await loadProgrammer(); 
             } catch (error) {
                 console.error('Fejl ved gemning:', error);
-                alert("Der skete en fejl.");
+                await visCustomDialog("Der skete en fejl. Prøv igen.", 'alert');
             } finally {
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
