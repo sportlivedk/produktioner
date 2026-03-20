@@ -387,8 +387,8 @@
 
                 let visProgramtitel = program["Programtitel"] || '';
                 if (program["TBC"] && program["TBC"].toUpperCase() === 'X') {
-                    // Justeret så kun selve "TBC" er i rød, mens parenteserne er standardfarve
-                    visProgramtitel += ' (<span style="color: red; font-weight: bold;">TBC</span>)';
+                    // Parenteser fjernet, så kun selve "TBC" står i rødt
+                    visProgramtitel += ' <span style="color: red; font-weight: bold;">TBC</span>';
                 }
 
                 const tbody = document.createElement('tbody');
