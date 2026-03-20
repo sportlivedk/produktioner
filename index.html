@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPORT LIVE | Produktioner</title>
+    <title>SPORT LIVE - Produktionsplan</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -79,7 +79,6 @@
         
         .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
 
-        /* Nye Custom Dialog Styles */
         .custom-dialog-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.6); z-index: 9999;
@@ -92,7 +91,7 @@
         }
         .custom-dialog-message {
             font-size: 15px; color: #333; margin-bottom: 25px; line-height: 1.5;
-            white-space: pre-wrap; /* Gør at linjeskift respekteres */
+            white-space: pre-wrap; 
         }
         .custom-dialog-actions {
             display: flex; justify-content: center; gap: 15px;
@@ -112,7 +111,7 @@
     <div class="header">
         <div style="display: flex; align-items: center; gap: 15px;">
             <img src="logo.png" alt="SPORT LIVE Logo" style="height: 45px; width: auto;">
-            <h1 style="margin: 0;">Produktioner 2026</h1>
+            <h1 style="margin: 0;">Produktionsoversigt</h1>
         </div>
         <button class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
     </div>
@@ -252,7 +251,6 @@
         
         let alleProgrammerGlobal = [];
 
-        // Funktion til at vise pæne advarsler og "Bekræft"-beskeder
         function visCustomDialog(message, type) {
             return new Promise((resolve) => {
                 const overlay = document.getElementById('customDialog');
@@ -533,26 +531,25 @@
             const valgtTid = document.getElementById('Tid').value;
             const rowId = document.getElementById('RowId').value;
 
-            // LOGIK 1: Tjekker via den nye custom dialog
+            // Opdateret tekststreng
             if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
-                await visCustomDialog("Du skal som minimum vælge en dato, kanal og sportsgren samt indtaste en programtitel.", 'alert');
+                await visCustomDialog("Du skal som minimum vælge en dato, en kanal og en sportsgren samt indtaste en programtitel.", 'alert');
                 return; 
             }
 
-            // LOGIK 2: Datotjek med den nye custom dialog
             const inputDate = new Date(valgtDato);
             inputDate.setHours(0, 0, 0, 0); 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
             if (inputDate < today) {
-                const confirmPast = await visCustomDialog("Du er i gang med at tilføje et program i fortiden. Ønsker du at fortsætte?", 'confirm');
+                // Opdateret tekststreng
+                const confirmPast = await visCustomDialog("Du er i gang med at tilføje et program i fortiden. Vil du fortsætte?", 'confirm');
                 if (!confirmPast) {
                     return; 
                 }
             }
 
-            // LOGIK 3: Kollisions-advarsel
             if (valgtKanal === "SPORT LIVE" && valgtDato && valgtTid) {
                 const collision = alleProgrammerGlobal.find(p => {
                     if (rowId && String(p.RowId) === String(rowId)) return false;
