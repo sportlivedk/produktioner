@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPORT LIVE - Produktionsplan</title>
+    <title>SPORT LIVE | Produktioner</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -111,7 +111,7 @@
     <div class="header">
         <div style="display: flex; align-items: center; gap: 15px;">
             <img src="logo.png" alt="SPORT LIVE Logo" style="height: 45px; width: auto;">
-            <h1 style="margin: 0;">Produktionsoversigt</h1>
+            <h1 style="margin: 0;">Produktioner 2026</h1>
         </div>
         <button class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
     </div>
@@ -531,7 +531,6 @@
             const valgtTid = document.getElementById('Tid').value;
             const rowId = document.getElementById('RowId').value;
 
-            // Opdateret tekststreng
             if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
                 await visCustomDialog("Du skal som minimum vælge en dato, en kanal og en sportsgren samt indtaste en programtitel.", 'alert');
                 return; 
@@ -544,7 +543,7 @@
 
             if (inputDate < today) {
                 // Opdateret tekststreng
-                const confirmPast = await visCustomDialog("Du er i gang med at tilføje et program i fortiden. Vil du fortsætte?", 'confirm');
+                const confirmPast = await visCustomDialog("Du er i gang med at tilføje et program på en dato, som ligger i fortiden. Vil du fortsætte?", 'confirm');
                 if (!confirmPast) {
                     return; 
                 }
@@ -576,7 +575,8 @@
                 });
 
                 if (collision) {
-                    const confirmCollision = await visCustomDialog(`Hov! Der ligger allerede et program på SPORT LIVE på denne dato og tidspunkt:\n\n"${collision.Programtitel}"\n\nEr du sikker på, at du vil gemme alligevel?`, 'confirm');
+                    // Opdateret tekststreng
+                    const confirmCollision = await visCustomDialog(`Der ligger allerede et program på SPORT LIVE på denne dato og tidspunkt:\n\n"${collision.Programtitel}"\n\nVil du gemme programmet alligevel?`, 'confirm');
                     if (!confirmCollision) {
                         return; 
                     }
