@@ -158,7 +158,12 @@
                         <datalist id="liste-Format"></datalist>
                     </div>
                     
-                    <div class="form-group"><label>RX</label><input type="text" id="RX"></div>
+                    <div class="form-group">
+                        <label>RX</label>
+                        <input type="text" id="RX" list="liste-RX" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-RX"></datalist>
+                    </div>
+                    
                     <div class="form-group"><label>P-plan</label><input type="text" id="P-plan"></div>
                     <div class="form-group"><label>Sling</label><input type="text" id="Sling"></div>
                     
@@ -303,7 +308,6 @@
                     kanalStyling = 'color: #5d441f; font-weight: bold;';
                 }
 
-                // Håndtering af klikbare links i Link/noter feltet
                 let noterTekst = program["Link / Noter"] || '-';
                 let formateretNoter = noterTekst;
                 if (noterTekst !== '-') {
