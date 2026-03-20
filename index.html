@@ -71,7 +71,13 @@
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: span 4; }
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .form-group input, .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
+        .form-group input:not([type="checkbox"]), .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
+        
+        /* Speciel styling til checkbox-rækken for at holde den pæn */
+        .checkbox-group { display: flex; flex-direction: row; align-items: center; gap: 10px; margin-top: 10px; }
+        .checkbox-group input { width: auto; margin: 0; cursor: pointer; width: 16px; height: 16px; }
+        .checkbox-group label { margin: 0; cursor: pointer; font-size: 14px; font-weight: normal; color: #333; }
+        
         .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
     </style>
 </head>
@@ -192,6 +198,12 @@
                     </div>
                     
                     <div class="form-group full-width"><label>Link/noter</label><input type="text" id="Link_Noter"></div>
+                    
+                    <div class="form-group full-width checkbox-group">
+                        <input type="checkbox" id="TBC">
+                        <label for="TBC">Afventer endelig bekr&aelig;ftelse (TBC)</label>
+                    </div>
+                    
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn" onclick="gemProgram()">Gem program</button>
@@ -317,6 +329,12 @@
                     });
                 }
 
+                // Opbygning af programtitel med eventuel TBC-markering
+                let visProgramtitel = program["Programtitel"] || '';
+                if (program["TBC"] && program["TBC"].toUpperCase() === 'X') {
+                    visProgramtitel += ' <span style="color: red; font-weight: bold;">(TBC)</span>';
+                }
+
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block';
 
@@ -328,7 +346,7 @@
                     <td><b>${pTid}</b></td>
                     <td style="${kanalStyling}">${kanalNavn}</td>
                     <td>${program["Sportsgren"] || ''}</td>
-                    <td>${program["Programtitel"] || ''}</td>
+                    <td>${visProgramtitel}</td>
                     <td>${program["Lokation"] || ''}</td>
                     <td>${program["Unit"] || ''}</td>
                     <td style="white-space: nowrap;">
@@ -393,6 +411,9 @@
                 beregnetUgedag = ugedage[datoObjekt.getDay()];
             }
 
+            // Aflæser nu TBC-feltet
+            const tbcStatus = document.getElementById('TBC').checked ? "X" : "";
+
             const nyProduktion = {
                 "Dato": valgtDato,
                 "Ugedag": beregnetUgedag,
@@ -410,7 +431,8 @@
                 "Kommentator": document.getElementById('Kommentator').value,
                 "Ekspert": document.getElementById('Ekspert').value,
                 "Reporter": document.getElementById('Reporter').value,
-                "Link / Noter": document.getElementById('Link_Noter').value
+                "Link / Noter": document.getElementById('Link_Noter').value,
+                "TBC": tbcStatus // Sender TBC til Google Sheets
             };
 
             try {
