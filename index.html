@@ -5,19 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPORT LIVE | Produktioner</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; }
+        /* Flexbox layout til at fryse toppen og lade tabellen scrolle */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f6f8; 
+            margin: 0; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
+        
+        .top-section { 
+            padding: 20px 20px 0 20px; 
+            flex-shrink: 0; 
+            background-color: #f4f6f8; 
+            z-index: 100; 
+        }
+        
+        .table-container { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 0 20px 20px 20px; 
+        }
+
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        h1 { color: #333; font-size: 24px; }
+        
+        /* Design til årstals-filter */
+        .title-wrapper { display: flex; align-items: center; gap: 15px; }
+        h1 { color: #333; font-size: 24px; margin: 0; display: flex; align-items: center; }
+        .year-filter { display: flex; gap: 12px; margin-left: 20px; padding-left: 20px; border-left: 2px solid #ccc; font-size: 18px; }
+        .year-option { color: #aaa; cursor: pointer; transition: all 0.2s; font-weight: normal; }
+        .year-option:hover { color: #666; }
+        .year-option.active { color: #0056b3; font-weight: bold; font-size: 22px; }
+
         .btn { background-color: #0056b3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
         .btn:hover { background-color: #004494; }
         
-        .month-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .month-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
         .month-btn { background-color: white; border: 1px solid #ccc; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: #555; }
         .month-btn:hover { background-color: #e9ecef; }
         .month-btn.active { background-color: #0056b3; color: white; border-color: #0056b3; }
 
-        table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; }
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
+        /* Fastlåst tabel-overskrift inde i det scrollende vindue */
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
         tbody.program-block:nth-of-type(odd) td { background-color: #ffffff; }
@@ -62,9 +94,13 @@
         
         .toggle-btn { background-color: #6c757d; padding: 6px 10px; margin-right: 5px; font-size: 12px; }
         .toggle-btn:hover { background-color: #5a6268; }
-        .action-btn { background-color: #28a745; padding: 6px 12px; }
+        .action-btn { padding: 6px 12px; margin-right: 5px; font-size: 12px; }
+        .rediger-btn { background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .rediger-btn:hover { background-color: #218838; }
+        .slet-btn { background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; padding: 6px 10px; font-weight: bold; }
+        .slet-btn:hover { background-color: #c82333; }
         
-        .modal { display: none; position: fixed; z-index: 20; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
+        .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
         .modal-content { background-color: white; margin: 3% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 1100px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
         .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
@@ -102,18 +138,63 @@
         }
         .btn-dialog.primary { background-color: #0056b3; color: white; }
         .btn-dialog.primary:hover { background-color: #004494; }
+        .btn-dialog.danger { background-color: #dc3545; color: white; }
+        .btn-dialog.danger:hover { background-color: #c82333; }
         .btn-dialog.secondary { background-color: #e9ecef; color: #333; }
         .btn-dialog.secondary:hover { background-color: #dde0e3; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <img src="logo.png" alt="SPORT LIVE Logo" style="height: 45px; width: auto;">
-            <h1 style="margin: 0;">Produktioner | 2026</h1>
+    <div class="top-section">
+        <div class="header">
+            <div class="title-wrapper">
+                <img src="logo.png" alt="SPORT LIVE Logo" style="height: 45px; width: auto;">
+                <h1>
+                    Produktioner
+                    <div class="year-filter">
+                        <span class="year-option active" id="year-2026" onclick="filtrerAar(2026)">2026</span>
+                        <span class="year-option" id="year-2027" onclick="filtrerAar(2027)">2027</span>
+                        <span class="year-option" id="year-2028" onclick="filtrerAar(2028)">2028</span>
+                    </div>
+                </h1>
+            </div>
+            <button class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
         </div>
-        <button class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
+
+        <div class="month-filter">
+            <button class="month-btn active" id="btn-month--1" onclick="filtrerMaaned(-1)">ALLE</button>
+            <button class="month-btn" id="btn-month-0" onclick="filtrerMaaned(0)">JANUAR</button>
+            <button class="month-btn" id="btn-month-1" onclick="filtrerMaaned(1)">FEBRUAR</button>
+            <button class="month-btn" id="btn-month-2" onclick="filtrerMaaned(2)">MARTS</button>
+            <button class="month-btn" id="btn-month-3" onclick="filtrerMaaned(3)">APRIL</button>
+            <button class="month-btn" id="btn-month-4" onclick="filtrerMaaned(4)">MAJ</button>
+            <button class="month-btn" id="btn-month-5" onclick="filtrerMaaned(5)">JUNI</button>
+            <button class="month-btn" id="btn-month-6" onclick="filtrerMaaned(6)">JULI</button>
+            <button class="month-btn" id="btn-month-7" onclick="filtrerMaaned(7)">AUGUST</button>
+            <button class="month-btn" id="btn-month-8" onclick="filtrerMaaned(8)">SEPTEMBER</button>
+            <button class="month-btn" id="btn-month-9" onclick="filtrerMaaned(9)">OKTOBER</button>
+            <button class="month-btn" id="btn-month-10" onclick="filtrerMaaned(10)">NOVEMBER</button>
+            <button class="month-btn" id="btn-month-11" onclick="filtrerMaaned(11)">DECEMBER</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table id="programTable">
+            <thead>
+                <tr>
+                    <th>Dato</th>
+                    <th>Ugedag</th>
+                    <th>Tid</th>
+                    <th>Kanal</th>
+                    <th>Sportsgren</th>
+                    <th style="max-width: 150px; word-wrap: break-word;">Programtitel</th>
+                    <th>Lokation</th>
+                    <th>Unit</th>
+                    <th>Handling</th>
+                </tr>
+            </thead>
+        </table>
     </div>
 
     <div id="customDialog" class="custom-dialog-overlay">
@@ -122,38 +203,6 @@
             <div id="dialogActions" class="custom-dialog-actions"></div>
         </div>
     </div>
-
-    <div class="month-filter">
-        <button class="month-btn active" id="btn-month--1" onclick="filtrerMaaned(-1)">ALLE</button>
-        <button class="month-btn" id="btn-month-0" onclick="filtrerMaaned(0)">JANUAR</button>
-        <button class="month-btn" id="btn-month-1" onclick="filtrerMaaned(1)">FEBRUAR</button>
-        <button class="month-btn" id="btn-month-2" onclick="filtrerMaaned(2)">MARTS</button>
-        <button class="month-btn" id="btn-month-3" onclick="filtrerMaaned(3)">APRIL</button>
-        <button class="month-btn" id="btn-month-4" onclick="filtrerMaaned(4)">MAJ</button>
-        <button class="month-btn" id="btn-month-5" onclick="filtrerMaaned(5)">JUNI</button>
-        <button class="month-btn" id="btn-month-6" onclick="filtrerMaaned(6)">JULI</button>
-        <button class="month-btn" id="btn-month-7" onclick="filtrerMaaned(7)">AUGUST</button>
-        <button class="month-btn" id="btn-month-8" onclick="filtrerMaaned(8)">SEPTEMBER</button>
-        <button class="month-btn" id="btn-month-9" onclick="filtrerMaaned(9)">OKTOBER</button>
-        <button class="month-btn" id="btn-month-10" onclick="filtrerMaaned(10)">NOVEMBER</button>
-        <button class="month-btn" id="btn-month-11" onclick="filtrerMaaned(11)">DECEMBER</button>
-    </div>
-
-    <table id="programTable">
-        <thead>
-            <tr>
-                <th>Dato</th>
-                <th>Ugedag</th>
-                <th>Tid</th>
-                <th>Kanal</th>
-                <th>Sportsgren</th>
-                <th style="max-width: 150px; word-wrap: break-word;">Programtitel</th>
-                <th>Lokation</th>
-                <th>Unit</th>
-                <th>Handling</th>
-            </tr>
-        </thead>
-    </table>
 
     <div id="programModal" class="modal">
         <div class="modal-content">
@@ -250,6 +299,8 @@
         const scriptURL = 'https://script.google.com/macros/s/AKfycby7t3jTFcBOWIzwruxri1-9fsBRVZx2iiFhHT9P9Ci1vkPV69rTIl5-oPajAkfB5XXNCA/exec';
         
         let alleProgrammerGlobal = [];
+        let valgtAar = 2026;
+        let valgtMaaned = -1;
 
         function visCustomDialog(message, type) {
             return new Promise((resolve) => {
@@ -275,6 +326,19 @@
                     const btnYes = document.createElement('button');
                     btnYes.className = 'btn-dialog primary';
                     btnYes.textContent = 'Ja, fortsæt';
+                    btnYes.onclick = () => { overlay.style.display = 'none'; resolve(true); };
+                    
+                    actionsEl.appendChild(btnNo);
+                    actionsEl.appendChild(btnYes);
+                } else if (type === 'delete') {
+                    const btnNo = document.createElement('button');
+                    btnNo.className = 'btn-dialog secondary';
+                    btnNo.textContent = 'Annuller';
+                    btnNo.onclick = () => { overlay.style.display = 'none'; resolve(false); };
+                    
+                    const btnYes = document.createElement('button');
+                    btnYes.className = 'btn-dialog danger';
+                    btnYes.textContent = 'Slet program';
                     btnYes.onclick = () => { overlay.style.display = 'none'; resolve(true); };
                     
                     actionsEl.appendChild(btnNo);
@@ -305,34 +369,55 @@
                     }
                 }
 
+                // Dobbelt sortering (Dato -> Tid)
                 alleProgrammerGlobal.sort((a, b) => {
-                    const datoA = new Date(a["Dato"] || 0);
-                    const datoB = new Date(b["Dato"] || 0);
-                    return datoA - datoB;
+                    const datoA = a["Dato"] || "";
+                    const datoB = b["Dato"] || "";
+                    
+                    if (datoA !== datoB) {
+                        return datoA.localeCompare(datoB);
+                    }
+                    
+                    const tidA = a["Tid"] || "23:59";
+                    const tidB = b["Tid"] || "23:59";
+                    return tidA.localeCompare(tidB);
                 });
 
-                filtrerMaaned(-1);
+                opdaterVisning();
 
             } catch (error) {
                 console.error('Fejl ved indlæsning:', error);
             }
         }
 
+        function filtrerAar(aar) {
+            valgtAar = aar;
+            document.querySelectorAll('.year-option').forEach(el => el.classList.remove('active'));
+            document.getElementById('year-' + aar).classList.add('active');
+            opdaterVisning();
+        }
+
         function filtrerMaaned(maanedIndex) {
+            valgtMaaned = maanedIndex;
             document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('btn-month-' + maanedIndex).classList.add('active');
+            opdaterVisning();
+        }
 
-            let programmerDerSkalVises = alleProgrammerGlobal;
-
-            if (maanedIndex !== -1) {
-                programmerDerSkalVises = alleProgrammerGlobal.filter(program => {
-                    if (!program["Dato"]) return false;
-                    const d = new Date(program["Dato"]);
-                    return d.getMonth() === maanedIndex;
-                });
-            }
-
-            tegnTabel(programmerDerSkalVises);
+        function opdaterVisning() {
+            let filtreret = alleProgrammerGlobal.filter(program => {
+                if (!program["Dato"]) return false;
+                const d = new Date(program["Dato"]);
+                
+                // Filtrer på aktivt år
+                if (d.getFullYear() !== valgtAar) return false;
+                
+                // Filtrer på måned
+                if (valgtMaaned !== -1 && d.getMonth() !== valgtMaaned) return false;
+                
+                return true;
+            });
+            tegnTabel(filtreret);
         }
 
         function toggleDetails(btn) {
@@ -353,6 +438,14 @@
             document.getElementById('RowId').value = ""; 
             document.getElementById('modalTitle').textContent = "Tilføj nyt program";
             document.getElementById('submitBtn').textContent = "Gem program";
+            
+            // Sætter dato-feltet til det valgte år automatisk som en hjælp
+            if (valgtAar) {
+                const defaultDate = new Date();
+                defaultDate.setFullYear(valgtAar);
+                document.getElementById('Dato').value = valgtAar + "-" + String(defaultDate.getMonth() + 1).padStart(2, '0') + "-" + String(defaultDate.getDate()).padStart(2, '0');
+            }
+            
             openModal();
         }
 
@@ -401,6 +494,31 @@
             document.getElementById('submitBtn').textContent = "Opdater program";
             
             openModal();
+        }
+
+        async function bekraeftSlet(rowId) {
+            const program = alleProgrammerGlobal.find(p => p.RowId === rowId);
+            const titel = program ? program["Programtitel"] : "dette program";
+            
+            const bekræft = await visCustomDialog(`Er du sikker på, at du vil slette "${titel}"?\n\nDenne handling kan ikke fortrydes.`, "delete");
+            
+            if (bekræft) {
+                udfoerSletning(rowId);
+            }
+        }
+
+        async function udfoerSletning(rowId) {
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "delete", RowId: rowId }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                await loadProgrammer(); 
+            } catch (error) {
+                console.error('Fejl ved sletning:', error);
+                await visCustomDialog("Der skete en fejl under sletning. Prøv igen.", 'alert');
+            }
         }
 
         function tegnTabel(programmer) {
@@ -473,7 +591,8 @@
                     <td>${program["Unit"] || ''}</td>
                     <td style="white-space: nowrap;">
                         <button class="btn toggle-btn" onclick="toggleDetails(this)">▼</button>
-                        <button class="btn action-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
+                        <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
+                        <button class="action-btn slet-btn" onclick="bekraeftSlet(${program.RowId})" title="Slet program">✖</button>
                     </td>
                 `;
                 
@@ -542,7 +661,6 @@
             today.setHours(0, 0, 0, 0);
 
             if (inputDate < today) {
-                // Opdateret tekststreng
                 const confirmPast = await visCustomDialog("Du er i gang med at tilføje et program på en dato, som ligger i fortiden. Vil du fortsætte?", 'confirm');
                 if (!confirmPast) {
                     return; 
@@ -575,7 +693,6 @@
                 });
 
                 if (collision) {
-                    // Opdateret tekststreng
                     const confirmCollision = await visCustomDialog(`Der ligger allerede et program på SPORT LIVE på denne dato og tidspunkt:\n\n"${collision.Programtitel}"\n\nVil du gemme programmet alligevel?`, 'confirm');
                     if (!confirmCollision) {
                         return; 
