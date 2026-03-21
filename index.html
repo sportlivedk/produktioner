@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPORT LIVE | Produktioner</title>
     <style>
-        /* Flexbox layout til at fryse toppen og lade tabellen scrolle */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #f4f6f8; 
@@ -31,10 +30,18 @@
 
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
-        /* Design til årstals-filter */
+        /* Design til årstals-filter - opdateret til baseline-justering */
         .title-wrapper { display: flex; align-items: center; gap: 15px; }
         h1 { color: #333; font-size: 24px; margin: 0; display: flex; align-items: center; }
-        .year-filter { display: flex; gap: 12px; margin-left: 20px; padding-left: 20px; border-left: 2px solid #ccc; font-size: 18px; }
+        .year-filter { 
+            display: flex; 
+            align-items: baseline; /* Dette tvinger tallene ned på samme bundlinje */
+            gap: 12px; 
+            margin-left: 20px; 
+            padding-left: 20px; 
+            border-left: 2px solid #ccc; 
+            font-size: 18px; 
+        }
         .year-option { color: #aaa; cursor: pointer; transition: all 0.2s; font-weight: normal; }
         .year-option:hover { color: #666; }
         .year-option.active { color: #0056b3; font-weight: bold; font-size: 22px; }
@@ -49,7 +56,6 @@
 
         table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; }
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
-        /* Fastlåst tabel-overskrift inde i det scrollende vindue */
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
         tbody.program-block:nth-of-type(odd) td { background-color: #ffffff; }
@@ -369,7 +375,6 @@
                     }
                 }
 
-                // Dobbelt sortering (Dato -> Tid)
                 alleProgrammerGlobal.sort((a, b) => {
                     const datoA = a["Dato"] || "";
                     const datoB = b["Dato"] || "";
@@ -409,10 +414,8 @@
                 if (!program["Dato"]) return false;
                 const d = new Date(program["Dato"]);
                 
-                // Filtrer på aktivt år
                 if (d.getFullYear() !== valgtAar) return false;
                 
-                // Filtrer på måned
                 if (valgtMaaned !== -1 && d.getMonth() !== valgtMaaned) return false;
                 
                 return true;
@@ -439,7 +442,6 @@
             document.getElementById('modalTitle').textContent = "Tilføj nyt program";
             document.getElementById('submitBtn').textContent = "Gem program";
             
-            // Sætter dato-feltet til det valgte år automatisk som en hjælp
             if (valgtAar) {
                 const defaultDate = new Date();
                 defaultDate.setFullYear(valgtAar);
