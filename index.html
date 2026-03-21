@@ -26,16 +26,25 @@
             flex-grow: 1; 
             overflow-y: auto; 
             padding: 0 20px 20px 20px; 
+            position: relative;
+        }
+
+        /* Styling til indlæsnings-teksten */
+        #loader {
+            text-align: center;
+            padding: 40px;
+            color: #555;
+            font-size: 16px;
+            font-weight: 500;
         }
 
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
-        /* Design til årstals-filter - opdateret til baseline-justering */
         .title-wrapper { display: flex; align-items: center; gap: 15px; }
         h1 { color: #333; font-size: 24px; margin: 0; display: flex; align-items: center; }
         .year-filter { 
             display: flex; 
-            align-items: baseline; /* Dette tvinger tallene ned på samme bundlinje */
+            align-items: baseline; 
             gap: 12px; 
             margin-left: 20px; 
             padding-left: 20px; 
@@ -186,12 +195,15 @@
     </div>
 
     <div class="table-container">
-        <table id="programTable">
+        <div id="loader">Indlæser programmer ...</div>
+        
+        <table id="programTable" style="display: none;">
             <thead>
                 <tr>
                     <th>Dato</th>
                     <th>Ugedag</th>
                     <th>Tid</th>
+                    <th>TX</th>
                     <th>Kanal</th>
                     <th>Sportsgren</th>
                     <th style="max-width: 150px; word-wrap: break-word;">Programtitel</th>
@@ -220,6 +232,7 @@
                 <div class="form-grid">
                     <div class="form-group"><label>Dato</label><input type="date" id="Dato"></div>
                     <div class="form-group"><label>Tid</label><input type="time" id="Tid"></div>
+                    <div class="form-group"><label>TX</label><input type="time" id="TX"></div>
                     
                     <div class="form-group">
                         <label>Kanal</label>
@@ -356,6 +369,10 @@
         }
 
         async function loadProgrammer() {
+            // Viser loader, gemmer tabel imens data hentes
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('programTable').style.display = 'none';
+            
             try {
                 const response = await fetch(scriptURL);
                 const jsonData = await response.json();
@@ -390,8 +407,13 @@
 
                 opdaterVisning();
 
+                // Fjerner loader og viser tabellen, når data er klar
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('programTable').style.display = 'table';
+
             } catch (error) {
                 console.error('Fejl ved indlæsning:', error);
+                document.getElementById('loader').textContent = "Der opstod en fejl under indlæsning af programmer.";
             }
         }
 
@@ -475,6 +497,18 @@
                 document.getElementById('Tid').value = "";
             }
 
+            // Udfyldelse af det nye TX-felt
+            if (program["TX"]) {
+                const txDate = new Date(program["TX"]);
+                if (!isNaN(txDate.getTime()) && String(program["TX"]).includes('T')) {
+                    document.getElementById('TX').value = String(txDate.getHours()).padStart(2, '0') + ":" + String(txDate.getMinutes()).padStart(2, '0');
+                } else {
+                    document.getElementById('TX').value = String(program["TX"]).substring(0, 5);
+                }
+            } else {
+                document.getElementById('TX').value = "";
+            }
+
             document.getElementById('Kanal').value = program["Kanal"] || '';
             document.getElementById('Sportsgren').value = program["Sportsgren"] || '';
             document.getElementById('Programtitel').value = program["Programtitel"] || '';
@@ -511,6 +545,10 @@
 
         async function udfoerSletning(rowId) {
             try {
+                // Viser loader igen under sletning
+                document.getElementById('loader').style.display = 'block';
+                document.getElementById('programTable').style.display = 'none';
+
                 await fetch(scriptURL, {
                     method: 'POST',
                     body: JSON.stringify({ action: "delete", RowId: rowId }),
@@ -519,6 +557,8 @@
                 await loadProgrammer(); 
             } catch (error) {
                 console.error('Fejl ved sletning:', error);
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('programTable').style.display = 'table';
                 await visCustomDialog("Der skete en fejl under sletning. Prøv igen.", 'alert');
             }
         }
@@ -531,6 +571,7 @@
                 let pDato = program["Dato"] || '';
                 const pUgedag = program["Ugedag"] || '';
                 let pTid = program["Tid"] || '';
+                let pTX = program["TX"] || '';
                 let kanalNavn = program["Kanal"] || '';
                 
                 if (pDato && pDato.includes('T')) {
@@ -540,6 +581,13 @@
                 if (pTid && pTid.includes('T')) {
                     const t = new Date(pTid);
                     pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                }
+                // Formatering af TX
+                if (pTX && pTX.includes('T')) {
+                    const tTX = new Date(pTX);
+                    pTX = tTX.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                } else if (pTX) {
+                    pTX = String(pTX).substring(0, 5);
                 }
 
                 let kanalStyling = '';
@@ -586,6 +634,7 @@
                     <td>${pDato}</td>
                     <td>${pUgedag}</td>
                     <td><b>${pTid}</b></td>
+                    <td><b>${pTX}</b></td>
                     <td style="${kanalStyling}">${kanalNavn}</td>
                     <td>${program["Sportsgren"] || ''}</td>
                     <td>${visProgramtitel}</td>
@@ -601,8 +650,9 @@
                 const trDetail = document.createElement('tr');
                 trDetail.className = 'detail-row';
                 
+                // colspan er opdateret til 10 for at tage højde for den nye TX kolonne
                 trDetail.innerHTML = `
-                    <td colspan="9">
+                    <td colspan="10">
                         <div class="detail-container">
                             <div class="detail-card bemanding">
                                 <h4>Personale</h4>
@@ -650,6 +700,7 @@
             const valgtSportsgren = document.getElementById('Sportsgren').value;
             const valgtProgramtitel = document.getElementById('Programtitel').value;
             const valgtTid = document.getElementById('Tid').value;
+            const valgtTX = document.getElementById('TX').value; // Fanger TX-feltet
             const rowId = document.getElementById('RowId').value;
 
             if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
@@ -702,6 +753,10 @@
                 }
             }
 
+            // Sørg for at vi viser loaderen under gemningen
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('programTable').style.display = 'none';
+            
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.textContent;
             submitBtn.textContent = "Gemmer...";
@@ -716,6 +771,7 @@
 
             const tbcStatus = document.getElementById('TBC').checked ? "X" : "";
 
+            // Opretter objektet inklusiv TX-feltet
             const nyProduktion = {
                 "RowId": rowId, 
                 "Dato": valgtDato,
@@ -735,7 +791,8 @@
                 "Ekspert": document.getElementById('Ekspert').value,
                 "Reporter": document.getElementById('Reporter').value,
                 "Link / Noter": document.getElementById('Link_Noter').value,
-                "TBC": tbcStatus 
+                "TBC": tbcStatus,
+                "TX": valgtTX 
             };
 
             try {
@@ -750,6 +807,9 @@
                 await loadProgrammer(); 
             } catch (error) {
                 console.error('Fejl ved gemning:', error);
+                // Viser tabellen igen, hvis det fejlede
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('programTable').style.display = 'table';
                 await visCustomDialog("Der skete en fejl. Prøv igen.", 'alert');
             } finally {
                 submitBtn.textContent = originalText;
