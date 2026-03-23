@@ -256,56 +256,57 @@
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             <h2 id="modalTitle">Tilf&oslash;j nyt program</h2>
-            <form id="programForm">
+            <form id="programForm" autocomplete="off">
                 <input type="hidden" id="RowId">
                 
                 <div class="form-grid">
-                    <div class="form-group"><label>Dato</label><input type="date" id="Dato"></div>
-                    <div class="form-group"><label>Tid</label><input type="time" id="Tid"></div>
-                    <div class="form-group"><label>TX</label><input type="time" id="TX"></div>
+                    <div class="form-group"><label>Dato</label><input type="date" id="Dato" autocomplete="off"></div>
+                    <div class="form-group"><label>Tid</label><input type="time" id="Tid" autocomplete="off"></div>
+                    <div class="form-group"><label>TX</label><input type="time" id="TX" autocomplete="off"></div>
                     
                     <div class="form-group">
                         <label>Kanal</label>
-                        <input type="text" id="Kanal" list="liste-Kanal" placeholder="V&aelig;lg eller skriv...">
+                        <input type="text" id="Kanal" list="liste-Kanal" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Kanal"></datalist>
                     </div>
                     
                     <div class="form-group">
                         <label>Sportsgren</label>
-                        <input type="text" id="Sportsgren" list="liste-Sportsgren" placeholder="V&aelig;lg eller skriv...">
+                        <input type="text" id="Sportsgren" list="liste-Sportsgren" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Sportsgren"></datalist>
                     </div>
                     
-                    <div class="form-group"><label>Programtitel</label><input type="text" id="Programtitel"></div>
+                    <div class="form-group"><label>Programtitel</label><input type="text" id="Programtitel" autocomplete="off"></div>
                     
                     <div class="form-group">
                         <label>Lokation</label>
-                        <input type="text" id="Lokation" list="liste-Lokation" placeholder="V&aelig;lg eller skriv...">
+                        <input type="text" id="Lokation" list="liste-Lokation" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Lokation"></datalist>
                     </div>
                     
                     <div class="form-group">
                         <label>Unit</label>
-                        <input type="text" id="Unit" list="liste-Unit" placeholder="V&aelig;lg eller skriv...">
+                        <input type="text" id="Unit" list="liste-Unit" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Unit"></datalist>
                     </div>
                     
                     <div class="form-group">
                         <label>Format</label>
-                        <input type="text" id="Format" list="liste-Format" placeholder="V&aelig;lg eller skriv...">
+                        <input type="text" id="Format" list="liste-Format" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Format"></datalist>
                     </div>
                     
                     <div class="form-group">
                         <label>RX</label>
-                        <input type="text" id="RX" list="liste-RX" placeholder="V&aelig;lg eller skriv...">
+                        <input type="text" id="RX" list="liste-RX" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-RX"></datalist>
                     </div>
                     
                     <div class="form-group">
                         <label>Produktionsplan</label>
-                        <input type="text" id="P-plan" list="liste-P-plan" placeholder="V&aelig;lg eller skriv...">
-                        <datalist id="liste-P-plan"></datalist>
+                        <select id="P-plan">
+                            <option value="">V&aelig;lg...</option>
+                        </select>
                     </div>
                     
                     <div class="form-group">
@@ -322,29 +323,29 @@
                     
                     <div class="form-group">
                         <label>Producer</label>
-                        <input type="text" id="Producer" list="liste-Producer" placeholder="V&aelig;lg eller skriv...">
+                        <input type="text" id="Producer" list="liste-Producer" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Producer"></datalist>
                     </div>
                     
                     <div class="form-group">
                         <label>Kommentator</label>
-                        <input type="text" id="Kommentator" list="liste-Kommentator" placeholder="V&aelig;lg eller skriv...">
+                        <input type="text" id="Kommentator" list="liste-Kommentator" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Kommentator"></datalist>
                     </div>
                     
                     <div class="form-group">
                         <label>Ekspert</label>
-                        <input type="text" id="Ekspert" list="liste-Ekspert" placeholder="V&aelig;lg eller skriv...">
+                        <input type="text" id="Ekspert" list="liste-Ekspert" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Ekspert"></datalist>
                     </div>
                     
                     <div class="form-group">
                         <label>Reporter</label>
-                        <input type="text" id="Reporter" list="liste-Reporter" placeholder="V&aelig;lg eller skriv...">
+                        <input type="text" id="Reporter" list="liste-Reporter" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Reporter"></datalist>
                     </div>
                     
-                    <div class="form-group full-width"><label>Link/noter</label><input type="text" id="Link_Noter"></div>
+                    <div class="form-group full-width"><label>Link/noter</label><input type="text" id="Link_Noter" autocomplete="off"></div>
                     
                     <div class="form-group full-width checkbox-group">
                         <input type="checkbox" id="TBC">
@@ -368,7 +369,6 @@
         let valgtAar = aktuelDato.getFullYear();
         let valgtMaaned = aktuelDato.getMonth();
 
-        // Lukker den nye Signal-dropdown, hvis man klikker udenfor
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.multi-select-container')) {
                 const dropdown = document.getElementById('signalDropdown');
@@ -457,7 +457,6 @@
                 const dropdowns = jsonData.dropdowns || {};
 
                 for (const [feltNavn, muligheder] of Object.entries(dropdowns)) {
-                    // Hvis feltet er "Signal til" (eller "Sling"), bygger vi vores nye multi-select checkbokse
                     if (feltNavn === 'Signal til' || feltNavn === 'Sling') {
                         const signalDropdown = document.getElementById('signalDropdown');
                         if (signalDropdown) {
@@ -481,8 +480,19 @@
                                 signalDropdown.appendChild(div);
                             });
                         }
+                    // Sikrer at Produktionsplan oprettes som rigtige <option> felter i vores <select>
+                    } else if (feltNavn === 'Produktionsplan' || feltNavn === 'P-plan') {
+                        const selectElement = document.getElementById('P-plan');
+                        if (selectElement) {
+                            selectElement.innerHTML = '<option value="">V&aelig;lg...</option>'; 
+                            muligheder.forEach(mulighed => {
+                                const option = document.createElement('option');
+                                option.value = mulighed;
+                                option.textContent = mulighed;
+                                selectElement.appendChild(option);
+                            });
+                        }
                     } else {
-                        // Alle andre normale datalister bygges som før
                         const datalistElement = document.getElementById('liste-' + feltNavn);
                         if (datalistElement) {
                             datalistElement.innerHTML = ''; 
@@ -571,7 +581,6 @@
             document.getElementById('programForm').reset();
             document.getElementById('RowId').value = ""; 
             
-            // Nulstiller multi-select
             document.querySelectorAll('#signalDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
             updateSignalHeader();
             
@@ -631,7 +640,6 @@
             document.getElementById('RX').value = program["RX"] || '';
             document.getElementById('P-plan').value = program["P-plan"] || program["Produktionsplan"] || '';
             
-            // Læser det eksisterende array ind i multi-select boksen
             const gemtSignal = program["Signal til"] || program["Sling"] || '';
             const signalArray = gemtSignal.split(',').map(s => s.trim());
             document.querySelectorAll('#signalDropdown input[type="checkbox"]').forEach(cb => {
@@ -758,7 +766,6 @@
                     visProgramtitel += ' <span style="color: red; font-weight: bold;">TBC</span>';
                 }
 
-                // Sikrer de nye navne vises med den rette farve
                 let pPlanTekst = program["P-plan"] || program["Produktionsplan"] || '-';
                 let signalTekst = program["Signal til"] || program["Sling"] || '-';
 
@@ -841,32 +848,29 @@
             const valgtTX = document.getElementById('TX').value; 
             const rowId = document.getElementById('RowId').value;
 
-            // Validering af standard krav
             if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
                 await visCustomDialog("Du skal som minimum vælge en dato, en kanal og en sportsgren samt indtaste en programtitel.", 'alert');
                 return; 
             }
 
-            // STRAM VALIDERING AF DATALISTER (Du må kun vælge noget der findes i forvejen)
+            // Validering af datalister (P-plan er ikke længere heri, da det er et select-felt, som validerer sig selv)
             const felterTilValidering = [
                 { id: 'Kanal', label: 'Kanal' },
                 { id: 'Sportsgren', label: 'Sportsgren' },
                 { id: 'Unit', label: 'Unit' },
                 { id: 'Format', label: 'Format' },
-                { id: 'RX', label: 'RX' },
-                { id: 'P-plan', label: 'Produktionsplan' }
+                { id: 'RX', label: 'RX' }
             ];
 
             for (let felt of felterTilValidering) {
                 const inputVal = document.getElementById(felt.id).value;
-                // Vi tjekker kun, hvis brugeren faktisk har skrevet noget i feltet
                 if (inputVal) {
                     const datalist = document.getElementById('liste-' + felt.id);
                     if (datalist) {
                         const gyldigeValg = Array.from(datalist.options).map(opt => opt.value);
                         if (!gyldigeValg.includes(inputVal)) {
                             await visCustomDialog(`"${inputVal}" er ikke tilladt i feltet "${felt.label}". Vælg venligst en gyldig mulighed fra listen.`, 'alert');
-                            return; // Stopper gem-funktionen helt
+                            return; 
                         }
                     }
                 }
@@ -934,7 +938,6 @@
 
             const tbcStatus = document.getElementById('TBC').checked ? "X" : "";
             
-            // Henter de valgte muligheder fra vores multi-select dropdown
             const valgteSignaler = Array.from(document.querySelectorAll('#signalDropdown input[type="checkbox"]:checked')).map(cb => cb.value).join(', ');
 
             const nyProduktion = {
@@ -950,8 +953,8 @@
                 "Format": document.getElementById('Format').value,
                 "RX": document.getElementById('RX').value,
                 "P-plan": document.getElementById('P-plan').value,
-                "Sling": valgteSignaler, // Beholder mapping over til Google Sheets Array
-                "Signal til": valgteSignaler, // For en sikkerheds skyld
+                "Sling": valgteSignaler, 
+                "Signal til": valgteSignaler, 
                 "Producer": document.getElementById('Producer').value,
                 "Kommentator": document.getElementById('Kommentator').value,
                 "Ekspert": document.getElementById('Ekspert').value,
