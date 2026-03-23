@@ -106,7 +106,6 @@
         .detail-label { font-weight: 600; color: #666; }
         .detail-value { color: #222; font-weight: 500; text-align: right; }
         
-        /* Knapper tvunget til præcis samme højde via inline-flex og fast height */
         .toggle-btn, .action-btn { 
             height: 26px; 
             padding: 0 10px; 
@@ -182,7 +181,7 @@
                 <h1>
                     Produktioner
                     <div class="year-filter">
-                        <span class="year-option active" id="year-2026" onclick="filtrerAar(2026)">2026</span>
+                        <span class="year-option" id="year-2026" onclick="filtrerAar(2026)">2026</span>
                         <span class="year-option" id="year-2027" onclick="filtrerAar(2027)">2027</span>
                         <span class="year-option" id="year-2028" onclick="filtrerAar(2028)">2028</span>
                     </div>
@@ -192,7 +191,7 @@
         </div>
 
         <div class="month-filter">
-            <button class="month-btn active" id="btn-month--1" onclick="filtrerMaaned(-1)">ALLE</button>
+            <button class="month-btn" id="btn-month--1" onclick="filtrerMaaned(-1)">ALLE</button>
             <button class="month-btn" id="btn-month-0" onclick="filtrerMaaned(0)">JANUAR</button>
             <button class="month-btn" id="btn-month-1" onclick="filtrerMaaned(1)">FEBRUAR</button>
             <button class="month-btn" id="btn-month-2" onclick="filtrerMaaned(2)">MARTS</button>
@@ -442,7 +441,6 @@
             }
         }
 
-        // Opdateret funktion for at håndtere hop imellem aktuelle og fremtidige år
         function filtrerAar(aar) {
             valgtAar = aar;
             const aktueltAar = aktuelDato.getFullYear();
@@ -450,7 +448,7 @@
             if (aar === aktueltAar) {
                 valgtMaaned = aktuelDato.getMonth();
             } else {
-                valgtMaaned = 0; // Viser Januar for alle andre år end det igangværende
+                valgtMaaned = 0; 
             }
             
             opdaterFiltreUI();
@@ -668,8 +666,8 @@
                     visProgramtitel += ' <span style="color: red; font-weight: bold;">TBC</span>';
                 }
 
-                // Kanten flyttet til venstre (border-left)
-                const borderDagsDato = erIdag ? 'border-left: 4px solid #28a745;' : '';
+                // Opdateret her til indvendig skygge for at undgå at bredden skifter
+                const borderDagsDato = erIdag ? 'box-shadow: inset 4px 0 0 0 #28a745;' : '';
 
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block';
