@@ -29,7 +29,6 @@
             position: relative;
         }
 
-        /* Styling til indlæsnings-teksten */
         #loader {
             text-align: center;
             padding: 40px;
@@ -107,12 +106,13 @@
         .detail-label { font-weight: 600; color: #666; }
         .detail-value { color: #222; font-weight: 500; text-align: right; }
         
-        .toggle-btn { background-color: #6c757d; padding: 6px 10px; margin-right: 5px; font-size: 12px; }
+        /* Knap-styling opdateret for at sikre helt lige knapper */
+        .toggle-btn { background-color: #6c757d; color: white; padding: 6px 10px; margin-right: 5px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; vertical-align: middle; }
         .toggle-btn:hover { background-color: #5a6268; }
-        .action-btn { padding: 6px 12px; margin-right: 5px; font-size: 12px; }
-        .rediger-btn { background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .action-btn { padding: 6px 12px; margin-right: 5px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; vertical-align: middle; }
+        .rediger-btn { background-color: #28a745; color: white; }
         .rediger-btn:hover { background-color: #218838; }
-        .slet-btn { background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; padding: 6px 10px; font-weight: bold; }
+        .slet-btn { background-color: #dc3545; color: white; font-weight: bold; padding: 6px 10px; margin-right: 0; }
         .slet-btn:hover { background-color: #c82333; }
         
         .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
@@ -168,7 +168,7 @@
                 <h1>
                     Produktioner
                     <div class="year-filter">
-                        <span class="year-option active" id="year-2026" onclick="filtrerAar(2026)">2026</span>
+                        <span class="year-option" id="year-2026" onclick="filtrerAar(2026)">2026</span>
                         <span class="year-option" id="year-2027" onclick="filtrerAar(2027)">2027</span>
                         <span class="year-option" id="year-2028" onclick="filtrerAar(2028)">2028</span>
                     </div>
@@ -178,7 +178,7 @@
         </div>
 
         <div class="month-filter">
-            <button class="month-btn active" id="btn-month--1" onclick="filtrerMaaned(-1)">ALLE</button>
+            <button class="month-btn" id="btn-month--1" onclick="filtrerMaaned(-1)">ALLE</button>
             <button class="month-btn" id="btn-month-0" onclick="filtrerMaaned(0)">JANUAR</button>
             <button class="month-btn" id="btn-month-1" onclick="filtrerMaaned(1)">FEBRUAR</button>
             <button class="month-btn" id="btn-month-2" onclick="filtrerMaaned(2)">MARTS</button>
@@ -318,8 +318,11 @@
         const scriptURL = 'https://script.google.com/macros/s/AKfycby7t3jTFcBOWIzwruxri1-9fsBRVZx2iiFhHT9P9Ci1vkPV69rTIl5-oPajAkfB5XXNCA/exec';
         
         let alleProgrammerGlobal = [];
-        let valgtAar = 2026;
-        let valgtMaaned = -1;
+        
+        // Sætter startvariabler til dags dato helt automatisk
+        let aktuelDato = new Date();
+        let valgtAar = aktuelDato.getFullYear();
+        let valgtMaaned = aktuelDato.getMonth();
 
         function visCustomDialog(message, type) {
             return new Promise((resolve) => {
@@ -368,8 +371,18 @@
             });
         }
 
+        // Opdaterer selve udseendet på filterknapperne baseret på JS-variabler
+        function opdaterFiltreUI() {
+            document.querySelectorAll('.year-option').forEach(el => el.classList.remove('active'));
+            let aktivtAarEl = document.getElementById('year-' + valgtAar);
+            if(aktivtAarEl) aktivtAarEl.classList.add('active');
+
+            document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
+            let aktivMaanedEl = document.getElementById('btn-month-' + valgtMaaned);
+            if(aktivMaanedEl) aktivMaanedEl.classList.add('active');
+        }
+
         async function loadProgrammer() {
-            // Viser loader, gemmer tabel imens data hentes
             document.getElementById('loader').style.display = 'block';
             document.getElementById('programTable').style.display = 'none';
             
@@ -405,9 +418,10 @@
                     return tidA.localeCompare(tidB);
                 });
 
+                // Sikrer at filtrene står korrekt, inden siden vises
+                opdaterFiltreUI();
                 opdaterVisning();
 
-                // Fjerner loader og viser tabellen, når data er klar
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('programTable').style.display = 'table';
 
@@ -419,15 +433,13 @@
 
         function filtrerAar(aar) {
             valgtAar = aar;
-            document.querySelectorAll('.year-option').forEach(el => el.classList.remove('active'));
-            document.getElementById('year-' + aar).classList.add('active');
+            opdaterFiltreUI();
             opdaterVisning();
         }
 
         function filtrerMaaned(maanedIndex) {
             valgtMaaned = maanedIndex;
-            document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('btn-month-' + maanedIndex).classList.add('active');
+            opdaterFiltreUI();
             opdaterVisning();
         }
 
@@ -497,7 +509,6 @@
                 document.getElementById('Tid').value = "";
             }
 
-            // Udfyldelse af det nye TX-felt
             if (program["TX"]) {
                 const txDate = new Date(program["TX"]);
                 if (!isNaN(txDate.getTime()) && String(program["TX"]).includes('T')) {
@@ -545,7 +556,6 @@
 
         async function udfoerSletning(rowId) {
             try {
-                // Viser loader igen under sletning
                 document.getElementById('loader').style.display = 'block';
                 document.getElementById('programTable').style.display = 'none';
 
@@ -567,22 +577,36 @@
             const table = document.getElementById('programTable');
             table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
 
+            const sysDatoI_dag = new Date(); // Dags dato logik opsættes her
+
             programmer.forEach(program => {
                 let pDato = program["Dato"] || '';
                 const pUgedag = program["Ugedag"] || '';
                 let pTid = program["Tid"] || '';
                 let pTX = program["TX"] || '';
                 let kanalNavn = program["Kanal"] || '';
+                let erIdag = false;
                 
+                // Tjekker om programmet rammer dags dato
+                if (pDato) {
+                    const d = new Date(pDato);
+                    if (d.getDate() === sysDatoI_dag.getDate() && 
+                        d.getMonth() === sysDatoI_dag.getMonth() && 
+                        d.getFullYear() === sysDatoI_dag.getFullYear()) {
+                        erIdag = true;
+                    }
+                }
+
                 if (pDato && pDato.includes('T')) {
                     const d = new Date(pDato);
                     pDato = d.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\./g, '/');
                 }
+                
                 if (pTid && pTid.includes('T')) {
                     const t = new Date(pTid);
                     pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
                 }
-                // Formatering af TX
+                
                 if (pTX && pTX.includes('T')) {
                     const tTX = new Date(pTX);
                     pTX = tTX.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
@@ -625,6 +649,9 @@
                     visProgramtitel += ' <span style="color: red; font-weight: bold;">TBC</span>';
                 }
 
+                // Genererer en grøn kant, hvis produktionen falder på dags dato
+                const borderDagsDato = erIdag ? 'border-right: 4px solid #28a745;' : '';
+
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block';
 
@@ -640,7 +667,7 @@
                     <td>${visProgramtitel}</td>
                     <td>${program["Lokation"] || ''}</td>
                     <td>${program["Unit"] || ''}</td>
-                    <td style="white-space: nowrap;">
+                    <td style="white-space: nowrap; ${borderDagsDato}">
                         <button class="btn toggle-btn" onclick="toggleDetails(this)">▼</button>
                         <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
                         <button class="action-btn slet-btn" onclick="bekraeftSlet(${program.RowId})" title="Slet program">✖</button>
@@ -650,7 +677,6 @@
                 const trDetail = document.createElement('tr');
                 trDetail.className = 'detail-row';
                 
-                // colspan er opdateret til 10 for at tage højde for den nye TX kolonne
                 trDetail.innerHTML = `
                     <td colspan="10">
                         <div class="detail-container">
@@ -700,7 +726,7 @@
             const valgtSportsgren = document.getElementById('Sportsgren').value;
             const valgtProgramtitel = document.getElementById('Programtitel').value;
             const valgtTid = document.getElementById('Tid').value;
-            const valgtTX = document.getElementById('TX').value; // Fanger TX-feltet
+            const valgtTX = document.getElementById('TX').value; 
             const rowId = document.getElementById('RowId').value;
 
             if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
@@ -753,7 +779,6 @@
                 }
             }
 
-            // Sørg for at vi viser loaderen under gemningen
             document.getElementById('loader').style.display = 'block';
             document.getElementById('programTable').style.display = 'none';
             
@@ -771,7 +796,6 @@
 
             const tbcStatus = document.getElementById('TBC').checked ? "X" : "";
 
-            // Opretter objektet inklusiv TX-feltet
             const nyProduktion = {
                 "RowId": rowId, 
                 "Dato": valgtDato,
@@ -807,7 +831,6 @@
                 await loadProgrammer(); 
             } catch (error) {
                 console.error('Fejl ved gemning:', error);
-                // Viser tabellen igen, hvis det fejlede
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('programTable').style.display = 'table';
                 await visCustomDialog("Der skete en fejl. Prøv igen.", 'alert');
