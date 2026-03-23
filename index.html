@@ -480,7 +480,6 @@
                                 signalDropdown.appendChild(div);
                             });
                         }
-                    // Sikrer at Produktionsplan oprettes som rigtige <option> felter i vores <select>
                     } else if (feltNavn === 'Produktionsplan' || feltNavn === 'P-plan') {
                         const selectElement = document.getElementById('P-plan');
                         if (selectElement) {
@@ -853,7 +852,6 @@
                 return; 
             }
 
-            // Validering af datalister (P-plan er ikke længere heri, da det er et select-felt, som validerer sig selv)
             const felterTilValidering = [
                 { id: 'Kanal', label: 'Kanal' },
                 { id: 'Sportsgren', label: 'Sportsgren' },
@@ -985,7 +983,30 @@
             }
         }
 
-        window.onload = loadProgrammer;
+        // Tilsætter logik til at åbne datalister automatisk ved klik
+        window.onload = function() {
+            document.querySelectorAll('input[list]').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.dataset.oldValue = this.value;
+                    this.value = '';
+                });
+                
+                // Gør det muligt at slette feltet helt (hvis man trykker på backspace/delete)
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' || e.key === 'Delete') {
+                        this.dataset.oldValue = ''; 
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    if (this.value === '') {
+                        this.value = this.dataset.oldValue || '';
+                    }
+                });
+            });
+
+            loadProgrammer();
+        };
 
         var modal = document.getElementById("programModal");
         function openModal() { modal.style.display = "block"; }
