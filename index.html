@@ -106,13 +106,27 @@
         .detail-label { font-weight: 600; color: #666; }
         .detail-value { color: #222; font-weight: 500; text-align: right; }
         
-        /* Knap-styling opdateret for at sikre helt lige knapper */
-        .toggle-btn { background-color: #6c757d; color: white; padding: 6px 10px; margin-right: 5px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; vertical-align: middle; }
+        /* Knapper tvunget til præcis samme højde via inline-flex og fast height */
+        .toggle-btn, .action-btn { 
+            height: 26px; 
+            padding: 0 10px; 
+            font-size: 12px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-sizing: border-box;
+            vertical-align: middle;
+        }
+        .toggle-btn { background-color: #6c757d; color: white; margin-right: 5px; }
         .toggle-btn:hover { background-color: #5a6268; }
-        .action-btn { padding: 6px 12px; margin-right: 5px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; vertical-align: middle; }
-        .rediger-btn { background-color: #28a745; color: white; }
+        
+        .rediger-btn { background-color: #28a745; color: white; margin-right: 5px; }
         .rediger-btn:hover { background-color: #218838; }
-        .slet-btn { background-color: #dc3545; color: white; font-weight: bold; padding: 6px 10px; margin-right: 0; }
+        
+        .slet-btn { background-color: #dc3545; color: white; font-weight: bold; margin-right: 0; }
         .slet-btn:hover { background-color: #c82333; }
         
         .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
@@ -168,7 +182,7 @@
                 <h1>
                     Produktioner
                     <div class="year-filter">
-                        <span class="year-option" id="year-2026" onclick="filtrerAar(2026)">2026</span>
+                        <span class="year-option active" id="year-2026" onclick="filtrerAar(2026)">2026</span>
                         <span class="year-option" id="year-2027" onclick="filtrerAar(2027)">2027</span>
                         <span class="year-option" id="year-2028" onclick="filtrerAar(2028)">2028</span>
                     </div>
@@ -178,7 +192,7 @@
         </div>
 
         <div class="month-filter">
-            <button class="month-btn" id="btn-month--1" onclick="filtrerMaaned(-1)">ALLE</button>
+            <button class="month-btn active" id="btn-month--1" onclick="filtrerMaaned(-1)">ALLE</button>
             <button class="month-btn" id="btn-month-0" onclick="filtrerMaaned(0)">JANUAR</button>
             <button class="month-btn" id="btn-month-1" onclick="filtrerMaaned(1)">FEBRUAR</button>
             <button class="month-btn" id="btn-month-2" onclick="filtrerMaaned(2)">MARTS</button>
@@ -319,7 +333,6 @@
         
         let alleProgrammerGlobal = [];
         
-        // Sætter startvariabler til dags dato helt automatisk
         let aktuelDato = new Date();
         let valgtAar = aktuelDato.getFullYear();
         let valgtMaaned = aktuelDato.getMonth();
@@ -371,7 +384,6 @@
             });
         }
 
-        // Opdaterer selve udseendet på filterknapperne baseret på JS-variabler
         function opdaterFiltreUI() {
             document.querySelectorAll('.year-option').forEach(el => el.classList.remove('active'));
             let aktivtAarEl = document.getElementById('year-' + valgtAar);
@@ -418,7 +430,6 @@
                     return tidA.localeCompare(tidB);
                 });
 
-                // Sikrer at filtrene står korrekt, inden siden vises
                 opdaterFiltreUI();
                 opdaterVisning();
 
@@ -431,8 +442,17 @@
             }
         }
 
+        // Opdateret funktion for at håndtere hop imellem aktuelle og fremtidige år
         function filtrerAar(aar) {
             valgtAar = aar;
+            const aktueltAar = aktuelDato.getFullYear();
+            
+            if (aar === aktueltAar) {
+                valgtMaaned = aktuelDato.getMonth();
+            } else {
+                valgtMaaned = 0; // Viser Januar for alle andre år end det igangværende
+            }
+            
             opdaterFiltreUI();
             opdaterVisning();
         }
@@ -577,7 +597,7 @@
             const table = document.getElementById('programTable');
             table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
 
-            const sysDatoI_dag = new Date(); // Dags dato logik opsættes her
+            const sysDatoI_dag = new Date();
 
             programmer.forEach(program => {
                 let pDato = program["Dato"] || '';
@@ -587,7 +607,6 @@
                 let kanalNavn = program["Kanal"] || '';
                 let erIdag = false;
                 
-                // Tjekker om programmet rammer dags dato
                 if (pDato) {
                     const d = new Date(pDato);
                     if (d.getDate() === sysDatoI_dag.getDate() && 
@@ -649,8 +668,8 @@
                     visProgramtitel += ' <span style="color: red; font-weight: bold;">TBC</span>';
                 }
 
-                // Genererer en grøn kant, hvis produktionen falder på dags dato
-                const borderDagsDato = erIdag ? 'border-right: 4px solid #28a745;' : '';
+                // Kanten flyttet til venstre (border-left)
+                const borderDagsDato = erIdag ? 'border-left: 4px solid #28a745;' : '';
 
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block';
@@ -658,7 +677,7 @@
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
                 trMain.innerHTML = `
-                    <td>${pDato}</td>
+                    <td style="${borderDagsDato}">${pDato}</td>
                     <td>${pUgedag}</td>
                     <td><b>${pTid}</b></td>
                     <td><b>${pTX}</b></td>
@@ -667,8 +686,8 @@
                     <td>${visProgramtitel}</td>
                     <td>${program["Lokation"] || ''}</td>
                     <td>${program["Unit"] || ''}</td>
-                    <td style="white-space: nowrap; ${borderDagsDato}">
-                        <button class="btn toggle-btn" onclick="toggleDetails(this)">▼</button>
+                    <td style="white-space: nowrap;">
+                        <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
                         <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
                         <button class="action-btn slet-btn" onclick="bekraeftSlet(${program.RowId})" title="Slet program">✖</button>
                     </td>
