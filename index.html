@@ -768,6 +768,10 @@
                 let pPlanTekst = program["P-plan"] || program["Produktionsplan"] || '-';
                 let signalTekst = program["Signal til"] || program["Sling"] || '-';
 
+                // Betinget styling til P-plan og Signal, så de kun er farvede, hvis der er data
+                let pPlanStyling = pPlanTekst !== '-' ? 'color: green; font-weight: bold;' : '';
+                let signalStyling = signalTekst !== '-' ? 'color: red; font-weight: bold;' : '';
+
                 const borderDagsDato = erIdag ? 'box-shadow: inset 4px 0 0 0 #28a745;' : '';
 
                 const tbody = document.createElement('tbody');
@@ -814,14 +818,14 @@
                                     <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${program["Unit"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Format:</span> <span class="detail-value">${program["Format"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">RX:</span> <span class="detail-value">${program["RX"] || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value" style="color: green; font-weight: bold;">${pPlanTekst}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value" style="${pPlanStyling}">${pPlanTekst}</span></div>
                                 </div>
                             </div>
                             
                             <div class="detail-card ekstra">
                                 <h4>Ekstra information</h4>
                                 <div class="detail-list">
-                                    <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="color: red; font-weight: bold;">${signalTekst}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="${signalStyling}">${signalTekst}</span></div>
                                 </div>
                                 <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
                                     <div class="detail-label" style="margin-bottom: 4px;">Link/noter:</div>
@@ -983,7 +987,6 @@
             }
         }
 
-        // Tilsætter logik til at åbne datalister automatisk ved klik
         window.onload = function() {
             document.querySelectorAll('input[list]').forEach(input => {
                 input.addEventListener('focus', function() {
@@ -991,7 +994,6 @@
                     this.value = '';
                 });
                 
-                // Gør det muligt at slette feltet helt (hvis man trykker på backspace/delete)
                 input.addEventListener('keydown', function(e) {
                     if (e.key === 'Backspace' || e.key === 'Delete') {
                         this.dataset.oldValue = ''; 
