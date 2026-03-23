@@ -137,6 +137,23 @@
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
         .form-group input:not([type="checkbox"]), .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
         
+        /* Custom Multi-select Dropdown Styles */
+        .multi-select-container { position: relative; width: 100%; user-select: none; }
+        .multi-select-header { 
+            padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: white; 
+            font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; 
+            min-height: 18px;
+        }
+        .multi-select-dropdown { 
+            position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; display: none; z-index: 10; border-radius: 4px; margin-top: 2px;
+        }
+        .multi-select-dropdown.show { display: block; }
+        .multi-select-option { padding: 6px 10px; display: flex; align-items: center; gap: 8px; }
+        .multi-select-option:hover { background-color: #f0f3f5; }
+        .multi-select-option input { margin: 0; cursor: pointer; width: 16px; height: 16px; }
+        .multi-select-option label { margin: 0; cursor: pointer; font-weight: normal; font-size: 14px; flex-grow: 1; }
+        
         .checkbox-group { display: flex; flex-direction: row; align-items: center; gap: 10px; margin-top: 10px; }
         .checkbox-group input { width: auto; margin: 0; cursor: pointer; width: 16px; height: 16px; }
         .checkbox-group label { margin: 0; cursor: pointer; font-size: 14px; font-weight: normal; color: #333; }
@@ -285,8 +302,23 @@
                         <datalist id="liste-RX"></datalist>
                     </div>
                     
-                    <div class="form-group"><label>P-plan</label><input type="text" id="P-plan"></div>
-                    <div class="form-group"><label>Sling</label><input type="text" id="Sling"></div>
+                    <div class="form-group">
+                        <label>Produktionsplan</label>
+                        <input type="text" id="P-plan" list="liste-P-plan" placeholder="V&aelig;lg eller skriv...">
+                        <datalist id="liste-P-plan"></datalist>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Signal skal sendes til</label>
+                        <div class="multi-select-container">
+                            <div class="multi-select-header" onclick="toggleMultiSelect()">
+                                <span id="signalHeaderText">V&aelig;lg...</span>
+                                <span style="font-size: 10px;">▼</span>
+                            </div>
+                            <div class="multi-select-dropdown" id="signalDropdown">
+                                </div>
+                        </div>
+                    </div>
                     
                     <div class="form-group">
                         <label>Producer</label>
@@ -335,6 +367,26 @@
         let aktuelDato = new Date();
         let valgtAar = aktuelDato.getFullYear();
         let valgtMaaned = aktuelDato.getMonth();
+
+        // Lukker den nye Signal-dropdown, hvis man klikker udenfor
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.multi-select-container')) {
+                const dropdown = document.getElementById('signalDropdown');
+                if (dropdown && dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        });
+
+        function toggleMultiSelect() {
+            document.getElementById('signalDropdown').classList.toggle('show');
+        }
+
+        function updateSignalHeader() {
+            const checkboxes = document.querySelectorAll('#signalDropdown input[type="checkbox"]:checked');
+            const valgteSignaler = Array.from(checkboxes).map(cb => cb.value).join(', ');
+            document.getElementById('signalHeaderText').textContent = valgteSignaler || 'Vælg...';
+        }
 
         function visCustomDialog(message, type) {
             return new Promise((resolve) => {
@@ -405,14 +457,41 @@
                 const dropdowns = jsonData.dropdowns || {};
 
                 for (const [feltNavn, muligheder] of Object.entries(dropdowns)) {
-                    const datalistElement = document.getElementById('liste-' + feltNavn);
-                    if (datalistElement) {
-                        datalistElement.innerHTML = ''; 
-                        muligheder.forEach(mulighed => {
-                            const option = document.createElement('option');
-                            option.value = mulighed;
-                            datalistElement.appendChild(option);
-                        });
+                    // Hvis feltet er "Signal til" (eller "Sling"), bygger vi vores nye multi-select checkbokse
+                    if (feltNavn === 'Signal til' || feltNavn === 'Sling') {
+                        const signalDropdown = document.getElementById('signalDropdown');
+                        if (signalDropdown) {
+                            signalDropdown.innerHTML = '';
+                            muligheder.forEach(mulighed => {
+                                const div = document.createElement('div');
+                                div.className = 'multi-select-option';
+                                
+                                const cb = document.createElement('input');
+                                cb.type = 'checkbox';
+                                cb.value = mulighed;
+                                cb.id = 'sig-' + mulighed.replace(/\s+/g, '-');
+                                cb.onchange = updateSignalHeader;
+                                
+                                const lbl = document.createElement('label');
+                                lbl.htmlFor = cb.id;
+                                lbl.textContent = mulighed;
+                                
+                                div.appendChild(cb);
+                                div.appendChild(lbl);
+                                signalDropdown.appendChild(div);
+                            });
+                        }
+                    } else {
+                        // Alle andre normale datalister bygges som før
+                        const datalistElement = document.getElementById('liste-' + feltNavn);
+                        if (datalistElement) {
+                            datalistElement.innerHTML = ''; 
+                            muligheder.forEach(mulighed => {
+                                const option = document.createElement('option');
+                                option.value = mulighed;
+                                datalistElement.appendChild(option);
+                            });
+                        }
                     }
                 }
 
@@ -491,6 +570,11 @@
         function opretNytProgram() {
             document.getElementById('programForm').reset();
             document.getElementById('RowId').value = ""; 
+            
+            // Nulstiller multi-select
+            document.querySelectorAll('#signalDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
+            updateSignalHeader();
+            
             document.getElementById('modalTitle').textContent = "Tilføj nyt program";
             document.getElementById('submitBtn').textContent = "Gem program";
             
@@ -545,8 +629,16 @@
             document.getElementById('Unit').value = program["Unit"] || '';
             document.getElementById('Format').value = program["Format"] || '';
             document.getElementById('RX').value = program["RX"] || '';
-            document.getElementById('P-plan').value = program["P-plan"] || '';
-            document.getElementById('Sling').value = program["Sling"] || '';
+            document.getElementById('P-plan').value = program["P-plan"] || program["Produktionsplan"] || '';
+            
+            // Læser det eksisterende array ind i multi-select boksen
+            const gemtSignal = program["Signal til"] || program["Sling"] || '';
+            const signalArray = gemtSignal.split(',').map(s => s.trim());
+            document.querySelectorAll('#signalDropdown input[type="checkbox"]').forEach(cb => {
+                cb.checked = signalArray.includes(cb.value);
+            });
+            updateSignalHeader();
+
             document.getElementById('Producer').value = program["Producer"] || '';
             document.getElementById('Kommentator').value = program["Kommentator"] || '';
             document.getElementById('Ekspert').value = program["Ekspert"] || '';
@@ -666,7 +758,10 @@
                     visProgramtitel += ' <span style="color: red; font-weight: bold;">TBC</span>';
                 }
 
-                // Opdateret her til indvendig skygge for at undgå at bredden skifter
+                // Sikrer de nye navne vises med den rette farve
+                let pPlanTekst = program["P-plan"] || program["Produktionsplan"] || '-';
+                let signalTekst = program["Signal til"] || program["Sling"] || '-';
+
                 const borderDagsDato = erIdag ? 'box-shadow: inset 4px 0 0 0 #28a745;' : '';
 
                 const tbody = document.createElement('tbody');
@@ -713,14 +808,14 @@
                                     <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${program["Unit"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Format:</span> <span class="detail-value">${program["Format"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">RX:</span> <span class="detail-value">${program["RX"] || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">P-plan:</span> <span class="detail-value">${program["P-plan"] || '-'}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value" style="color: green; font-weight: bold;">${pPlanTekst}</span></div>
                                 </div>
                             </div>
                             
                             <div class="detail-card ekstra">
                                 <h4>Ekstra information</h4>
                                 <div class="detail-list">
-                                    <div class="detail-list-item"><span class="detail-label">Sling:</span> <span class="detail-value">${program["Sling"] || '-'}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="color: red; font-weight: bold;">${signalTekst}</span></div>
                                 </div>
                                 <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
                                     <div class="detail-label" style="margin-bottom: 4px;">Link/noter:</div>
@@ -746,9 +841,35 @@
             const valgtTX = document.getElementById('TX').value; 
             const rowId = document.getElementById('RowId').value;
 
+            // Validering af standard krav
             if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
                 await visCustomDialog("Du skal som minimum vælge en dato, en kanal og en sportsgren samt indtaste en programtitel.", 'alert');
                 return; 
+            }
+
+            // STRAM VALIDERING AF DATALISTER (Du må kun vælge noget der findes i forvejen)
+            const felterTilValidering = [
+                { id: 'Kanal', label: 'Kanal' },
+                { id: 'Sportsgren', label: 'Sportsgren' },
+                { id: 'Unit', label: 'Unit' },
+                { id: 'Format', label: 'Format' },
+                { id: 'RX', label: 'RX' },
+                { id: 'P-plan', label: 'Produktionsplan' }
+            ];
+
+            for (let felt of felterTilValidering) {
+                const inputVal = document.getElementById(felt.id).value;
+                // Vi tjekker kun, hvis brugeren faktisk har skrevet noget i feltet
+                if (inputVal) {
+                    const datalist = document.getElementById('liste-' + felt.id);
+                    if (datalist) {
+                        const gyldigeValg = Array.from(datalist.options).map(opt => opt.value);
+                        if (!gyldigeValg.includes(inputVal)) {
+                            await visCustomDialog(`"${inputVal}" er ikke tilladt i feltet "${felt.label}". Vælg venligst en gyldig mulighed fra listen.`, 'alert');
+                            return; // Stopper gem-funktionen helt
+                        }
+                    }
+                }
             }
 
             const inputDate = new Date(valgtDato);
@@ -812,6 +933,9 @@
             }
 
             const tbcStatus = document.getElementById('TBC').checked ? "X" : "";
+            
+            // Henter de valgte muligheder fra vores multi-select dropdown
+            const valgteSignaler = Array.from(document.querySelectorAll('#signalDropdown input[type="checkbox"]:checked')).map(cb => cb.value).join(', ');
 
             const nyProduktion = {
                 "RowId": rowId, 
@@ -826,7 +950,8 @@
                 "Format": document.getElementById('Format').value,
                 "RX": document.getElementById('RX').value,
                 "P-plan": document.getElementById('P-plan').value,
-                "Sling": document.getElementById('Sling').value,
+                "Sling": valgteSignaler, // Beholder mapping over til Google Sheets Array
+                "Signal til": valgteSignaler, // For en sikkerheds skyld
                 "Producer": document.getElementById('Producer').value,
                 "Kommentator": document.getElementById('Kommentator').value,
                 "Ekspert": document.getElementById('Ekspert').value,
