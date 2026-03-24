@@ -25,7 +25,7 @@
         .table-container { 
             flex-grow: 1; 
             overflow-y: scroll; 
-            overflow-x: auto; /* Tillader horisontal scrolling på små skærme */
+            overflow-x: auto; 
             padding: 0 20px 20px 20px; 
             position: relative;
         }
@@ -63,8 +63,8 @@
         .month-btn:hover { background-color: #e9ecef; }
         .month-btn.active { background-color: #0056b3; color: white; border-color: #0056b3; }
 
-        /* Tilføjet min-width på 1300px for at forhindre at tabellen bliver mast på mobil/tv */
-        table { width: 100%; min-width: 1300px; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; table-layout: fixed; word-wrap: break-word; }
+        /* max()-funktionen sikrer, at tabellen aldrig bliver presset sammen på mobilen */
+        table { width: max(100%, 1250px); border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; table-layout: fixed; word-wrap: break-word; }
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
