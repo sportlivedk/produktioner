@@ -24,7 +24,8 @@
         
         .table-container { 
             flex-grow: 1; 
-            overflow-y: auto; 
+            /* Ændret fra auto til scroll for at forhindre hoppende layout */
+            overflow-y: scroll; 
             padding: 0 20px 20px 20px; 
             position: relative;
         }
@@ -62,7 +63,8 @@
         .month-btn:hover { background-color: #e9ecef; }
         .month-btn.active { background-color: #0056b3; color: white; border-color: #0056b3; }
 
-        table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; }
+        /* Tilføjet table-layout: fixed og word-wrap */
+        table { width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; table-layout: fixed; word-wrap: break-word; }
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
@@ -71,6 +73,8 @@
         tbody.program-block:hover td { background-color: #e8f0fe; }
         
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
+        
+        .date-separator td { border-top: 2px solid rgba(0, 0, 0, 0.3) !important; }
         
         .kanal-badge {
             display: inline-block;
@@ -239,16 +243,16 @@
         <table id="programTable" style="display: none;">
             <thead>
                 <tr>
-                    <th>Dato</th>
-                    <th>Ugedag</th>
-                    <th>Tid</th>
-                    <th>TX</th>
-                    <th>Kanal</th>
-                    <th>Sportsgren</th>
-                    <th style="max-width: 150px; word-wrap: break-word;">Programtitel</th>
-                    <th>Lokation</th>
-                    <th>Unit</th>
-                    <th>Handling</th>
+                    <th style="width: 85px;">Dato</th>
+                    <th style="width: 75px;">Ugedag</th>
+                    <th style="width: 55px;">Tid</th>
+                    <th style="width: 55px;">TX</th>
+                    <th style="width: 135px;">Kanal</th>
+                    <th style="width: 120px;">Sportsgren</th>
+                    <th>Programtitel</th>
+                    <th style="width: 120px;">Lokation</th>
+                    <th style="width: 60px;">Unit</th>
+                    <th style="width: 155px;">Handling</th>
                 </tr>
             </thead>
         </table>
