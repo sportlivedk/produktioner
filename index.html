@@ -682,6 +682,11 @@
             table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
 
             const sysDatoI_dag = new Date();
+            sysDatoI_dag.setHours(0, 0, 0, 0);
+            const sysDatoI_morgen = new Date(sysDatoI_dag);
+            sysDatoI_morgen.setDate(sysDatoI_morgen.getDate() + 1);
+
+            let forrigeDatoFormat = '';
 
             programmer.forEach(program => {
                 let pDato = program["Dato"] || '';
@@ -690,21 +695,31 @@
                 let pTX = program["TX"] || '';
                 let kanalNavn = program["Kanal"] || '';
                 let erIdag = false;
+                let erImorgen = false;
                 
                 if (pDato) {
                     const d = new Date(pDato);
-                    if (d.getDate() === sysDatoI_dag.getDate() && 
-                        d.getMonth() === sysDatoI_dag.getMonth() && 
-                        d.getFullYear() === sysDatoI_dag.getFullYear()) {
+                    d.setHours(0, 0, 0, 0);
+                    if (d.getTime() === sysDatoI_dag.getTime()) {
                         erIdag = true;
+                    } else if (d.getTime() === sysDatoI_morgen.getTime()) {
+                        erImorgen = true;
                     }
                 }
 
+                let pDatoFormat = pDato;
                 if (pDato && pDato.includes('T')) {
                     const d = new Date(pDato);
-                    pDato = d.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\./g, '/');
+                    pDatoFormat = d.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\./g, '/');
                 }
+                pDato = pDatoFormat;
                 
+                let datoSkift = false;
+                if (forrigeDatoFormat !== '' && forrigeDatoFormat !== pDatoFormat) {
+                    datoSkift = true;
+                }
+                forrigeDatoFormat = pDatoFormat;
+
                 if (pTid && pTid.includes('T')) {
                     const t = new Date(pTid);
                     pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
@@ -766,15 +781,23 @@
                     pPlanDisplay = `<a href="${linkUrl}" target="_blank" style="color: green; font-weight: bold; text-decoration: none;">Klik her for at åbne</a>`;
                 }
 
-                const borderDagsDato = erIdag ? 'box-shadow: inset 4px 0 0 0 #28a745;' : '';
+                let datoCelleStyle = '';
+                if (erIdag) {
+                    datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #28a745; color: #28a745; font-weight: bold;';
+                } else if (erImorgen) {
+                    datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #d39e00; color: #d39e00; font-weight: bold;';
+                }
 
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block';
+                if (datoSkift) {
+                    tbody.style.borderTop = '2px solid #000';
+                }
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
                 trMain.innerHTML = `
-                    <td style="${borderDagsDato}">${pDato}</td>
+                    <td style="${datoCelleStyle}">${pDato}</td>
                     <td>${pUgedag}</td>
                     <td><b>${pTid}</b></td>
                     <td><b>${pTX}</b></td>
