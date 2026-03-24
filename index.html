@@ -138,9 +138,8 @@
         .rediger-btn { background-color: #28a745; color: white; margin-right: 5px; }
         .rediger-btn:hover { background-color: #218838; }
 
-        /* Ny CSS klasse til Kopier-knappen */
-        .kopier-btn { background-color: #0d6efd; color: white; margin-right: 5px; }
-        .kopier-btn:hover { background-color: #0b5ed7; }
+        .kopier-btn { background-color: #0056b3; color: white; margin-right: 5px; }
+        .kopier-btn:hover { background-color: #004494; }
         
         .slet-btn { background-color: #dc3545; color: white; font-weight: bold; margin-right: 0; }
         .slet-btn:hover { background-color: #c82333; }
@@ -255,7 +254,7 @@
                     <th style="width: 280px;">Programtitel</th>
                     <th style="width: 270px;">Lokation</th>
                     <th style="width: 70px;">Unit</th>
-                    <th style="width: 210px;">Handling</th>
+                    <th style="width: 180px; text-align: right;">Handling</th>
                 </tr>
             </thead>
         </table>
@@ -663,12 +662,10 @@
             openModal();
         }
 
-        // Ny funktion til at kopiere et program (opretter som nyt, når man gemmer)
         function kopierProgram(rowId) {
             const program = alleProgrammerGlobal.find(p => p.RowId === rowId);
             if (!program) return;
 
-            // Fjerner RowId, så systemet opfatter det som et nyt program ved "Gem"
             document.getElementById('RowId').value = "";
             
             if (program["Dato"]) {
@@ -724,7 +721,6 @@
             
             document.getElementById('TBC').checked = (program["TBC"] && program["TBC"].toUpperCase() === 'X');
 
-            // Ændrer teksterne til kopi-tilstand
             document.getElementById('modalTitle').textContent = "Kopier program";
             document.getElementById('submitBtn').textContent = "Gem program";
             
@@ -892,7 +888,7 @@
                     <td>${visProgramtitel}</td>
                     <td>${program["Lokation"] || ''}</td>
                     <td>${program["Unit"] || ''}</td>
-                    <td style="white-space: nowrap;">
+                    <td style="white-space: nowrap; text-align: right;">
                         <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
                         <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
                         <button class="action-btn kopier-btn" onclick="kopierProgram(${program.RowId})" title="Kopier program">Kopier</button>
