@@ -63,7 +63,6 @@
         .month-btn:hover { background-color: #e9ecef; }
         .month-btn.active { background-color: #0056b3; color: white; border-color: #0056b3; }
 
-        /* Knaldhård min-width på 1400px sikrer, at tabellen aldrig masses på små skærme */
         table { width: 100%; min-width: 1400px; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; table-layout: fixed; word-wrap: break-word; }
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
@@ -138,6 +137,10 @@
         
         .rediger-btn { background-color: #28a745; color: white; margin-right: 5px; }
         .rediger-btn:hover { background-color: #218838; }
+
+        /* Ny CSS klasse til Kopier-knappen */
+        .kopier-btn { background-color: #0d6efd; color: white; margin-right: 5px; }
+        .kopier-btn:hover { background-color: #0b5ed7; }
         
         .slet-btn { background-color: #dc3545; color: white; font-weight: bold; margin-right: 0; }
         .slet-btn:hover { background-color: #c82333; }
@@ -250,9 +253,9 @@
                     <th style="width: 140px;">Kanal</th>
                     <th style="width: 120px;">Sportsgren</th>
                     <th style="width: 280px;">Programtitel</th>
-                    <th style="width: 300px;">Lokation</th>
+                    <th style="width: 270px;">Lokation</th>
                     <th style="width: 70px;">Unit</th>
-                    <th style="width: 180px;">Handling</th>
+                    <th style="width: 210px;">Handling</th>
                 </tr>
             </thead>
         </table>
@@ -660,6 +663,74 @@
             openModal();
         }
 
+        // Ny funktion til at kopiere et program (opretter som nyt, når man gemmer)
+        function kopierProgram(rowId) {
+            const program = alleProgrammerGlobal.find(p => p.RowId === rowId);
+            if (!program) return;
+
+            // Fjerner RowId, så systemet opfatter det som et nyt program ved "Gem"
+            document.getElementById('RowId').value = "";
+            
+            if (program["Dato"]) {
+                const d = new Date(program["Dato"]);
+                document.getElementById('Dato').value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+            } else {
+                document.getElementById('Dato').value = "";
+            }
+            
+            if (program["Tid"]) {
+                const t = new Date(program["Tid"]);
+                if (!isNaN(t.getTime()) && String(program["Tid"]).includes('T')) {
+                    document.getElementById('Tid').value = String(t.getHours()).padStart(2, '0') + ":" + String(t.getMinutes()).padStart(2, '0');
+                } else {
+                    document.getElementById('Tid').value = program["Tid"];
+                }
+            } else {
+                document.getElementById('Tid').value = "";
+            }
+
+            if (program["TX"]) {
+                const txDate = new Date(program["TX"]);
+                if (!isNaN(txDate.getTime()) && String(program["TX"]).includes('T')) {
+                    document.getElementById('TX').value = String(txDate.getHours()).padStart(2, '0') + ":" + String(txDate.getMinutes()).padStart(2, '0');
+                } else {
+                    document.getElementById('TX').value = String(program["TX"]).substring(0, 5);
+                }
+            } else {
+                document.getElementById('TX').value = "";
+            }
+
+            document.getElementById('Kanal').value = program["Kanal"] || '';
+            document.getElementById('Sportsgren').value = program["Sportsgren"] || '';
+            document.getElementById('Programtitel').value = program["Programtitel"] || '';
+            document.getElementById('Lokation').value = program["Lokation"] || '';
+            document.getElementById('Unit').value = program["Unit"] || '';
+            document.getElementById('Format').value = program["Format"] || '';
+            document.getElementById('RX').value = program["RX"] || '';
+            document.getElementById('P-plan').value = program["P-plan"] || program["Produktionsplan"] || '';
+            
+            const gemtSignal = program["Signal til"] || program["Sling"] || '';
+            const signalArray = gemtSignal.split(',').map(s => s.trim());
+            document.querySelectorAll('#signalDropdown input[type="checkbox"]').forEach(cb => {
+                cb.checked = signalArray.includes(cb.value);
+            });
+            updateSignalHeader();
+
+            document.getElementById('Producer').value = program["Producer"] || '';
+            document.getElementById('Kommentator').value = program["Kommentator"] || '';
+            document.getElementById('Ekspert').value = program["Ekspert"] || '';
+            document.getElementById('Reporter').value = program["Reporter"] || '';
+            document.getElementById('Link_Noter').value = program["Link / Noter"] || '';
+            
+            document.getElementById('TBC').checked = (program["TBC"] && program["TBC"].toUpperCase() === 'X');
+
+            // Ændrer teksterne til kopi-tilstand
+            document.getElementById('modalTitle').textContent = "Kopier program";
+            document.getElementById('submitBtn').textContent = "Gem program";
+            
+            openModal();
+        }
+
         async function bekraeftSlet(rowId) {
             const program = alleProgrammerGlobal.find(p => p.RowId === rowId);
             const titel = program ? program["Programtitel"] : "dette program";
@@ -824,6 +895,7 @@
                     <td style="white-space: nowrap;">
                         <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
                         <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
+                        <button class="action-btn kopier-btn" onclick="kopierProgram(${program.RowId})" title="Kopier program">Kopier</button>
                         <button class="action-btn slet-btn" onclick="bekraeftSlet(${program.RowId})" title="Slet program">✖</button>
                     </td>
                 `;
