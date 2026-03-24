@@ -72,9 +72,6 @@
         
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
         
-        /* Dato separator - nu nedtonet med en elegant gennemsigtighed */
-        .date-separator td { border-top: 2px solid rgba(0, 0, 0, 0.3) !important; }
-        
         .kanal-badge {
             display: inline-block;
             width: 130px;
@@ -750,15 +747,11 @@
                 else if (kanalNavn === 'Ekstra Bladet+') { badgeStyle = 'background-color: #ff0000; color: white;'; }
                 else if (kanalNavn === 'JFM') { badgeStyle = 'background-color: #175b30; color: white;'; }
                 else if (kanalNavn === 'Optagelse') { badgeStyle = 'background-color: #000000; color: white;'; }
-                else if (kanalNavn.includes('Pluto TV')) { 
-                    kanalStyling = 'color: #000000; font-weight: bold;';
-                } else if (kanalNavn === 'SPORT LIVE') {
-                    kanalStyling = 'color: #dd5f12; font-weight: bold;';
-                } else if (kanalNavn === 'Viaplay') {
-                    kanalStyling = 'color: #3b62d3; font-weight: bold;';
-                } else if (kanalNavn === 'YouTube') {
-                    kanalStyling = 'color: #5d441f; font-weight: bold;';
-                }
+                else if (kanalNavn === 'Pluto TV (DK)') { badgeStyle = 'background-color: #7030a0; color: white;'; }
+                else if (kanalNavn === 'Pluto TV (NO)') { badgeStyle = 'background-color: #3b201f; color: white;'; }
+                else if (kanalNavn === 'Pluto TV (SE)') { badgeStyle = 'background-color: #3b62d3; color: white;'; }
+                else if (kanalNavn === 'Pluto TV (DE)') { badgeStyle = 'background-color: #fff80c; color: black;'; }
+                else if (kanalNavn === 'SPORT LIVE') { badgeStyle = 'background-color: #dc5e11; color: white;'; }
 
                 let kanalDisplay = kanalNavn;
                 if (badgeStyle !== '') {
@@ -805,11 +798,14 @@
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block';
 
+                if (datoSkift) {
+                    const trSep = document.createElement('tr');
+                    trSep.innerHTML = `<td colspan="10" style="padding: 0; border: none;"><div style="height: 2px; background-color: rgba(0,0,0,0.2); width: 100%;"></div></td>`;
+                    tbody.appendChild(trSep);
+                }
+
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
-                if (datoSkift) {
-                    trMain.classList.add('date-separator');
-                }
                 
                 trMain.innerHTML = `
                     <td style="${datoCelleStyle}">${pDato}</td>
