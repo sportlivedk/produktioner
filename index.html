@@ -757,14 +757,13 @@
 
                 let signalStyling = signalTekst !== '-' ? 'color: red; font-weight: bold;' : '';
                 
-                // Formateringslogik til Produktionsplan link
                 let pPlanDisplay = '-';
                 if (pPlanTekst !== '-' && pPlanTekst.trim() !== '') {
                     let linkUrl = pPlanTekst.trim();
                     if (!linkUrl.startsWith('http://') && !linkUrl.startsWith('https://')) {
                         linkUrl = 'https://' + linkUrl;
                     }
-                    pPlanDisplay = `<a href="${linkUrl}" target="_blank" style="color: green; font-weight: bold; text-decoration: underline;">Klik her for at åbne</a>`;
+                    pPlanDisplay = `<a href="${linkUrl}" target="_blank" style="color: green; font-weight: bold; text-decoration: none;">Klik her for at åbne</a>`;
                 }
 
                 const borderDagsDato = erIdag ? 'box-shadow: inset 4px 0 0 0 #28a745;' : '';
