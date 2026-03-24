@@ -63,8 +63,8 @@
         .month-btn:hover { background-color: #e9ecef; }
         .month-btn.active { background-color: #0056b3; color: white; border-color: #0056b3; }
 
-        /* max()-funktionen sikrer, at tabellen aldrig bliver presset sammen på mobilen */
-        table { width: max(100%, 1250px); border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; table-layout: fixed; word-wrap: break-word; }
+        /* Knaldhård min-width på 1400px sikrer, at tabellen aldrig masses på små skærme */
+        table { width: 100%; min-width: 1400px; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; table-layout: fixed; word-wrap: break-word; }
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
@@ -249,8 +249,8 @@
                     <th style="width: 55px;">TX</th>
                     <th style="width: 140px;">Kanal</th>
                     <th style="width: 120px;">Sportsgren</th>
-                    <th>Programtitel</th>
-                    <th style="width: 260px;">Lokation</th>
+                    <th style="width: 280px;">Programtitel</th>
+                    <th style="width: 300px;">Lokation</th>
                     <th style="width: 70px;">Unit</th>
                     <th style="width: 180px;">Handling</th>
                 </tr>
