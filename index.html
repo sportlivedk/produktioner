@@ -254,7 +254,7 @@
                     <th style="width: 280px;">Programtitel</th>
                     <th style="width: 270px;">Lokation</th>
                     <th style="width: 70px;">Unit</th>
-                    <th style="width: 180px; text-align: right;">Handling</th>
+                    <th style="width: 210px;">Handling</th>
                 </tr>
             </thead>
         </table>
@@ -888,7 +888,7 @@
                     <td>${visProgramtitel}</td>
                     <td>${program["Lokation"] || ''}</td>
                     <td>${program["Unit"] || ''}</td>
-                    <td style="white-space: nowrap; text-align: right;">
+                    <td style="white-space: nowrap;">
                         <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
                         <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
                         <button class="action-btn kopier-btn" onclick="kopierProgram(${program.RowId})" title="Kopier program">Kopier</button>
