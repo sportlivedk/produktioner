@@ -303,13 +303,6 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>Produktionsplan</label>
-                        <select id="P-plan">
-                            <option value="">V&aelig;lg...</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
                         <label>Signal skal sendes til</label>
                         <div class="multi-select-container">
                             <div class="multi-select-header" onclick="toggleMultiSelect()">
@@ -343,6 +336,11 @@
                         <label>Reporter</label>
                         <input type="text" id="Reporter" list="liste-Reporter" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Reporter"></datalist>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Produktionsplan (inds&aelig;t link)</label>
+                        <input type="text" id="P-plan" autocomplete="off">
                     </div>
                     
                     <div class="form-group full-width"><label>Link/noter</label><input type="text" id="Link_Noter" autocomplete="off"></div>
@@ -480,18 +478,7 @@
                                 signalDropdown.appendChild(div);
                             });
                         }
-                    } else if (feltNavn === 'Produktionsplan' || feltNavn === 'P-plan') {
-                        const selectElement = document.getElementById('P-plan');
-                        if (selectElement) {
-                            selectElement.innerHTML = '<option value="">V&aelig;lg...</option>'; 
-                            muligheder.forEach(mulighed => {
-                                const option = document.createElement('option');
-                                option.value = mulighed;
-                                option.textContent = mulighed;
-                                selectElement.appendChild(option);
-                            });
-                        }
-                    } else {
+                    } else if (feltNavn !== 'Produktionsplan' && feltNavn !== 'P-plan') {
                         const datalistElement = document.getElementById('liste-' + feltNavn);
                         if (datalistElement) {
                             datalistElement.innerHTML = ''; 
@@ -768,9 +755,17 @@
                 let pPlanTekst = program["P-plan"] || program["Produktionsplan"] || '-';
                 let signalTekst = program["Signal til"] || program["Sling"] || '-';
 
-                // Betinget styling til P-plan og Signal, så de kun er farvede, hvis der er data
-                let pPlanStyling = pPlanTekst !== '-' ? 'color: green; font-weight: bold;' : '';
                 let signalStyling = signalTekst !== '-' ? 'color: red; font-weight: bold;' : '';
+                
+                // Formateringslogik til Produktionsplan link
+                let pPlanDisplay = '-';
+                if (pPlanTekst !== '-' && pPlanTekst.trim() !== '') {
+                    let linkUrl = pPlanTekst.trim();
+                    if (!linkUrl.startsWith('http://') && !linkUrl.startsWith('https://')) {
+                        linkUrl = 'https://' + linkUrl;
+                    }
+                    pPlanDisplay = `<a href="${linkUrl}" target="_blank" style="color: green; font-weight: bold; text-decoration: underline;">Klik her for at åbne</a>`;
+                }
 
                 const borderDagsDato = erIdag ? 'box-shadow: inset 4px 0 0 0 #28a745;' : '';
 
@@ -818,14 +813,14 @@
                                     <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${program["Unit"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Format:</span> <span class="detail-value">${program["Format"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">RX:</span> <span class="detail-value">${program["RX"] || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value" style="${pPlanStyling}">${pPlanTekst}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="${signalStyling}">${signalTekst}</span></div>
                                 </div>
                             </div>
                             
                             <div class="detail-card ekstra">
                                 <h4>Ekstra information</h4>
                                 <div class="detail-list">
-                                    <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="${signalStyling}">${signalTekst}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
                                 </div>
                                 <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
                                     <div class="detail-label" style="margin-bottom: 4px;">Link/noter:</div>
