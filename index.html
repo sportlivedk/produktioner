@@ -72,6 +72,9 @@
         
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
         
+        /* Den nye skudsikre linje, der adskiller datoerne */
+        .date-separator td { border-top: 2px solid #000 !important; }
+        
         .detail-row { display: none; }
         .detail-row td { border-bottom: 2px solid #ddd; padding: 8px 20px 20px 20px; background-color: #fafbfc; }
         
@@ -137,7 +140,6 @@
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
         .form-group input:not([type="checkbox"]), .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
         
-        /* Custom Multi-select Dropdown Styles */
         .multi-select-container { position: relative; width: 100%; user-select: none; }
         .multi-select-header { 
             padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: white; 
@@ -719,7 +721,7 @@
                     datoSkift = true;
                 }
                 forrigeDatoFormat = pDatoFormat;
-
+                
                 if (pTid && pTid.includes('T')) {
                     const t = new Date(pTid);
                     pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
@@ -790,12 +792,13 @@
 
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block';
-                if (datoSkift) {
-                    tbody.style.borderTop = '2px solid #000';
-                }
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
+                if (datoSkift) {
+                    trMain.classList.add('date-separator');
+                }
+                
                 trMain.innerHTML = `
                     <td style="${datoCelleStyle}">${pDato}</td>
                     <td>${pUgedag}</td>
