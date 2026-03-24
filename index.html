@@ -72,9 +72,6 @@
         
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
         
-        .date-separator td { border-top: 2px solid #000 !important; }
-        
-        /* Ny CSS-klasse til at styre ensartet bredde og design på kanal-badges */
         .kanal-badge {
             display: inline-block;
             width: 130px;
@@ -744,7 +741,6 @@
                     pTX = String(pTX).substring(0, 5);
                 }
 
-                // Generer den nye kanal badge styling
                 let badgeStyle = '';
                 if (kanalNavn === 'Feltet+') { badgeStyle = 'background-color: #ff0d99; color: white;'; }
                 else if (kanalNavn === 'Bold+') { badgeStyle = 'background-color: #92d050; color: white;'; }
@@ -801,12 +797,16 @@
 
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block';
+                
+                // Tilføjer den eksplicitte separator-række, hvis datoen skifter
+                if (datoSkift) {
+                    const trSep = document.createElement('tr');
+                    trSep.innerHTML = `<td colspan="10" style="padding: 0; border: none;"><div style="height: 2px; background-color: #333; width: 100%;"></div></td>`;
+                    tbody.appendChild(trSep);
+                }
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
-                if (datoSkift) {
-                    trMain.classList.add('date-separator');
-                }
                 
                 trMain.innerHTML = `
                     <td style="${datoCelleStyle}">${pDato}</td>
