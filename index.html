@@ -21,7 +21,7 @@
             top: 0; left: 0; width: 100%; height: 100%;
             background-color: #f4f6f8;
             z-index: 9999;
-            display: flex;
+            display: none; /* Skjult som standard for at undgå glimt */
             align-items: center;
             justify-content: center;
         }
@@ -35,7 +35,7 @@
             text-align: center;
         }
         .login-box img { height: 60px; margin-bottom: 20px; }
-        .login-box h2 { margin-top: 0; margin-bottom: 25px; color: #333; font-size: 20px; }
+        .login-box h2 { margin-top: 0; margin-bottom: 25px; color: #333; font-size: 26px; }
         .login-error { color: #dc3545; font-size: 13px; margin-bottom: 15px; display: none; font-weight: bold; }
         .btn-login { width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
         .login-loader { display: none; margin-top: 15px; font-size: 14px; color: #555; }
@@ -196,7 +196,7 @@
     <div id="loginOverlay" class="login-overlay">
         <div class="login-box">
             <img src="logo.png" alt="SPORT LIVE Logo">
-            <h2>Produktionsplan</h2>
+            <h2>Produktionsoversigt</h2>
             
             <div id="loginError" class="login-error">Forkert brugernavn eller adgangskode</div>
             
@@ -248,7 +248,7 @@
                 <div id="userInfoContainer" class="user-info-text">
                     Logget ind som <strong id="displayUsername"></strong> 
                     <span style="color: #ccc; margin-left: 8px;">|</span>
-                    <a href="#" class="logout-link" onclick="logUd(event)">LOG UD</a>
+                    <a href="#" class="logout-link" onclick="logUd(event)">Log ud</a>
                 </div>
             </div>
         </div>
@@ -435,7 +435,6 @@
                     brugerRolle = result.rolle || "Læser";
                     aktuelBruger = user;
                     
-                    // Gem brugerdata i browserens midlertidige hukommelse (slettes når browser lukkes)
                     sessionStorage.setItem('sportlive_user', aktuelBruger);
                     sessionStorage.setItem('sportlive_role', brugerRolle);
                     
@@ -458,30 +457,25 @@
         function afslutLogin() {
             document.getElementById('loginOverlay').style.display = "none";
             
-            // Opdaterer brugerteksten under "Tilføj"-knappen
             document.getElementById('userInfoContainer').style.display = "block";
             document.getElementById('displayUsername').textContent = aktuelBruger;
             
-            // Start dataindlæsning
             loadProgrammer();
         }
 
         function logUd(event) {
             if(event) event.preventDefault();
             
-            // Slet data fra hukommelsen
             sessionStorage.removeItem('sportlive_user');
             sessionStorage.removeItem('sportlive_role');
             brugerRolle = "";
             aktuelBruger = "";
             
-            // Nulstil tabellen og skjul elementer
             alleProgrammerGlobal = [];
             document.getElementById('programTable').style.display = "none";
             document.getElementById('ingenResultater').style.display = "none";
             document.getElementById('userInfoContainer').style.display = "none";
             
-            // Nulstil og vis login-skærm
             document.getElementById('loginPassword').value = "";
             document.getElementById('btnLogin').style.display = "block";
             document.getElementById('loginLoader').style.display = "none";
@@ -574,10 +568,13 @@
             else idagBtn.classList.remove('active');
         }
 
-        async function loadProgrammer() {
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('programTable').style.display = 'none';
-            document.getElementById('ingenResultater').style.display = 'none';
+        async function loadProgrammer(silent = false) {
+            // Hvis silent er true, skjuler vi ikke tabellen eller viser load-beskeden
+            if (!silent) {
+                document.getElementById('loader').style.display = 'block';
+                document.getElementById('programTable').style.display = 'none';
+                document.getElementById('ingenResultater').style.display = 'none';
+            }
             
             try {
                 const getUrl = scriptURL + "?action=getdata";
@@ -647,12 +644,16 @@
                 opdaterFiltreUI();
                 opdaterVisning();
 
-                document.getElementById('loader').style.display = 'none';
+                if (!silent) {
+                    document.getElementById('loader').style.display = 'none';
+                }
 
             } catch (error) {
                 console.error('Fejl ved indlæsning:', error);
-                document.getElementById('loader').textContent = "Der opstod en fejl under indlæsning af programmer.";
-                document.getElementById('loader').style.display = 'block';
+                if (!silent) {
+                    document.getElementById('loader').textContent = "Der opstod en fejl under indlæsning af programmer.";
+                    document.getElementById('loader').style.display = 'block';
+                }
             }
         }
 
@@ -1023,7 +1024,6 @@
                 if (erIdag) datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #28a745; color: #28a745; font-weight: bold;';
                 else if (erImorgen) datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #d39e00; color: #d39e00; font-weight: bold;';
 
-                // Alle knapper vises uanset rolle, så layoutet forbliver det samme
                 let handlingsKnapper = `
                     <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
                     <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
@@ -1239,7 +1239,6 @@
         }
 
         window.onload = function() {
-            // Tjekker om brugeren allerede er logget ind via hukommelsen
             const gemtBruger = sessionStorage.getItem('sportlive_user');
             const gemtRolle = sessionStorage.getItem('sportlive_role');
             
@@ -1248,8 +1247,16 @@
                 brugerRolle = gemtRolle;
                 afslutLogin();
             } else {
+                document.getElementById('loginOverlay').style.display = 'flex';
                 document.getElementById('loginUsername').focus();
             }
+
+            // Auto-opdatering i baggrunden hvert 5. minut (300.000 millisekunder)
+            setInterval(() => {
+                if (brugerRolle !== "") {
+                    loadProgrammer(true); // 'true' betyder 'silent' opdatering
+                }
+            }, 300000);
             
             document.querySelectorAll('input[list]').forEach(input => {
                 input.addEventListener('focus', function() {
