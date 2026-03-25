@@ -67,8 +67,9 @@
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
-        tbody.program-block:nth-of-type(odd) td { background-color: #ffffff; }
-        tbody.program-block:nth-of-type(even) td { background-color: #f0f3f5; }
+        /* Baggrundsfarverne styres nu af dato-klasserne bg-light og bg-dark frem for odd/even */
+        tbody.program-block.bg-light td { background-color: #ffffff; }
+        tbody.program-block.bg-dark td { background-color: #f0f3f5; }
         tbody.program-block:hover td { background-color: #e8f0fe; }
         
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
@@ -767,6 +768,7 @@
             sysDatoI_morgen.setDate(sysDatoI_morgen.getDate() + 1);
 
             let forrigeDatoFormat = '';
+            let isLightBg = true;
 
             programmer.forEach(program => {
                 let pDato = program["Dato"] || '';
@@ -797,6 +799,7 @@
                 let datoSkift = false;
                 if (forrigeDatoFormat !== '' && forrigeDatoFormat !== pDatoFormat) {
                     datoSkift = true;
+                    isLightBg = !isLightBg;
                 }
                 forrigeDatoFormat = pDatoFormat;
                 
@@ -867,7 +870,7 @@
                 }
 
                 const tbody = document.createElement('tbody');
-                tbody.className = 'program-block';
+                tbody.className = 'program-block ' + (isLightBg ? 'bg-light' : 'bg-dark');
 
                 if (datoSkift) {
                     const trSep = document.createElement('tr');
