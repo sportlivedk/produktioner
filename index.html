@@ -34,7 +34,8 @@
             max-width: 350px;
             text-align: center;
         }
-        .login-box img { height: 60px; margin-bottom: 20px; }
+        /* Afstand under logo mindsket fra 20px til 5px */
+        .login-box img { height: 60px; margin-bottom: 5px; } 
         .login-box h2 { margin-top: 0; margin-bottom: 25px; color: #333; font-size: 26px; }
         .login-error { color: #dc3545; font-size: 13px; margin-bottom: 15px; display: none; font-weight: bold; }
         .btn-login { width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
@@ -93,7 +94,8 @@
         .btn:hover { background-color: #004494; }
         .btn:disabled { background-color: #a0c4e8; cursor: not-allowed; }
         
-        .user-info-text { font-size: 12px; color: #666; display: none; }
+        /* Margin-top tilføjet for lidt ekstra luft */
+        .user-info-text { font-size: 12px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #333; }
         .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; margin-left: 8px; cursor: pointer; }
         .logout-link:hover { text-decoration: underline; }
@@ -569,7 +571,6 @@
         }
 
         async function loadProgrammer(silent = false) {
-            // Hvis silent er true, skjuler vi ikke tabellen eller viser load-beskeden
             if (!silent) {
                 document.getElementById('loader').style.display = 'block';
                 document.getElementById('programTable').style.display = 'none';
@@ -1251,10 +1252,9 @@
                 document.getElementById('loginUsername').focus();
             }
 
-            // Auto-opdatering i baggrunden hvert 5. minut (300.000 millisekunder)
             setInterval(() => {
                 if (brugerRolle !== "") {
-                    loadProgrammer(true); // 'true' betyder 'silent' opdatering
+                    loadProgrammer(true);
                 }
             }, 300000);
             
