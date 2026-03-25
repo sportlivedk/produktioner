@@ -15,6 +15,31 @@
             overflow: hidden; 
         }
         
+        /* LOGIN OVERLAY CSS */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #f4f6f8;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+        .login-box img { height: 60px; margin-bottom: 20px; }
+        .login-box h2 { margin-top: 0; margin-bottom: 25px; color: #333; font-size: 20px; }
+        .login-error { color: #dc3545; font-size: 13px; margin-bottom: 15px; display: none; font-weight: bold; }
+        .btn-login { width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
+        .login-loader { display: none; margin-top: 15px; font-size: 14px; color: #555; }
+
         .top-section { 
             padding: 20px 20px 0 20px; 
             flex-shrink: 0; 
@@ -64,6 +89,7 @@
 
         .btn { background-color: #0056b3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;}
         .btn:hover { background-color: #004494; }
+        .btn:disabled { background-color: #a0c4e8; cursor: not-allowed; }
         
         .month-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; align-items: center; }
         .month-btn { background-color: white; border: 1px solid #ccc; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: #555; transition: background-color 0.2s; }
@@ -85,15 +111,7 @@
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
         .date-separator td { border-top: 2px solid rgba(0, 0, 0, 0.3) !important; }
         
-        .kanal-badge {
-            display: inline-block;
-            width: 130px;
-            text-align: center;
-            padding: 6px 0;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-        }
+        .kanal-badge { display: inline-block; width: 130px; text-align: center; padding: 6px 0; border-radius: 6px; font-size: 12px; font-weight: bold; }
         
         .detail-row { display: none; }
         .detail-row td { border-bottom: 2px solid #ddd; padding: 8px 20px 20px 20px; background-color: #fafbfc; }
@@ -131,7 +149,7 @@
         .modal-content { background-color: white; margin: 3% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 1100px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
         .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
-        .form-group { display: flex; flex-direction: column; }
+        .form-group { display: flex; flex-direction: column; text-align: left;}
         .form-group.full-width { grid-column: span 4; }
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
         .form-group input:not([type="checkbox"]), .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
@@ -168,6 +186,27 @@
 </head>
 <body>
 
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <img src="logo.png" alt="SPORT LIVE Logo">
+            <h2>Produktionsplan</h2>
+            
+            <div id="loginError" class="login-error">Forkert brugernavn eller adgangskode</div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Brugernavn</label>
+                <input type="text" id="loginUsername" autocomplete="off" onkeypress="if(event.key === 'Enter') document.getElementById('loginPassword').focus();">
+            </div>
+            <div class="form-group">
+                <label>Adgangskode</label>
+                <input type="password" id="loginPassword" onkeypress="if(event.key === 'Enter') logInd();">
+            </div>
+            
+            <button id="btnLogin" class="btn btn-login" onclick="logInd()">Log ind</button>
+            <div id="loginLoader" class="login-loader">Validerer login...</div>
+        </div>
+    </div>
+
     <div class="top-section">
         <div class="header">
             <div class="title-wrapper">
@@ -195,7 +234,7 @@
                     <button id="clearSearchBtn" class="search-clear-btn" onclick="rydSogning()" title="Ryd søgning">✕</button>
                 </div>
                 
-                <button class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
+                <button id="btnTilfoejProgram" class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
             </div>
         </div>
 
@@ -219,7 +258,7 @@
     </div>
 
     <div class="table-container">
-        <div id="loader">Indlæser programmer ...</div>
+        <div id="loader" style="display: none;">Indlæser programmer ...</div>
         <div id="ingenResultater">Ingen programmer matcher dine valgte filtre eller søgning.</div>
         
         <table id="programTable" style="display: none;">
@@ -253,50 +292,41 @@
             <h2 id="modalTitle">Tilf&oslash;j nyt program</h2>
             <form id="programForm" autocomplete="off">
                 <input type="hidden" id="RowId">
-                
                 <div class="form-grid">
                     <div class="form-group"><label>Dato</label><input type="date" id="Dato" autocomplete="off"></div>
                     <div class="form-group"><label>Tid</label><input type="time" id="Tid" autocomplete="off"></div>
                     <div class="form-group"><label>TX</label><input type="time" id="TX" autocomplete="off"></div>
-                    
                     <div class="form-group">
                         <label>Kanal</label>
                         <input type="text" id="Kanal" list="liste-Kanal" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Kanal"></datalist>
                     </div>
-                    
                     <div class="form-group">
                         <label>Sportsgren</label>
                         <input type="text" id="Sportsgren" list="liste-Sportsgren" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Sportsgren"></datalist>
                     </div>
-                    
                     <div class="form-group"><label>Programtitel</label><input type="text" id="Programtitel" autocomplete="off"></div>
-                    
                     <div class="form-group">
                         <label>Lokation</label>
                         <input type="text" id="Lokation" list="liste-Lokation" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Lokation"></datalist>
                     </div>
-                    
                     <div class="form-group">
                         <label>Unit</label>
                         <input type="text" id="Unit" list="liste-Unit" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Unit"></datalist>
                     </div>
-                    
                     <div class="form-group">
                         <label>Format</label>
                         <input type="text" id="Format" list="liste-Format" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Format"></datalist>
                     </div>
-                    
                     <div class="form-group">
                         <label>RX</label>
                         <input type="text" id="RX" list="liste-RX" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-RX"></datalist>
                     </div>
-                    
                     <div class="form-group">
                         <label>Signal skal sendes til</label>
                         <div class="multi-select-container">
@@ -308,43 +338,35 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="form-group">
                         <label>Producer</label>
                         <input type="text" id="Producer" list="liste-Producer" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Producer"></datalist>
                     </div>
-                    
                     <div class="form-group">
                         <label>Kommentator/vært</label>
                         <input type="text" id="Kommentator" list="liste-Kommentator" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Kommentator"></datalist>
                     </div>
-                    
                     <div class="form-group">
                         <label>Ekspert/gæst</label>
                         <input type="text" id="Ekspert" list="liste-Ekspert" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Ekspert"></datalist>
                     </div>
-                    
                     <div class="form-group">
                         <label>Reporter</label>
                         <input type="text" id="Reporter" list="liste-Reporter" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Reporter"></datalist>
                     </div>
-                    
                     <div class="form-group full-width">
                         <label>Produktionsplan (inds&aelig;t link)</label>
                         <input type="text" id="P-plan" autocomplete="off">
                     </div>
-                    
                     <div class="form-group full-width"><label>Link/noter</label><input type="text" id="Link_Noter" autocomplete="off"></div>
-                    
                     <div class="form-group full-width checkbox-group">
                         <input type="checkbox" id="TBC">
                         <label for="TBC">Afventer endelig bekr&aelig;ftelse (TBC)</label>
                     </div>
-                    
                 </div>
                 <div class="form-actions">
                     <button type="button" id="submitBtn" class="btn" onclick="gemProgram()">Gem program</button>
@@ -354,16 +376,66 @@
     </div>
 
     <script>
+        // HUSK AT OPDATERE GOOGLE APPS SCRIPT MED LOGIN-LOGIK FØR DETTE VIRKER
         const scriptURL = 'https://script.google.com/macros/s/AKfycby7t3jTFcBOWIzwruxri1-9fsBRVZx2iiFhHT9P9Ci1vkPV69rTIl5-oPajAkfB5XXNCA/exec';
         
         let alleProgrammerGlobal = [];
-        
         let aktuelDato = new Date();
         let valgtAar = aktuelDato.getFullYear();
         let valgtMaaned = aktuelDato.getMonth();
         let visKunIdag = false;
         
+        // Styrer brugerens rettigheder
+        let brugerRolle = ""; 
+        
         const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
+
+        // --- LOGIN FUNKTIONALITET ---
+        async function logInd() {
+            const user = document.getElementById('loginUsername').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            const btn = document.getElementById('btnLogin');
+            const loader = document.getElementById('loginLoader');
+
+            if (!user || !pass) {
+                errorDiv.textContent = "Udfyld venligst begge felter";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            errorDiv.style.display = "none";
+            btn.style.display = "none";
+            loader.style.display = "block";
+
+            try {
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "login", username: user, password: pass }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    brugerRolle = result.rolle || "Læser";
+                    document.getElementById('loginOverlay').style.display = "none";
+                    loadProgrammer();
+                } else {
+                    errorDiv.textContent = result.message || "Forkert brugernavn eller adgangskode";
+                    errorDiv.style.display = "block";
+                    btn.style.display = "block";
+                    loader.style.display = "none";
+                }
+            } catch (error) {
+                console.error("Login fejl:", error);
+                errorDiv.textContent = "Der opstod en netværksfejl. Prøv igen.";
+                errorDiv.style.display = "block";
+                btn.style.display = "block";
+                loader.style.display = "none";
+            }
+        }
+        // ------------------------------
 
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.multi-select-container')) {
@@ -455,24 +527,19 @@
             document.getElementById('ingenResultater').style.display = 'none';
             
             try {
-                const response = await fetch(scriptURL);
+                const getUrl = scriptURL + "?action=getdata";
+                const response = await fetch(getUrl);
                 const jsonData = await response.json();
                 
                 let raaProgrammer = jsonData.programmer || [];
                 
-                // NØGLEFIX: Vi normaliserer alle datoer til "ÅÅÅÅ-MM-DD" det sekund, de indlæses
                 alleProgrammerGlobal = raaProgrammer.map(p => {
                     if (p["Dato"]) {
                         const d = new Date(p["Dato"]);
                         if (!isNaN(d.getTime())) {
-                            // Bygger en sikker lokal YYYY-MM-DD tekststreng
                             p["NormDato"] = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-                        } else {
-                            p["NormDato"] = p["Dato"];
-                        }
-                    } else {
-                        p["NormDato"] = "";
-                    }
+                        } else { p["NormDato"] = p["Dato"]; }
+                    } else { p["NormDato"] = ""; }
                     return p;
                 });
 
@@ -515,7 +582,6 @@
                     }
                 }
 
-                // Sortering bruger nu også den skudsikre NormDato
                 alleProgrammerGlobal.sort((a, b) => {
                     const datoA = a["NormDato"] || "";
                     const datoB = b["NormDato"] || "";
@@ -533,6 +599,7 @@
             } catch (error) {
                 console.error('Fejl ved indlæsning:', error);
                 document.getElementById('loader').textContent = "Der opstod en fejl under indlæsning af programmer.";
+                document.getElementById('loader').style.display = 'block';
             }
         }
 
@@ -569,7 +636,6 @@
                 visKunIdag = false;
                 opdaterFiltreUI();
             }
-            
             opdaterVisning();
         }
 
@@ -584,7 +650,6 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             const kategoriFilter = document.getElementById('typeFilter').value;
             
-            // Henter dags dato som ren YYYY-MM-DD tekststreng
             const sysDato = new Date();
             const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
 
@@ -592,7 +657,6 @@
                 const normDato = program["NormDato"] || "";
                 if (!normDato) return false;
                 
-                // Nu sammenligner vi blot tekst = tekst
                 if (visKunIdag) {
                     if (normDato !== idagsDatoStr) return false;
                 } else {
@@ -613,11 +677,8 @@
                 
                 if (searchTerm !== '') {
                     const alleFelterTekst = Object.values(program).join(' ').toLowerCase();
-                    if (!alleFelterTekst.includes(searchTerm)) {
-                        return false;
-                    }
+                    if (!alleFelterTekst.includes(searchTerm)) { return false; }
                 }
-                
                 return true;
             });
             
@@ -637,7 +698,13 @@
             }
         }
 
-        function opretNytProgram() {
+        async function opretNytProgram() {
+            // Tjekker rettigheder først
+            if (brugerRolle !== "Admin") {
+                await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
+                return;
+            }
+
             document.getElementById('programForm').reset();
             document.getElementById('RowId').value = ""; 
             
@@ -655,20 +722,22 @@
                 const sysDato = new Date();
                 document.getElementById('Dato').value = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
             }
-            
             openModal();
         }
 
-        function redigerProgram(rowId) {
+        async function redigerProgram(rowId) {
+            if (brugerRolle !== "Admin") {
+                await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
+                return;
+            }
+
             const program = alleProgrammerGlobal.find(p => p.RowId === rowId);
             if (!program) return;
 
             document.getElementById('RowId').value = program.RowId;
             
-            // Bruger NormDato i formularen for at sikre korrekt dag
-            if (program["NormDato"]) {
-                document.getElementById('Dato').value = program["NormDato"];
-            } else { document.getElementById('Dato').value = ""; }
+            if (program["NormDato"]) { document.getElementById('Dato').value = program["NormDato"]; } 
+            else { document.getElementById('Dato').value = ""; }
             
             if (program["Tid"]) {
                 const t = new Date(program["Tid"]);
@@ -709,19 +778,22 @@
 
             document.getElementById('modalTitle').textContent = "Rediger program";
             document.getElementById('submitBtn').textContent = "Opdater program";
-            
             openModal();
         }
 
-        function kopierProgram(rowId) {
+        async function kopierProgram(rowId) {
+            if (brugerRolle !== "Admin") {
+                await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
+                return;
+            }
+
             const program = alleProgrammerGlobal.find(p => p.RowId === rowId);
             if (!program) return;
 
             document.getElementById('RowId').value = "";
             
-            if (program["NormDato"]) {
-                document.getElementById('Dato').value = program["NormDato"];
-            } else { document.getElementById('Dato').value = ""; }
+            if (program["NormDato"]) { document.getElementById('Dato').value = program["NormDato"]; } 
+            else { document.getElementById('Dato').value = ""; }
             
             if (program["Tid"]) {
                 const t = new Date(program["Tid"]);
@@ -762,15 +834,18 @@
 
             document.getElementById('modalTitle').textContent = "Kopier program";
             document.getElementById('submitBtn').textContent = "Gem program";
-            
             openModal();
         }
 
         async function bekraeftSlet(rowId) {
+            if (brugerRolle !== "Admin") {
+                await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
+                return;
+            }
+
             const program = alleProgrammerGlobal.find(p => p.RowId === rowId);
             const titel = program ? program["Programtitel"] : "dette program";
             const bekræft = await visCustomDialog(`Er du sikker på, at du vil slette "${titel}"?\n\nDenne handling kan ikke fortrydes.`, "delete");
-            
             if (bekræft) udfoerSletning(rowId);
         }
 
@@ -808,7 +883,6 @@
                 ingenResultater.style.display = 'none';
             }
 
-            // Bygger tekststrenge for i dag og i morgen til sidemarkeringerne
             const sysDato = new Date();
             const idagStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
             const dImorgen = new Date(sysDato);
@@ -822,7 +896,6 @@
                 const normDato = program["NormDato"] || "";
                 let pDatoFormat = normDato;
                 
-                // Vender YYYY-MM-DD om til visning i tabellen: DD/MM/YYYY
                 if (normDato) {
                     const parts = normDato.split('-');
                     if(parts.length === 3) pDatoFormat = parts[2] + "/" + parts[1] + "/" + parts[0];
@@ -898,6 +971,14 @@
                 if (erIdag) datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #28a745; color: #28a745; font-weight: bold;';
                 else if (erImorgen) datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #d39e00; color: #d39e00; font-weight: bold;';
 
+                // Alle knapper vises uanset rolle, så layoutet forbliver det samme
+                let handlingsKnapper = `
+                    <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
+                    <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
+                    <button class="action-btn kopier-btn" onclick="kopierProgram(${program.RowId})" title="Kopier program">Kopier</button>
+                    <button class="action-btn slet-btn" onclick="bekraeftSlet(${program.RowId})" title="Slet program">✖</button>
+                `;
+
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block ' + (isLightBg ? 'bg-light' : 'bg-dark');
 
@@ -919,12 +1000,7 @@
                     <td>${visProgramtitel}</td>
                     <td>${program["Lokation"] || ''}</td>
                     <td>${program["Unit"] || ''}</td>
-                    <td style="white-space: nowrap;">
-                        <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
-                        <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
-                        <button class="action-btn kopier-btn" onclick="kopierProgram(${program.RowId})" title="Kopier program">Kopier</button>
-                        <button class="action-btn slet-btn" onclick="bekraeftSlet(${program.RowId})" title="Slet program">✖</button>
-                    </td>
+                    <td style="white-space: nowrap;">${handlingsKnapper}</td>
                 `;
                 
                 const trDetail = document.createElement('tr');
@@ -973,6 +1049,11 @@
         }
 
         async function gemProgram() {
+            if (brugerRolle !== "Admin") {
+                await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
+                return;
+            }
+            
             const valgtDato = document.getElementById('Dato').value;
             const valgtKanal = document.getElementById('Kanal').value;
             const valgtSportsgren = document.getElementById('Sportsgren').value;
@@ -1106,6 +1187,8 @@
         }
 
         window.onload = function() {
+            document.getElementById('loginUsername').focus();
+            
             document.querySelectorAll('input[list]').forEach(input => {
                 input.addEventListener('focus', function() {
                     this.dataset.oldValue = this.value;
@@ -1118,8 +1201,6 @@
                     if (this.value === '') this.value = this.dataset.oldValue || '';
                 });
             });
-
-            loadProgrammer();
         };
 
         var modal = document.getElementById("programModal");
