@@ -56,7 +56,7 @@
         .year-option.active { color: #0056b3; font-weight: bold; font-size: 22px; }
 
         .controls-wrapper { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .filter-select { padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; cursor: pointer; outline: none; }
+        .filter-select { padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; cursor: pointer; outline: none; min-width: 200px; }
         .search-container { display: flex; position: relative; }
         .search-input { padding: 9px; padding-right: 30px; border: 1px solid #ccc; border-radius: 4px; width: 220px; font-size: 14px; outline: none; }
         .search-clear-btn { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #999; font-weight: bold; font-size: 14px; display: none; }
@@ -70,7 +70,7 @@
         .month-btn:hover { background-color: #e9ecef; }
         .month-btn.active { background-color: #0056b3; color: white; border-color: #0056b3; }
         
-        .btn-idag { margin-left: 25px; border-width: 2px; border-color: #28a745; color: #28a745; }
+        .btn-idag { border: 1px solid #28a745; color: #28a745; margin-left: 0; }
         .btn-idag:hover { background-color: #e8f5e9; }
         .btn-idag.active { background-color: #28a745; color: white; border-color: #28a745; }
 
@@ -184,14 +184,14 @@
             
             <div class="controls-wrapper">
                 <select id="typeFilter" class="filter-select" onchange="opdaterVisning()">
-                    <option value="alle">Vis alle produktioner</option>
+                    <option value="alle">Vis alle programmer</option>
                     <option value="sportlive">Kun SPORT LIVE</option>
-                    <option value="ekstern">Eksterne produktioner</option>
+                    <option value="ekstern">Kun eksterne modtagere</option>
                     <option value="ob">Kun OB-produktioner</option>
                 </select>
                 
                 <div class="search-container">
-                    <input type="text" id="searchInput" class="search-input" placeholder="Søg i alt (titel, sted, person...)" onkeyup="handterSogning()">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Søg i alt (titel, sted, person...)" onkeyup="handterSogning()" autocomplete="off">
                     <button id="clearSearchBtn" class="search-clear-btn" onclick="rydSogning()" title="Ryd søgning">✕</button>
                 </div>
                 
@@ -363,7 +363,6 @@
         let valgtMaaned = aktuelDato.getMonth();
         let visKunIdag = false;
         
-        // Liste af kendte OB-vogne fra kravspecifikation
         const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
 
         document.addEventListener('click', function(e) {
@@ -526,7 +525,7 @@
         }
 
         function filtrerAar(aar) {
-            visKunIdag = false; // Afbryd "I DAG" hvis man klikker på et år
+            visKunIdag = false; 
             valgtAar = aar;
             const aktueltAar = aktuelDato.getFullYear();
             if (aar === aktueltAar) {
@@ -539,22 +538,30 @@
         }
 
         function filtrerMaaned(maanedIndex) {
-            visKunIdag = false; // Afbryd "I DAG" hvis man klikker på en måned
+            visKunIdag = false; 
             valgtMaaned = maanedIndex;
             opdaterFiltreUI();
             opdaterVisning();
         }
 
         function filtrerIdag() {
-            visKunIdag = !visKunIdag; // Toggle
+            visKunIdag = !visKunIdag; 
             opdaterFiltreUI();
             opdaterVisning();
         }
 
         function handterSogning() {
-            const input = document.getElementById('searchInput').value;
+            const input = document.getElementById('searchInput').value.trim();
             const clearBtn = document.getElementById('clearSearchBtn');
             clearBtn.style.display = input.length > 0 ? 'block' : 'none';
+            
+            // For at undgå UX-forvirring, tvinges månedsfilteret til "ALLE", når der søges i hele året
+            if (input.length > 0) {
+                valgtMaaned = -1;
+                visKunIdag = false;
+                opdaterFiltreUI();
+            }
+            
             opdaterVisning();
         }
 
@@ -569,25 +576,21 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             const kategoriFilter = document.getElementById('typeFilter').value;
             
-            // Format system dato til YYYY-MM-DD til sammenligning
             const sysDato = new Date();
             const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
 
             let filtreret = alleProgrammerGlobal.filter(program => {
                 const programDatoStr = program["Dato"] ? String(program["Dato"]).split('T')[0] : "";
                 
-                // 1. Tjek om "I DAG" er aktiv
                 if (visKunIdag) {
                     if (programDatoStr !== idagsDatoStr) return false;
                 } else {
-                    // Ellers brug År og Måned
                     if (!program["Dato"]) return false;
                     const d = new Date(program["Dato"]);
                     if (d.getFullYear() !== valgtAar) return false;
                     if (valgtMaaned !== -1 && d.getMonth() !== valgtMaaned) return false;
                 }
                 
-                // 2. Tjek Kategorifilter (Dropdown)
                 const kanalNavn = program["Kanal"] || '';
                 const unitNavn = program["Unit"] || '';
                 
@@ -595,9 +598,7 @@
                 if (kategoriFilter === 'ekstern' && kanalNavn === 'SPORT LIVE') return false;
                 if (kategoriFilter === 'ob' && !obUnits.includes(unitNavn)) return false;
                 
-                // 3. Tjek Søgefelt (fritekst i alle felter)
                 if (searchTerm !== '') {
-                    // Saml alle værdier for dette objekt i en lang tekststreng
                     const alleFelterTekst = Object.values(program).join(' ').toLowerCase();
                     if (!alleFelterTekst.includes(searchTerm)) {
                         return false;
@@ -623,8 +624,6 @@
             }
         }
 
-        // --- De resterende Formular-funktioner (opret, rediger, kopier, slet, gem) forbliver uændrede ---
-        
         function opretNytProgram() {
             document.getElementById('programForm').reset();
             document.getElementById('RowId').value = ""; 
