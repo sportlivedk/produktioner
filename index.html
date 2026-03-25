@@ -38,7 +38,7 @@
             font-weight: 500;
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
         
         .title-wrapper { display: flex; align-items: center; gap: 15px; }
         h1 { color: #333; font-size: 24px; margin: 0; display: flex; align-items: center; }
@@ -55,25 +55,34 @@
         .year-option:hover { color: #666; }
         .year-option.active { color: #0056b3; font-weight: bold; font-size: 22px; }
 
-        .btn { background-color: #0056b3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .controls-wrapper { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filter-select { padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; cursor: pointer; outline: none; }
+        .search-container { display: flex; position: relative; }
+        .search-input { padding: 9px; padding-right: 30px; border: 1px solid #ccc; border-radius: 4px; width: 220px; font-size: 14px; outline: none; }
+        .search-clear-btn { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #999; font-weight: bold; font-size: 14px; display: none; }
+        .search-clear-btn:hover { color: #dc3545; }
+
+        .btn { background-color: #0056b3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;}
         .btn:hover { background-color: #004494; }
         
-        .month-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-        .month-btn { background-color: white; border: 1px solid #ccc; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: #555; }
+        .month-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; align-items: center; }
+        .month-btn { background-color: white; border: 1px solid #ccc; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: #555; transition: background-color 0.2s; }
         .month-btn:hover { background-color: #e9ecef; }
         .month-btn.active { background-color: #0056b3; color: white; border-color: #0056b3; }
+        
+        .btn-idag { margin-left: 25px; border-width: 2px; border-color: #28a745; color: #28a745; }
+        .btn-idag:hover { background-color: #e8f5e9; }
+        .btn-idag.active { background-color: #28a745; color: white; border-color: #28a745; }
 
         table { width: 100%; min-width: 1400px; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; table-layout: fixed; word-wrap: break-word; }
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
         th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
-        /* Baggrundsfarverne styres nu af dato-klasserne bg-light og bg-dark frem for odd/even */
         tbody.program-block.bg-light td { background-color: #ffffff; }
         tbody.program-block.bg-dark td { background-color: #f0f3f5; }
         tbody.program-block:hover td { background-color: #e8f0fe; }
         
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
-        
         .date-separator td { border-top: 2px solid rgba(0, 0, 0, 0.3) !important; }
         
         .kanal-badge {
@@ -91,26 +100,8 @@
         
         .detail-container { display: flex; gap: 20px; }
         
-        .detail-card { 
-            flex: 1; 
-            background-color: white; 
-            border: 1px solid #e1e4e8; 
-            border-radius: 6px; 
-            padding: 15px; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); 
-        }
-        
-        .detail-card h4 { 
-            margin-top: 0; 
-            margin-bottom: 12px; 
-            font-size: 13px; 
-            text-transform: uppercase; 
-            color: #555; 
-            border-bottom: 1px solid #eee; 
-            padding-bottom: 8px; 
-            letter-spacing: 0.5px;
-        }
-        
+        .detail-card { flex: 1; background-color: white; border: 1px solid #e1e4e8; border-radius: 6px; padding: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .detail-card h4 { margin-top: 0; margin-bottom: 12px; font-size: 13px; text-transform: uppercase; color: #555; border-bottom: 1px solid #eee; padding-bottom: 8px; letter-spacing: 0.5px; }
         .detail-card.bemanding { border-top: 4px solid #0056b3; }
         .detail-card.teknik { border-top: 4px solid #28a745; }
         .detail-card.ekstra { border-top: 4px solid #fd7e14; }
@@ -121,17 +112,8 @@
         .detail-value { color: #222; font-weight: 500; text-align: right; }
         
         .toggle-btn, .action-btn { 
-            height: 26px; 
-            padding: 0 10px; 
-            font-size: 12px; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-sizing: border-box;
-            vertical-align: middle;
+            height: 26px; padding: 0 10px; font-size: 12px; border: none; border-radius: 4px; 
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; vertical-align: middle;
         }
         .toggle-btn { background-color: #6c757d; color: white; margin-right: 5px; }
         .toggle-btn:hover { background-color: #5a6268; }
@@ -155,15 +137,8 @@
         .form-group input:not([type="checkbox"]), .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
         
         .multi-select-container { position: relative; width: 100%; user-select: none; }
-        .multi-select-header { 
-            padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: white; 
-            font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; 
-            min-height: 18px;
-        }
-        .multi-select-dropdown { 
-            position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; display: none; z-index: 10; border-radius: 4px; margin-top: 2px;
-        }
+        .multi-select-header { padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: white; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; min-height: 18px; }
+        .multi-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; display: none; z-index: 10; border-radius: 4px; margin-top: 2px; }
         .multi-select-dropdown.show { display: block; }
         .multi-select-option { padding: 6px 10px; display: flex; align-items: center; gap: 8px; }
         .multi-select-option:hover { background-color: #f0f3f5; }
@@ -176,33 +151,19 @@
         
         .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
 
-        .custom-dialog-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.6); z-index: 9999;
-            display: none; align-items: center; justify-content: center;
-        }
-        .custom-dialog-box {
-            background-color: white; padding: 25px 30px; border-radius: 8px;
-            width: 90%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-        .custom-dialog-message {
-            font-size: 15px; color: #333; margin-bottom: 25px; line-height: 1.5;
-            white-space: pre-wrap; 
-        }
-        .custom-dialog-actions {
-            display: flex; justify-content: center; gap: 15px;
-        }
-        .btn-dialog {
-            padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;
-            font-size: 14px; font-weight: 600; transition: background-color 0.2s;
-        }
+        .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .custom-dialog-box { background-color: white; padding: 25px 30px; border-radius: 8px; width: 90%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
+        .custom-dialog-message { font-size: 15px; color: #333; margin-bottom: 25px; line-height: 1.5; white-space: pre-wrap; }
+        .custom-dialog-actions { display: flex; justify-content: center; gap: 15px; }
+        .btn-dialog { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; transition: background-color 0.2s; }
         .btn-dialog.primary { background-color: #0056b3; color: white; }
         .btn-dialog.primary:hover { background-color: #004494; }
         .btn-dialog.danger { background-color: #dc3545; color: white; }
         .btn-dialog.danger:hover { background-color: #c82333; }
         .btn-dialog.secondary { background-color: #e9ecef; color: #333; }
         .btn-dialog.secondary:hover { background-color: #dde0e3; }
+        
+        #ingenResultater { display: none; text-align: center; padding: 40px; color: #777; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -220,7 +181,22 @@
                     </div>
                 </h1>
             </div>
-            <button class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
+            
+            <div class="controls-wrapper">
+                <select id="typeFilter" class="filter-select" onchange="opdaterVisning()">
+                    <option value="alle">Vis alle produktioner</option>
+                    <option value="sportlive">Kun SPORT LIVE</option>
+                    <option value="ekstern">Eksterne produktioner</option>
+                    <option value="ob">Kun OB-produktioner</option>
+                </select>
+                
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Søg i alt (titel, sted, person...)" onkeyup="handterSogning()">
+                    <button id="clearSearchBtn" class="search-clear-btn" onclick="rydSogning()" title="Ryd søgning">✕</button>
+                </div>
+                
+                <button class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
+            </div>
         </div>
 
         <div class="month-filter">
@@ -237,11 +213,14 @@
             <button class="month-btn" id="btn-month-9" onclick="filtrerMaaned(9)">OKTOBER</button>
             <button class="month-btn" id="btn-month-10" onclick="filtrerMaaned(10)">NOVEMBER</button>
             <button class="month-btn" id="btn-month-11" onclick="filtrerMaaned(11)">DECEMBER</button>
+            
+            <button class="month-btn btn-idag" id="btn-idag" onclick="filtrerIdag()">I DAG</button>
         </div>
     </div>
 
     <div class="table-container">
         <div id="loader">Indlæser programmer ...</div>
+        <div id="ingenResultater">Ingen programmer matcher dine valgte filtre eller søgning.</div>
         
         <table id="programTable" style="display: none;">
             <thead>
@@ -382,6 +361,10 @@
         let aktuelDato = new Date();
         let valgtAar = aktuelDato.getFullYear();
         let valgtMaaned = aktuelDato.getMonth();
+        let visKunIdag = false;
+        
+        // Liste af kendte OB-vogne fra kravspecifikation
+        const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
 
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.multi-select-container')) {
@@ -450,18 +433,33 @@
         }
 
         function opdaterFiltreUI() {
+            // År
             document.querySelectorAll('.year-option').forEach(el => el.classList.remove('active'));
-            let aktivtAarEl = document.getElementById('year-' + valgtAar);
-            if(aktivtAarEl) aktivtAarEl.classList.add('active');
+            if (!visKunIdag) {
+                let aktivtAarEl = document.getElementById('year-' + valgtAar);
+                if(aktivtAarEl) aktivtAarEl.classList.add('active');
+            }
 
+            // Måned
             document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
-            let aktivMaanedEl = document.getElementById('btn-month-' + valgtMaaned);
-            if(aktivMaanedEl) aktivMaanedEl.classList.add('active');
+            if (!visKunIdag) {
+                let aktivMaanedEl = document.getElementById('btn-month-' + valgtMaaned);
+                if(aktivMaanedEl) aktivMaanedEl.classList.add('active');
+            }
+            
+            // I Dag knap
+            const idagBtn = document.getElementById('btn-idag');
+            if (visKunIdag) {
+                idagBtn.classList.add('active');
+            } else {
+                idagBtn.classList.remove('active');
+            }
         }
 
         async function loadProgrammer() {
             document.getElementById('loader').style.display = 'block';
             document.getElementById('programTable').style.display = 'none';
+            document.getElementById('ingenResultater').style.display = 'none';
             
             try {
                 const response = await fetch(scriptURL);
@@ -510,11 +508,7 @@
                 alleProgrammerGlobal.sort((a, b) => {
                     const datoA = a["Dato"] || "";
                     const datoB = b["Dato"] || "";
-                    
-                    if (datoA !== datoB) {
-                        return datoA.localeCompare(datoB);
-                    }
-                    
+                    if (datoA !== datoB) return datoA.localeCompare(datoB);
                     const tidA = a["Tid"] || "23:59";
                     const tidB = b["Tid"] || "23:59";
                     return tidA.localeCompare(tidB);
@@ -524,7 +518,6 @@
                 opdaterVisning();
 
                 document.getElementById('loader').style.display = 'none';
-                document.getElementById('programTable').style.display = 'table';
 
             } catch (error) {
                 console.error('Fejl ved indlæsning:', error);
@@ -533,36 +526,87 @@
         }
 
         function filtrerAar(aar) {
+            visKunIdag = false; // Afbryd "I DAG" hvis man klikker på et år
             valgtAar = aar;
             const aktueltAar = aktuelDato.getFullYear();
-            
             if (aar === aktueltAar) {
                 valgtMaaned = aktuelDato.getMonth();
             } else {
                 valgtMaaned = 0; 
             }
-            
             opdaterFiltreUI();
             opdaterVisning();
         }
 
         function filtrerMaaned(maanedIndex) {
+            visKunIdag = false; // Afbryd "I DAG" hvis man klikker på en måned
             valgtMaaned = maanedIndex;
             opdaterFiltreUI();
             opdaterVisning();
         }
 
+        function filtrerIdag() {
+            visKunIdag = !visKunIdag; // Toggle
+            opdaterFiltreUI();
+            opdaterVisning();
+        }
+
+        function handterSogning() {
+            const input = document.getElementById('searchInput').value;
+            const clearBtn = document.getElementById('clearSearchBtn');
+            clearBtn.style.display = input.length > 0 ? 'block' : 'none';
+            opdaterVisning();
+        }
+
+        function rydSogning() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            document.getElementById('clearSearchBtn').style.display = 'none';
+            opdaterVisning();
+        }
+
         function opdaterVisning() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const kategoriFilter = document.getElementById('typeFilter').value;
+            
+            // Format system dato til YYYY-MM-DD til sammenligning
+            const sysDato = new Date();
+            const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
+
             let filtreret = alleProgrammerGlobal.filter(program => {
-                if (!program["Dato"]) return false;
-                const d = new Date(program["Dato"]);
+                const programDatoStr = program["Dato"] ? String(program["Dato"]).split('T')[0] : "";
                 
-                if (d.getFullYear() !== valgtAar) return false;
+                // 1. Tjek om "I DAG" er aktiv
+                if (visKunIdag) {
+                    if (programDatoStr !== idagsDatoStr) return false;
+                } else {
+                    // Ellers brug År og Måned
+                    if (!program["Dato"]) return false;
+                    const d = new Date(program["Dato"]);
+                    if (d.getFullYear() !== valgtAar) return false;
+                    if (valgtMaaned !== -1 && d.getMonth() !== valgtMaaned) return false;
+                }
                 
-                if (valgtMaaned !== -1 && d.getMonth() !== valgtMaaned) return false;
+                // 2. Tjek Kategorifilter (Dropdown)
+                const kanalNavn = program["Kanal"] || '';
+                const unitNavn = program["Unit"] || '';
+                
+                if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE') return false;
+                if (kategoriFilter === 'ekstern' && kanalNavn === 'SPORT LIVE') return false;
+                if (kategoriFilter === 'ob' && !obUnits.includes(unitNavn)) return false;
+                
+                // 3. Tjek Søgefelt (fritekst i alle felter)
+                if (searchTerm !== '') {
+                    // Saml alle værdier for dette objekt i en lang tekststreng
+                    const alleFelterTekst = Object.values(program).join(' ').toLowerCase();
+                    if (!alleFelterTekst.includes(searchTerm)) {
+                        return false;
+                    }
+                }
                 
                 return true;
             });
+            
             tegnTabel(filtreret);
         }
 
@@ -579,6 +623,8 @@
             }
         }
 
+        // --- De resterende Formular-funktioner (opret, rediger, kopier, slet, gem) forbliver uændrede ---
+        
         function opretNytProgram() {
             document.getElementById('programForm').reset();
             document.getElementById('RowId').value = ""; 
@@ -589,10 +635,13 @@
             document.getElementById('modalTitle').textContent = "Tilføj nyt program";
             document.getElementById('submitBtn').textContent = "Gem program";
             
-            if (valgtAar) {
+            if (valgtAar && !visKunIdag) {
                 const defaultDate = new Date();
                 defaultDate.setFullYear(valgtAar);
                 document.getElementById('Dato').value = valgtAar + "-" + String(defaultDate.getMonth() + 1).padStart(2, '0') + "-" + String(defaultDate.getDate()).padStart(2, '0');
+            } else if (visKunIdag) {
+                const sysDato = new Date();
+                document.getElementById('Dato').value = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
             }
             
             openModal();
@@ -607,31 +656,21 @@
             if (program["Dato"]) {
                 const d = new Date(program["Dato"]);
                 document.getElementById('Dato').value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-            } else {
-                document.getElementById('Dato').value = "";
-            }
+            } else { document.getElementById('Dato').value = ""; }
             
             if (program["Tid"]) {
                 const t = new Date(program["Tid"]);
                 if (!isNaN(t.getTime()) && String(program["Tid"]).includes('T')) {
                     document.getElementById('Tid').value = String(t.getHours()).padStart(2, '0') + ":" + String(t.getMinutes()).padStart(2, '0');
-                } else {
-                    document.getElementById('Tid').value = program["Tid"];
-                }
-            } else {
-                document.getElementById('Tid').value = "";
-            }
+                } else { document.getElementById('Tid').value = program["Tid"]; }
+            } else { document.getElementById('Tid').value = ""; }
 
             if (program["TX"]) {
                 const txDate = new Date(program["TX"]);
                 if (!isNaN(txDate.getTime()) && String(program["TX"]).includes('T')) {
                     document.getElementById('TX').value = String(txDate.getHours()).padStart(2, '0') + ":" + String(txDate.getMinutes()).padStart(2, '0');
-                } else {
-                    document.getElementById('TX').value = String(program["TX"]).substring(0, 5);
-                }
-            } else {
-                document.getElementById('TX').value = "";
-            }
+                } else { document.getElementById('TX').value = String(program["TX"]).substring(0, 5); }
+            } else { document.getElementById('TX').value = ""; }
 
             document.getElementById('Kanal').value = program["Kanal"] || '';
             document.getElementById('Sportsgren').value = program["Sportsgren"] || '';
@@ -654,7 +693,6 @@
             document.getElementById('Ekspert').value = program["Ekspert"] || '';
             document.getElementById('Reporter').value = program["Reporter"] || '';
             document.getElementById('Link_Noter').value = program["Link / Noter"] || '';
-            
             document.getElementById('TBC').checked = (program["TBC"] && program["TBC"].toUpperCase() === 'X');
 
             document.getElementById('modalTitle').textContent = "Rediger program";
@@ -672,31 +710,21 @@
             if (program["Dato"]) {
                 const d = new Date(program["Dato"]);
                 document.getElementById('Dato').value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-            } else {
-                document.getElementById('Dato').value = "";
-            }
+            } else { document.getElementById('Dato').value = ""; }
             
             if (program["Tid"]) {
                 const t = new Date(program["Tid"]);
                 if (!isNaN(t.getTime()) && String(program["Tid"]).includes('T')) {
                     document.getElementById('Tid').value = String(t.getHours()).padStart(2, '0') + ":" + String(t.getMinutes()).padStart(2, '0');
-                } else {
-                    document.getElementById('Tid').value = program["Tid"];
-                }
-            } else {
-                document.getElementById('Tid').value = "";
-            }
+                } else { document.getElementById('Tid').value = program["Tid"]; }
+            } else { document.getElementById('Tid').value = ""; }
 
             if (program["TX"]) {
                 const txDate = new Date(program["TX"]);
                 if (!isNaN(txDate.getTime()) && String(program["TX"]).includes('T')) {
                     document.getElementById('TX').value = String(txDate.getHours()).padStart(2, '0') + ":" + String(txDate.getMinutes()).padStart(2, '0');
-                } else {
-                    document.getElementById('TX').value = String(program["TX"]).substring(0, 5);
-                }
-            } else {
-                document.getElementById('TX').value = "";
-            }
+                } else { document.getElementById('TX').value = String(program["TX"]).substring(0, 5); }
+            } else { document.getElementById('TX').value = ""; }
 
             document.getElementById('Kanal').value = program["Kanal"] || '';
             document.getElementById('Sportsgren').value = program["Sportsgren"] || '';
@@ -719,7 +747,6 @@
             document.getElementById('Ekspert').value = program["Ekspert"] || '';
             document.getElementById('Reporter').value = program["Reporter"] || '';
             document.getElementById('Link_Noter').value = program["Link / Noter"] || '';
-            
             document.getElementById('TBC').checked = (program["TBC"] && program["TBC"].toUpperCase() === 'X');
 
             document.getElementById('modalTitle').textContent = "Kopier program";
@@ -731,12 +758,9 @@
         async function bekraeftSlet(rowId) {
             const program = alleProgrammerGlobal.find(p => p.RowId === rowId);
             const titel = program ? program["Programtitel"] : "dette program";
-            
             const bekræft = await visCustomDialog(`Er du sikker på, at du vil slette "${titel}"?\n\nDenne handling kan ikke fortrydes.`, "delete");
             
-            if (bekræft) {
-                udfoerSletning(rowId);
-            }
+            if (bekræft) udfoerSletning(rowId);
         }
 
         async function udfoerSletning(rowId) {
@@ -760,7 +784,18 @@
 
         function tegnTabel(programmer) {
             const table = document.getElementById('programTable');
+            const ingenResultater = document.getElementById('ingenResultater');
+            
             table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
+
+            if (programmer.length === 0) {
+                table.style.display = 'none';
+                ingenResultater.style.display = 'block';
+                return;
+            } else {
+                table.style.display = 'table';
+                ingenResultater.style.display = 'none';
+            }
 
             const sysDatoI_dag = new Date();
             sysDatoI_dag.setHours(0, 0, 0, 0);
@@ -782,11 +817,8 @@
                 if (pDato) {
                     const d = new Date(pDato);
                     d.setHours(0, 0, 0, 0);
-                    if (d.getTime() === sysDatoI_dag.getTime()) {
-                        erIdag = true;
-                    } else if (d.getTime() === sysDatoI_morgen.getTime()) {
-                        erImorgen = true;
-                    }
+                    if (d.getTime() === sysDatoI_dag.getTime()) erIdag = true;
+                    else if (d.getTime() === sysDatoI_morgen.getTime()) erImorgen = true;
                 }
 
                 let pDatoFormat = pDato;
@@ -816,31 +848,26 @@
                 }
 
                 let badgeStyle = '';
-                if (kanalNavn === 'Feltet+') { badgeStyle = 'background-color: #ff0d99; color: white;'; }
-                else if (kanalNavn === 'Bold+') { badgeStyle = 'background-color: #92d050; color: white;'; }
-                else if (kanalNavn === 'Ekstra Bladet+') { badgeStyle = 'background-color: #ff0000; color: white;'; }
-                else if (kanalNavn === 'JFM') { badgeStyle = 'background-color: #175b30; color: white;'; }
-                else if (kanalNavn === 'Optagelse') { badgeStyle = 'background-color: #000000; color: white;'; }
-                else if (kanalNavn === 'Pluto TV (DK)') { badgeStyle = 'background-color: #7030a0; color: white;'; }
-                else if (kanalNavn === 'Pluto TV (NO)') { badgeStyle = 'background-color: #3b201f; color: white;'; }
-                else if (kanalNavn === 'Pluto TV (SE)') { badgeStyle = 'background-color: #3b62d3; color: white;'; }
-                else if (kanalNavn === 'Pluto TV (DE)') { badgeStyle = 'background-color: #fff80c; color: black;'; }
-                else if (kanalNavn === 'SPORT LIVE') { badgeStyle = 'background-color: #dc5e11; color: white;'; }
+                if (kanalNavn === 'Feltet+') badgeStyle = 'background-color: #ff0d99; color: white;';
+                else if (kanalNavn === 'Bold+') badgeStyle = 'background-color: #92d050; color: white;';
+                else if (kanalNavn === 'Ekstra Bladet+') badgeStyle = 'background-color: #ff0000; color: white;';
+                else if (kanalNavn === 'JFM') badgeStyle = 'background-color: #175b30; color: white;';
+                else if (kanalNavn === 'Optagelse') badgeStyle = 'background-color: #000000; color: white;';
+                else if (kanalNavn === 'Pluto TV (DK)') badgeStyle = 'background-color: #7030a0; color: white;';
+                else if (kanalNavn === 'Pluto TV (NO)') badgeStyle = 'background-color: #3b201f; color: white;';
+                else if (kanalNavn === 'Pluto TV (SE)') badgeStyle = 'background-color: #3b62d3; color: white;';
+                else if (kanalNavn === 'Pluto TV (DE)') badgeStyle = 'background-color: #fff80c; color: black;';
+                else if (kanalNavn === 'SPORT LIVE') badgeStyle = 'background-color: #dc5e11; color: white;';
 
                 let kanalDisplay = kanalNavn;
-                if (badgeStyle !== '') {
-                    kanalDisplay = `<span class="kanal-badge" style="${badgeStyle}">${kanalNavn}</span>`;
-                } else if (kanalNavn !== '') {
-                    kanalDisplay = `<span class="kanal-badge" style="background-color: #e9ecef; color: #333;">${kanalNavn}</span>`;
-                }
+                if (badgeStyle !== '') kanalDisplay = `<span class="kanal-badge" style="${badgeStyle}">${kanalNavn}</span>`;
+                else if (kanalNavn !== '') kanalDisplay = `<span class="kanal-badge" style="background-color: #e9ecef; color: #333;">${kanalNavn}</span>`;
 
                 let noterTekst = program["Link / Noter"] || '-';
                 let formateretNoter = noterTekst;
                 if (noterTekst !== '-') {
                     const urlRegex = /(https?:\/\/[^\s]+)/g;
-                    formateretNoter = noterTekst.replace(urlRegex, function(url) {
-                        return `<a href="${url}" target="_blank" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${url}</a>`;
-                    });
+                    formateretNoter = noterTekst.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${url}</a>`);
                 }
 
                 let visProgramtitel = program["Programtitel"] || '';
@@ -850,24 +877,18 @@
 
                 let pPlanTekst = program["P-plan"] || program["Produktionsplan"] || '-';
                 let signalTekst = program["Signal til"] || program["Sling"] || '-';
-
                 let signalStyling = signalTekst !== '-' ? 'color: red; font-weight: bold;' : '';
                 
                 let pPlanDisplay = '-';
                 if (pPlanTekst !== '-' && pPlanTekst.trim() !== '') {
                     let linkUrl = pPlanTekst.trim();
-                    if (!linkUrl.startsWith('http://') && !linkUrl.startsWith('https://')) {
-                        linkUrl = 'https://' + linkUrl;
-                    }
+                    if (!linkUrl.startsWith('http://') && !linkUrl.startsWith('https://')) linkUrl = 'https://' + linkUrl;
                     pPlanDisplay = `<a href="${linkUrl}" target="_blank" style="color: green; font-weight: bold; text-decoration: none;">Klik her for at åbne</a>`;
                 }
 
                 let datoCelleStyle = '';
-                if (erIdag) {
-                    datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #28a745; color: #28a745; font-weight: bold;';
-                } else if (erImorgen) {
-                    datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #d39e00; color: #d39e00; font-weight: bold;';
-                }
+                if (erIdag) datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #28a745; color: #28a745; font-weight: bold;';
+                else if (erImorgen) datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #d39e00; color: #d39e00; font-weight: bold;';
 
                 const tbody = document.createElement('tbody');
                 tbody.className = 'program-block ' + (isLightBg ? 'bg-light' : 'bg-dark');
@@ -880,7 +901,6 @@
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
-                
                 trMain.innerHTML = `
                     <td style="${datoCelleStyle}">${pDato}</td>
                     <td>${pUgedag}</td>
@@ -901,7 +921,6 @@
                 
                 const trDetail = document.createElement('tr');
                 trDetail.className = 'detail-row';
-                
                 trDetail.innerHTML = `
                     <td colspan="10">
                         <div class="detail-container">
@@ -988,9 +1007,7 @@
 
             if (inputDate < today) {
                 const confirmPast = await visCustomDialog("Du er i gang med at tilføje et program på en dato, som ligger i fortiden. Vil du fortsætte?", 'confirm');
-                if (!confirmPast) {
-                    return; 
-                }
+                if (!confirmPast) return; 
             }
 
             if (valgtKanal === "SPORT LIVE" && valgtDato && valgtTid) {
@@ -1020,14 +1037,13 @@
 
                 if (collision) {
                     const confirmCollision = await visCustomDialog(`Der ligger allerede et program på SPORT LIVE på denne dato og tidspunkt:\n\n"${collision.Programtitel}"\n\nVil du gemme programmet alligevel?`, 'confirm');
-                    if (!confirmCollision) {
-                        return; 
-                    }
+                    if (!confirmCollision) return; 
                 }
             }
 
             document.getElementById('loader').style.display = 'block';
             document.getElementById('programTable').style.display = 'none';
+            document.getElementById('ingenResultater').style.display = 'none';
             
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.textContent;
@@ -1042,7 +1058,6 @@
             }
 
             const tbcStatus = document.getElementById('TBC').checked ? "X" : "";
-            
             const valgteSignaler = Array.from(document.querySelectorAll('#signalDropdown input[type="checkbox"]:checked')).map(cb => cb.value).join(', ');
 
             const nyProduktion = {
@@ -1096,17 +1111,11 @@
                     this.dataset.oldValue = this.value;
                     this.value = '';
                 });
-                
                 input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Backspace' || e.key === 'Delete') {
-                        this.dataset.oldValue = ''; 
-                    }
+                    if (e.key === 'Backspace' || e.key === 'Delete') this.dataset.oldValue = ''; 
                 });
-
                 input.addEventListener('blur', function() {
-                    if (this.value === '') {
-                        this.value = this.dataset.oldValue || '';
-                    }
+                    if (this.value === '') this.value = this.dataset.oldValue || '';
                 });
             });
 
@@ -1116,7 +1125,7 @@
         var modal = document.getElementById("programModal");
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
-        window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }
+        window.onclick = function(event) { if (event.target == modal) modal.style.display = "none"; }
     </script>
 </body>
 </html>
