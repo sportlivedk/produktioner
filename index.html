@@ -555,7 +555,6 @@
             const clearBtn = document.getElementById('clearSearchBtn');
             clearBtn.style.display = input.length > 0 ? 'block' : 'none';
             
-            // For at undgå UX-forvirring, tvinges månedsfilteret til "ALLE", når der søges i hele året
             if (input.length > 0) {
                 valgtMaaned = -1;
                 visKunIdag = false;
@@ -577,16 +576,20 @@
             const kategoriFilter = document.getElementById('typeFilter').value;
             
             const sysDato = new Date();
-            const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
 
             let filtreret = alleProgrammerGlobal.filter(program => {
-                const programDatoStr = program["Dato"] ? String(program["Dato"]).split('T')[0] : "";
+                if (!program["Dato"]) return false;
+                
+                // Brug Date() til korrekt konvertering til lokal tidszone i stedet for streng-klipning
+                const d = new Date(program["Dato"]);
                 
                 if (visKunIdag) {
-                    if (programDatoStr !== idagsDatoStr) return false;
+                    if (d.getFullYear() !== sysDato.getFullYear() || 
+                        d.getMonth() !== sysDato.getMonth() || 
+                        d.getDate() !== sysDato.getDate()) {
+                        return false;
+                    }
                 } else {
-                    if (!program["Dato"]) return false;
-                    const d = new Date(program["Dato"]);
                     if (d.getFullYear() !== valgtAar) return false;
                     if (valgtMaaned !== -1 && d.getMonth() !== valgtMaaned) return false;
                 }
