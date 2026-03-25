@@ -432,27 +432,21 @@
         }
 
         function opdaterFiltreUI() {
-            // År
             document.querySelectorAll('.year-option').forEach(el => el.classList.remove('active'));
             if (!visKunIdag) {
                 let aktivtAarEl = document.getElementById('year-' + valgtAar);
                 if(aktivtAarEl) aktivtAarEl.classList.add('active');
             }
 
-            // Måned
             document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
             if (!visKunIdag) {
                 let aktivMaanedEl = document.getElementById('btn-month-' + valgtMaaned);
                 if(aktivMaanedEl) aktivMaanedEl.classList.add('active');
             }
             
-            // I Dag knap
             const idagBtn = document.getElementById('btn-idag');
-            if (visKunIdag) {
-                idagBtn.classList.add('active');
-            } else {
-                idagBtn.classList.remove('active');
-            }
+            if (visKunIdag) idagBtn.classList.add('active');
+            else idagBtn.classList.remove('active');
         }
 
         async function loadProgrammer() {
@@ -464,7 +458,24 @@
                 const response = await fetch(scriptURL);
                 const jsonData = await response.json();
                 
-                alleProgrammerGlobal = jsonData.programmer || [];
+                let raaProgrammer = jsonData.programmer || [];
+                
+                // NØGLEFIX: Vi normaliserer alle datoer til "ÅÅÅÅ-MM-DD" det sekund, de indlæses
+                alleProgrammerGlobal = raaProgrammer.map(p => {
+                    if (p["Dato"]) {
+                        const d = new Date(p["Dato"]);
+                        if (!isNaN(d.getTime())) {
+                            // Bygger en sikker lokal YYYY-MM-DD tekststreng
+                            p["NormDato"] = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+                        } else {
+                            p["NormDato"] = p["Dato"];
+                        }
+                    } else {
+                        p["NormDato"] = "";
+                    }
+                    return p;
+                });
+
                 const dropdowns = jsonData.dropdowns || {};
 
                 for (const [feltNavn, muligheder] of Object.entries(dropdowns)) {
@@ -504,9 +515,10 @@
                     }
                 }
 
+                // Sortering bruger nu også den skudsikre NormDato
                 alleProgrammerGlobal.sort((a, b) => {
-                    const datoA = a["Dato"] || "";
-                    const datoB = b["Dato"] || "";
+                    const datoA = a["NormDato"] || "";
+                    const datoB = b["NormDato"] || "";
                     if (datoA !== datoB) return datoA.localeCompare(datoB);
                     const tidA = a["Tid"] || "23:59";
                     const tidB = b["Tid"] || "23:59";
@@ -528,11 +540,8 @@
             visKunIdag = false; 
             valgtAar = aar;
             const aktueltAar = aktuelDato.getFullYear();
-            if (aar === aktueltAar) {
-                valgtMaaned = aktuelDato.getMonth();
-            } else {
-                valgtMaaned = 0; 
-            }
+            if (aar === aktueltAar) valgtMaaned = aktuelDato.getMonth();
+            else valgtMaaned = 0; 
             opdaterFiltreUI();
             opdaterVisning();
         }
@@ -575,23 +584,24 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             const kategoriFilter = document.getElementById('typeFilter').value;
             
+            // Henter dags dato som ren YYYY-MM-DD tekststreng
             const sysDato = new Date();
+            const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
 
             let filtreret = alleProgrammerGlobal.filter(program => {
-                if (!program["Dato"]) return false;
+                const normDato = program["NormDato"] || "";
+                if (!normDato) return false;
                 
-                // Brug Date() til korrekt konvertering til lokal tidszone i stedet for streng-klipning
-                const d = new Date(program["Dato"]);
-                
+                // Nu sammenligner vi blot tekst = tekst
                 if (visKunIdag) {
-                    if (d.getFullYear() !== sysDato.getFullYear() || 
-                        d.getMonth() !== sysDato.getMonth() || 
-                        d.getDate() !== sysDato.getDate()) {
-                        return false;
-                    }
+                    if (normDato !== idagsDatoStr) return false;
                 } else {
-                    if (d.getFullYear() !== valgtAar) return false;
-                    if (valgtMaaned !== -1 && d.getMonth() !== valgtMaaned) return false;
+                    const parts = normDato.split('-');
+                    const pAar = parseInt(parts[0], 10);
+                    const pMaaned = parseInt(parts[1], 10) - 1; 
+                    
+                    if (pAar !== valgtAar) return false;
+                    if (valgtMaaned !== -1 && pMaaned !== valgtMaaned) return false;
                 }
                 
                 const kanalNavn = program["Kanal"] || '';
@@ -655,9 +665,9 @@
 
             document.getElementById('RowId').value = program.RowId;
             
-            if (program["Dato"]) {
-                const d = new Date(program["Dato"]);
-                document.getElementById('Dato').value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+            // Bruger NormDato i formularen for at sikre korrekt dag
+            if (program["NormDato"]) {
+                document.getElementById('Dato').value = program["NormDato"];
             } else { document.getElementById('Dato').value = ""; }
             
             if (program["Tid"]) {
@@ -709,9 +719,8 @@
 
             document.getElementById('RowId').value = "";
             
-            if (program["Dato"]) {
-                const d = new Date(program["Dato"]);
-                document.getElementById('Dato').value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+            if (program["NormDato"]) {
+                document.getElementById('Dato').value = program["NormDato"];
             } else { document.getElementById('Dato').value = ""; }
             
             if (program["Tid"]) {
@@ -799,36 +808,28 @@
                 ingenResultater.style.display = 'none';
             }
 
-            const sysDatoI_dag = new Date();
-            sysDatoI_dag.setHours(0, 0, 0, 0);
-            const sysDatoI_morgen = new Date(sysDatoI_dag);
-            sysDatoI_morgen.setDate(sysDatoI_morgen.getDate() + 1);
+            // Bygger tekststrenge for i dag og i morgen til sidemarkeringerne
+            const sysDato = new Date();
+            const idagStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
+            const dImorgen = new Date(sysDato);
+            dImorgen.setDate(dImorgen.getDate() + 1);
+            const imorgenStr = dImorgen.getFullYear() + "-" + String(dImorgen.getMonth() + 1).padStart(2, '0') + "-" + String(dImorgen.getDate()).padStart(2, '0');
 
             let forrigeDatoFormat = '';
             let isLightBg = true;
 
             programmer.forEach(program => {
-                let pDato = program["Dato"] || '';
-                const pUgedag = program["Ugedag"] || '';
-                let pTid = program["Tid"] || '';
-                let pTX = program["TX"] || '';
-                let kanalNavn = program["Kanal"] || '';
-                let erIdag = false;
-                let erImorgen = false;
+                const normDato = program["NormDato"] || "";
+                let pDatoFormat = normDato;
                 
-                if (pDato) {
-                    const d = new Date(pDato);
-                    d.setHours(0, 0, 0, 0);
-                    if (d.getTime() === sysDatoI_dag.getTime()) erIdag = true;
-                    else if (d.getTime() === sysDatoI_morgen.getTime()) erImorgen = true;
+                // Vender YYYY-MM-DD om til visning i tabellen: DD/MM/YYYY
+                if (normDato) {
+                    const parts = normDato.split('-');
+                    if(parts.length === 3) pDatoFormat = parts[2] + "/" + parts[1] + "/" + parts[0];
                 }
-
-                let pDatoFormat = pDato;
-                if (pDato && pDato.includes('T')) {
-                    const d = new Date(pDato);
-                    pDatoFormat = d.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\./g, '/');
-                }
-                pDato = pDatoFormat;
+                
+                const erIdag = (normDato === idagStr);
+                const erImorgen = (normDato === imorgenStr);
                 
                 let datoSkift = false;
                 if (forrigeDatoFormat !== '' && forrigeDatoFormat !== pDatoFormat) {
@@ -836,6 +837,11 @@
                     isLightBg = !isLightBg;
                 }
                 forrigeDatoFormat = pDatoFormat;
+
+                const pUgedag = program["Ugedag"] || '';
+                let pTid = program["Tid"] || '';
+                let pTX = program["TX"] || '';
+                let kanalNavn = program["Kanal"] || '';
                 
                 if (pTid && pTid.includes('T')) {
                     const t = new Date(pTid);
@@ -904,7 +910,7 @@
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
                 trMain.innerHTML = `
-                    <td style="${datoCelleStyle}">${pDato}</td>
+                    <td style="${datoCelleStyle}">${pDatoFormat}</td>
                     <td>${pUgedag}</td>
                     <td><b>${pTid}</b></td>
                     <td><b>${pTX}</b></td>
@@ -1002,12 +1008,10 @@
                 }
             }
 
-            const inputDate = new Date(valgtDato);
-            inputDate.setHours(0, 0, 0, 0); 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const sysDato = new Date();
+            const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
 
-            if (inputDate < today) {
+            if (valgtDato < idagsDatoStr) {
                 const confirmPast = await visCustomDialog("Du er i gang med at tilføje et program på en dato, som ligger i fortiden. Vil du fortsætte?", 'confirm');
                 if (!confirmPast) return; 
             }
@@ -1017,12 +1021,7 @@
                     if (rowId && String(p.RowId) === String(rowId)) return false;
                     if (p.Kanal !== "SPORT LIVE") return false;
 
-                    let pDatoFormatted = "";
-                    if (p.Dato) {
-                        const d = new Date(p.Dato);
-                        pDatoFormatted = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-                    }
-
+                    const vTidFormatted = valgtTid.substring(0, 5);
                     let pTidFormatted = "";
                     if (p.Tid) {
                         const t = new Date(p.Tid);
@@ -1033,8 +1032,7 @@
                         }
                     }
 
-                    const vTidFormatted = valgtTid.substring(0, 5);
-                    return (pDatoFormatted === valgtDato) && (pTidFormatted === vTidFormatted);
+                    return (p.NormDato === valgtDato) && (pTidFormatted === vTidFormatted);
                 });
 
                 if (collision) {
