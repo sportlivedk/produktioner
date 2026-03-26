@@ -400,7 +400,7 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycby7t3jTFcBOWIzwruxri1-9fsBRVZx2iiFhHT9P9Ci1vkPV69rTIl5-oPajAkfB5XXNCA/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbznTiMKZZDJhmuZpArHJLwZcN-Ic745YuXZitWrdDojG-L3KuW-VXy0mtJUPOE3xCR1/exec';
         
         let alleProgrammerGlobal = [];
         let aktuelDato = new Date();
@@ -1282,7 +1282,14 @@
         var modal = document.getElementById("programModal");
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
-        window.onclick = function(event) { if (event.target == modal) modal.style.display = "none"; }
+        window.onclick = async function(event) { 
+    if (event.target == modal) { 
+        const bekræft = await visCustomDialog("Er du sikker på, at du vil lukke vinduet?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
+        if (bekræft) {
+            closeModal();
+        }
+    } 
+};
     </script>
 </body>
 </html>
