@@ -35,12 +35,10 @@
             text-align: center;
         }
         
-        /* HER ER RETTELSEN TIL LOGOET */
         .login-box img { 
             display: block; 
-            margin: 0 auto 5px auto; /* Centrerer 100% matematisk (top, højre, bund, venstre) */
+            margin: 0 auto 5px auto; 
             height: 60px; 
-            /* Hvis det stadig ser skævt ud, kan du aktivere linjen herunder ved at fjerne skråstreger/stjerner: */
             transform: translateX(-8px);
         } 
         
@@ -241,6 +239,7 @@
                 <div class="controls-wrapper">
                     <select id="typeFilter" class="filter-select" onchange="opdaterVisning()">
                         <option value="alle">Vis alle programmer</option>
+                        <option value="fremtidige">Kun fremtidige</option>
                         <option value="sportlive">Kun SPORT LIVE</option>
                         <option value="ekstern">Kun eksterne modtagere</option>
                         <option value="ob">Kun OB-produktioner</option>
@@ -279,6 +278,8 @@
             
             <button class="month-btn btn-idag" id="btn-idag" onclick="filtrerIdag()">I DAG</button>
         </div>
+
+        <div id="programCountText" style="margin-bottom: 15px; font-size: 14px; color: #555;">Viser <b>0</b> programmer</div>
     </div>
 
     <div class="table-container">
@@ -293,8 +294,8 @@
                     <th style="width: 55px;">Tid</th>
                     <th style="width: 55px;">TX</th>
                     <th style="width: 140px;">Kanal</th>
-                    <th style="width: 120px;">Sportsgren</th>
-                    <th style="width: 280px;">Programtitel</th>
+                    <th style="width: 90px;">Sportsgren</th>
+                    <th style="width: 310px;">Programtitel</th>
                     <th style="width: 270px;">Lokation</th>
                     <th style="width: 70px;">Unit</th>
                     <th style="width: 210px;">Handling</th>
@@ -733,6 +734,7 @@
                 const kanalNavn = program["Kanal"] || '';
                 const unitNavn = program["Unit"] || '';
                 
+                if (kategoriFilter === 'fremtidige' && normDato < idagsDatoStr) return false;
                 if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE') return false;
                 if (kategoriFilter === 'ekstern' && kanalNavn === 'SPORT LIVE') return false;
                 if (kategoriFilter === 'ob' && !obUnits.includes(unitNavn)) return false;
@@ -743,6 +745,11 @@
                 }
                 return true;
             });
+            
+            const countEl = document.getElementById('programCountText');
+            if (countEl) {
+                countEl.innerHTML = `Viser <b>${filtreret.length}</b> programmer`;
+            }
             
             tegnTabel(filtreret);
         }
@@ -1283,13 +1290,13 @@
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
         window.onclick = async function(event) { 
-    if (event.target == modal) { 
-        const bekræft = await visCustomDialog("Er du sikker på, at du vil lukke vinduet?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
-        if (bekræft) {
-            closeModal();
-        }
-    } 
-};
+            if (event.target == modal) { 
+                const bekræft = await visCustomDialog("Er du sikker på, at du vil lukke vinduet?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
+                if (bekræft) {
+                    closeModal();
+                }
+            } 
+        };
     </script>
 </body>
 </html>
