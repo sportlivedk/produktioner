@@ -742,7 +742,7 @@
                 if (kategoriFilter === 'fremtidige' && normDato < idagsDatoStr) return false;
                 // SPORT LIVE-filteret tager nu også Optagelse med
                 if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
-                if (kategoriFilter === 'ekstern' && kanalNavn === 'SPORT LIVE') return false;
+                if (kategoriFilter === 'ekstern' && (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse')) return false;
                 if (kategoriFilter === 'ob' && !obUnits.includes(unitNavn)) return false;
                 
                 if (searchTerm !== '') {
