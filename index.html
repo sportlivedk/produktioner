@@ -245,7 +245,7 @@
                             <option value="ekstern">Vis kun eksterne modtagere</option>
                             <option value="ob">Vis kun OB-produktioner</option>
                         </select>
-                        <div id="programCountText" style="position: absolute; top: 100%; left: 12px; font-size: 13px; color: #666; margin-top: 10px; white-space: nowrap;">Viser <b>0</b> programmer</div>
+                        <div id="programCountText" style="position: absolute; top: 100%; left: 10px; font-size: 13px; color: #666; margin-top: 6px; white-space: nowrap;">Viser <b>0</b> programmer</div>
                     </div>
                     
                     <div class="search-container">
@@ -314,7 +314,7 @@
 
     <div id="programModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
+            <span class="close" onclick="forsogLukModal()">&times;</span>
             <h2 id="modalTitle">Tilf&oslash;j nyt program</h2>
             <form id="programForm" autocomplete="off">
                 <input type="hidden" id="RowId">
@@ -326,6 +326,10 @@
                         <label>Kanal</label>
                         <input type="text" id="Kanal" list="liste-Kanal" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Kanal"></datalist>
+                    </div>
+                    <div class="form-group" id="group-Premieredato" style="display: none;">
+                        <label>Premieredato</label>
+                        <input type="date" id="Premieredato" autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label>Sportsgren</label>
@@ -736,7 +740,8 @@
                 const unitNavn = program["Unit"] || '';
                 
                 if (kategoriFilter === 'fremtidige' && normDato < idagsDatoStr) return false;
-                if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE') return false;
+                // SPORT LIVE-filteret tager nu også Optagelse med
+                if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
                 if (kategoriFilter === 'ekstern' && kanalNavn === 'SPORT LIVE') return false;
                 if (kategoriFilter === 'ob' && !obUnits.includes(unitNavn)) return false;
                 
@@ -768,6 +773,31 @@
             }
         }
 
+        // Tjekker om formen har fået skrevet/valgt noget (ser bort fra den auto-udfyldte dato)
+        function erFormularUdfyldt() {
+            const fieldsToCheck = ['Tid', 'TX', 'Kanal', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'Producer', 'Kommentator', 'Ekspert', 'Reporter', 'P-plan', 'Link_Noter', 'Premieredato'];
+            for (let id of fieldsToCheck) {
+                const el = document.getElementById(id);
+                if (el && el.value.trim() !== '') return true;
+            }
+            const checkboxes = document.querySelectorAll('#signalDropdown input[type="checkbox"]:checked');
+            if (checkboxes.length > 0) return true;
+            const tbcBox = document.getElementById('TBC');
+            if (tbcBox && tbcBox.checked) return true;
+            return false;
+        }
+
+        async function forsogLukModal() {
+            if (erFormularUdfyldt()) {
+                const bekræft = await visCustomDialog("Er du sikker på, at du vil afslutte uden at gemme?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
+                if (bekræft) {
+                    closeModal();
+                }
+            } else {
+                closeModal();
+            }
+        }
+
         async function opretNytProgram() {
             if (brugerRolle !== "Admin") {
                 await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
@@ -777,6 +807,9 @@
             document.getElementById('programForm').reset();
             document.getElementById('RowId').value = ""; 
             
+            document.getElementById('group-Premieredato').style.display = 'none';
+            document.getElementById('Premieredato').value = '';
+
             document.querySelectorAll('#signalDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
             updateSignalHeader();
             
@@ -823,6 +856,15 @@
             } else { document.getElementById('TX').value = ""; }
 
             document.getElementById('Kanal').value = program["Kanal"] || '';
+            
+            if (program["Kanal"] === 'Optagelse') {
+                document.getElementById('group-Premieredato').style.display = 'flex';
+                document.getElementById('Premieredato').value = program["Premieredato"] || '';
+            } else {
+                document.getElementById('group-Premieredato').style.display = 'none';
+                document.getElementById('Premieredato').value = '';
+            }
+
             document.getElementById('Sportsgren').value = program["Sportsgren"] || '';
             document.getElementById('Programtitel').value = program["Programtitel"] || '';
             document.getElementById('Lokation').value = program["Lokation"] || '';
@@ -879,6 +921,15 @@
             } else { document.getElementById('TX').value = ""; }
 
             document.getElementById('Kanal').value = program["Kanal"] || '';
+            
+            if (program["Kanal"] === 'Optagelse') {
+                document.getElementById('group-Premieredato').style.display = 'flex';
+                document.getElementById('Premieredato').value = program["Premieredato"] || '';
+            } else {
+                document.getElementById('group-Premieredato').style.display = 'none';
+                document.getElementById('Premieredato').value = '';
+            }
+
             document.getElementById('Sportsgren').value = program["Sportsgren"] || '';
             document.getElementById('Programtitel').value = program["Programtitel"] || '';
             document.getElementById('Lokation').value = program["Lokation"] || '';
@@ -1214,6 +1265,7 @@
                 "Dato": valgtDato,
                 "Ugedag": beregnetUgedag,
                 "Kanal": valgtKanal,
+                "Premieredato": document.getElementById('Premieredato') ? document.getElementById('Premieredato').value : "",
                 "Sportsgren": valgtSportsgren,
                 "Programtitel": valgtProgramtitel,
                 "Lokation": document.getElementById('Lokation').value,
@@ -1273,6 +1325,15 @@
                 }
             }, 300000);
             
+            // Tilføjer event listener for at folde Premieredato ud, hvis Kanal = Optagelse
+            document.getElementById('Kanal').addEventListener('input', function() {
+                if (this.value === 'Optagelse') {
+                    document.getElementById('group-Premieredato').style.display = 'flex';
+                } else {
+                    document.getElementById('group-Premieredato').style.display = 'none';
+                }
+            });
+            
             document.querySelectorAll('input[list]').forEach(input => {
                 input.addEventListener('focus', function() {
                     this.dataset.oldValue = this.value;
@@ -1290,12 +1351,10 @@
         var modal = document.getElementById("programModal");
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
+        
         window.onclick = async function(event) { 
             if (event.target == modal) { 
-                const bekræft = await visCustomDialog("Er du sikker på, at du vil lukke vinduet?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
-                if (bekræft) {
-                    closeModal();
-                }
+                forsogLukModal();
             } 
         };
     </script>
