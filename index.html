@@ -1191,7 +1191,7 @@
             // NY VALIDERINGSBLOK 2: Premieredato vs Dato
             if (valgtKanal === "Optagelse" && valgtPremieredato && valgtDato) {
                 if (valgtPremieredato < valgtDato) {
-                    await visCustomDialog("Premieredato må ikke være tidligere end datoen for begivenheden.", 'alert');
+                    await visCustomDialog("Premieredato må ikke være tidligere end datoen for begivenheden. Vælg venligst en senere dato.", 'alert');
                     return;
                 }
             }
