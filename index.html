@@ -480,8 +480,7 @@
                 { text: 'Sportsgren', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
                 { text: 'Produktion', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
                 { text: 'Sted', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
-                { text: 'Tid', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
-                { text: 'TX', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+                { text: 'Tid', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }, // Denne viser nu TX-data
                 { text: 'Kommentator/vært', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
                 { text: 'Ekspert/gæst', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }
             ]);
@@ -542,8 +541,7 @@
                     { text: p["Sportsgren"] || '', fontSize: 9 },
                     { ...produktionCelle, fontSize: 9 },
                     { text: truncSted, fontSize: 9, noWrap: true },
-                    { text: pTid, fontSize: 9, bold: true },
-                    { text: pTX, fontSize: 9, bold: true },
+                    { text: pTX, fontSize: 9, bold: true }, // pTX bruges nu under "Tid"
                     { text: kommTxt, fontSize: 9 },
                     { text: p["Ekspert"] || '', fontSize: 9 }
                 ]);
@@ -551,7 +549,8 @@
 
             const docDefinition = {
                 pageOrientation: 'landscape',
-                pageMargins: [40, 125, 40, 30], 
+                // Top-margin mindsket til 115 for at trække tabellen lidt længere op
+                pageMargins: [40, 115, 40, 30], 
                 defaultStyle: {
                     color: '#000000'
                 },
@@ -560,7 +559,8 @@
                         margin: [40, 20, 40, 0],
                         stack: [
                             logoData ? { image: logoData, width: 270 } : { text: 'SPORT LIVE', fontSize: 36, bold: true, color: '#dc5e11' },
-                            { text: overskrift, fontSize: 19, bold: true, margin: [6, 12, 0, 0], color: '#000000' } 
+                            // Rykket 4 pixels til højre (10 istedet for 6) og 6 pixels tættere på logoet (6 istedet for 12)
+                            { text: overskrift, fontSize: 19, bold: true, margin: [10, 6, 0, 0], color: '#000000' } 
                         ]
                     };
                 },
@@ -568,8 +568,8 @@
                     {
                         table: {
                             headerRows: 1,
-                            // Kommentator og Ekspert er mindsket fra 105 til 85 punkter for at skaffe plads til "Produktion" (*)
-                            widths: [50, 65, '*', 125, 35, 35, 85, 85],
+                            // Nu kun 7 kolonner. "Sted" fik +15 px, Kommentator og Ekspert fik +10 px hver.
+                            widths: [50, 65, '*', 140, 35, 95, 95],
                             body: tableBody
                         },
                         layout: {
