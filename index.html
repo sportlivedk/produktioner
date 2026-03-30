@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPORT LIVE | Produktioner</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -100,6 +102,9 @@
         .btn:hover { background-color: #004494; }
         .btn:disabled { background-color: #a0c4e8; cursor: not-allowed; }
         
+        #btnExportPDF { background-color: #dc5e11; margin-right: 5px; }
+        #btnExportPDF:hover { background-color: #ba4e0d !important; }
+
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #333; }
         .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; margin-left: 8px; cursor: pointer; }
@@ -237,6 +242,8 @@
             
             <div class="header-right">
                 <div class="controls-wrapper">
+                    <button id="btnExportPDF" class="btn" style="display: none;" onclick="genererPDF()">⬇ Download PDF</button>
+
                     <div style="position: relative;">
                         <select id="typeFilter" class="filter-select" onchange="opdaterVisning()">
                             <option value="alle">Vis alle programmer</option>
@@ -409,6 +416,7 @@
         const scriptURL = 'https://script.google.com/macros/s/AKfycbznTiMKZZDJhmuZpArHJLwZcN-Ic745YuXZitWrdDojG-L3KuW-VXy0mtJUPOE3xCR1/exec';
         
         let alleProgrammerGlobal = [];
+        let aktuelleProgrammerVist = []; 
         let aktuelDato = new Date();
         let valgtAar = aktuelDato.getFullYear();
         let valgtMaaned = aktuelDato.getMonth();
@@ -418,6 +426,136 @@
         let aktuelBruger = "";
         
         const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
+
+        // --- PDF GENERATOR FUNKTION ---
+        async function genererPDF() {
+            if (valgtMaaned === -1 || !valgtAar) return;
+
+            const pdfBtn = document.getElementById('btnExportPDF');
+            const orgTekst = pdfBtn.innerHTML;
+            pdfBtn.innerHTML = '⏳ Genererer...';
+            pdfBtn.disabled = true;
+
+            const maanedNavne = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"];
+            const maanedNavn = maanedNavne[valgtMaaned];
+            const overskrift = `Produktioner, ${maanedNavn} ${valgtAar}`;
+
+            let logoData = null;
+            try {
+                const imgEl = document.querySelector('.title-wrapper img');
+                const canvas = document.createElement('canvas');
+                canvas.width = imgEl.naturalWidth || imgEl.width || 200;
+                canvas.height = imgEl.naturalHeight || imgEl.height || 50;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(imgEl, 0, 0);
+                logoData = canvas.toDataURL('image/png');
+            } catch(e) { 
+                console.log('Kunne ikke hente logo til PDF', e); 
+            }
+
+            const tableBody = [];
+            tableBody.push([
+                { text: 'Dato', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+                { text: 'Sportsgren', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+                { text: 'Produktion', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+                { text: 'Sted', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+                { text: 'Tid', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+                { text: 'TX', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+                { text: 'Kommentator/vært', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+                { text: 'Ekspert/gæst', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }
+            ]);
+
+            aktuelleProgrammerVist.forEach(p => {
+                let rawDato = p["NormDato"];
+                if (p["Kanal"] === 'Optagelse' && p["Premieredato"]) {
+                    rawDato = p["Premieredato"];
+                }
+                let datoStr = "";
+                if (rawDato) {
+                    const parts = rawDato.split('-');
+                    if(parts.length === 3) datoStr = parts[2] + "." + parts[1] + "." + parts[0].substring(2,4);
+                }
+
+                let produktionCelle = { text: p["Programtitel"] || '' };
+                if (p["TBC"] && String(p["TBC"]).toUpperCase() === 'X') {
+                    produktionCelle = {
+                        text: [
+                            { text: p["Programtitel"] || '' },
+                            { text: ' TBC', color: 'red', bold: true }
+                        ]
+                    };
+                }
+
+                let pTid = p["Tid"] || '';
+                if (pTid && pTid.includes('T')) pTid = new Date(pTid).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                else if (pTid) pTid = pTid.substring(0, 5);
+
+                let pTX = p["TX"] || '';
+                if (pTX && pTX.includes('T')) pTX = new Date(pTX).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                else if (pTX) pTX = pTX.substring(0, 5);
+
+                let kommTxt = p["Kommentator"] || '';
+                if (p["Kanal"] === 'Optagelse') kommTxt = p["Reporter"] || '';
+
+                tableBody.push([
+                    { text: datoStr, fontSize: 9, margin: [0, 4, 0, 4] },
+                    { text: p["Sportsgren"] || '', fontSize: 9, margin: [0, 4, 0, 4] },
+                    { ...produktionCelle, fontSize: 9, margin: [0, 4, 0, 4] },
+                    { text: p["Lokation"] || '', fontSize: 9, margin: [0, 4, 0, 4] },
+                    { text: pTid, fontSize: 9, bold: true, margin: [0, 4, 0, 4] },
+                    { text: pTX, fontSize: 9, bold: true, margin: [0, 4, 0, 4] },
+                    { text: kommTxt, fontSize: 9, margin: [0, 4, 0, 4] },
+                    { text: p["Ekspert"] || '', fontSize: 9, margin: [0, 4, 0, 4] }
+                ]);
+            });
+
+            const docDefinition = {
+                pageOrientation: 'landscape',
+                pageMargins: [30, 40, 30, 30],
+                header: function() {
+                    return {
+                        margin: [30, 20, 30, 0],
+                        columns: [
+                            logoData ? { image: logoData, width: 100 } : { text: 'SPORT LIVE', fontSize: 16, bold: true, color: '#dc5e11' },
+                            { text: overskrift, alignment: 'right', fontSize: 14, bold: true, margin: [0, 5, 0, 0], color: '#333' }
+                        ]
+                    };
+                },
+                content: [
+                    {
+                        table: {
+                            headerRows: 1,
+                            widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                            body: tableBody
+                        },
+                        layout: {
+                            fillColor: function (rowIndex) {
+                                return (rowIndex > 0 && rowIndex % 2 === 0) ? '#f8f9fa' : null;
+                            },
+                            hLineWidth: function (i, node) {
+                                return (i === 0 || i === node.table.body.length) ? 0 : 0.5;
+                            },
+                            vLineWidth: function (i, node) {
+                                return 0;
+                            },
+                            hLineColor: function (i, node) {
+                                return '#e1e4e8';
+                            }
+                        }
+                    }
+                ]
+            };
+
+            try {
+                pdfMake.createPdf(docDefinition).download(`SPORT_LIVE_Produktioner_${maanedNavn}_${valgtAar}.pdf`);
+            } catch(e) {
+                alert('Der skete en fejl ved generering af PDF.');
+                console.error(e);
+            }
+
+            pdfBtn.innerHTML = orgTekst;
+            pdfBtn.disabled = false;
+        }
 
         // --- LOGIN FUNKTIONALITET ---
         async function logInd() {
@@ -487,6 +625,7 @@
             aktuelBruger = "";
             
             alleProgrammerGlobal = [];
+            aktuelleProgrammerVist = [];
             document.getElementById('programTable').style.display = "none";
             document.getElementById('ingenResultater').style.display = "none";
             document.getElementById('userInfoContainer').style.display = "none";
@@ -497,7 +636,6 @@
             document.getElementById('loginOverlay').style.display = "flex";
             document.getElementById('loginUsername').focus();
         }
-        // ------------------------------
 
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.multi-select-container')) {
@@ -721,10 +859,20 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             const kategoriFilter = document.getElementById('typeFilter').value;
             
+            // PDF Eksport knap logik
+            const pdfBtn = document.getElementById('btnExportPDF');
+            if (pdfBtn) {
+                if (valgtMaaned !== -1 && kategoriFilter === 'sportlive') {
+                    pdfBtn.style.display = 'inline-block';
+                } else {
+                    pdfBtn.style.display = 'none';
+                }
+            }
+
             const sysDato = new Date();
             const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
 
-            let filtreret = alleProgrammerGlobal.filter(program => {
+            aktuelleProgrammerVist = alleProgrammerGlobal.filter(program => {
                 const normDato = program["NormDato"] || "";
                 if (!normDato) return false;
                 
@@ -743,7 +891,6 @@
                 const unitNavn = program["Unit"] || '';
                 
                 if (kategoriFilter === 'fremtidige' && normDato < idagsDatoStr) return false;
-                // SPORT LIVE-filteret tager nu også Optagelse med
                 if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
                 if (kategoriFilter === 'ekstern' && (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse')) return false;
                 if (kategoriFilter === 'ob' && !obUnits.includes(unitNavn)) return false;
@@ -757,10 +904,10 @@
             
             const countEl = document.getElementById('programCountText');
             if (countEl) {
-                countEl.innerHTML = `Viser <b>${filtreret.length}</b> programmer`;
+                countEl.innerHTML = `Viser <b>${aktuelleProgrammerVist.length}</b> programmer`;
             }
             
-            tegnTabel(filtreret);
+            tegnTabel(aktuelleProgrammerVist);
         }
 
         function toggleDetails(btn) {
@@ -776,7 +923,6 @@
             }
         }
 
-        // Tjekker om formen har fået skrevet/valgt noget (ser bort fra den auto-udfyldte dato)
         function erFormularUdfyldt() {
             const fieldsToCheck = ['Tid', 'TX', 'Kanal', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'Producer', 'Kommentator', 'Ekspert', 'Reporter', 'P-plan', 'Link_Noter', 'Premieredato'];
             for (let id of fieldsToCheck) {
@@ -1183,6 +1329,21 @@
             const valgtTid = document.getElementById('Tid').value;
             const valgtTX = document.getElementById('TX').value; 
             const rowId = document.getElementById('RowId').value;
+            const valgtPremieredato = document.getElementById('Premieredato') ? document.getElementById('Premieredato').value : "";
+
+            if (valgtTX && valgtTid) {
+                if (valgtTX > valgtTid) {
+                    await visCustomDialog("Transmission (TX) kan ikke begynde senere end starttidspunktet for begivenheden.", 'alert');
+                    return;
+                }
+            }
+
+            if (valgtKanal === "Optagelse" && valgtPremieredato && valgtDato) {
+                if (valgtPremieredato < valgtDato) {
+                    await visCustomDialog("Premieredato må ikke være tidligere end datoen for begivenheden.", 'alert');
+                    return;
+                }
+            }
 
             if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
                 await visCustomDialog("Du skal som minimum vælge en dato, en kanal og en sportsgren samt indtaste en programtitel.", 'alert');
@@ -1244,6 +1405,9 @@
                 }
             }
 
+            const scrollContainer = document.querySelector('.table-container');
+            const savedScrollPosition = scrollContainer ? scrollContainer.scrollTop : 0;
+
             document.getElementById('loader').style.display = 'block';
             document.getElementById('programTable').style.display = 'none';
             document.getElementById('ingenResultater').style.display = 'none';
@@ -1268,7 +1432,7 @@
                 "Dato": valgtDato,
                 "Ugedag": beregnetUgedag,
                 "Kanal": valgtKanal,
-                "Premieredato": document.getElementById('Premieredato') ? document.getElementById('Premieredato').value : "",
+                "Premieredato": valgtPremieredato,
                 "Sportsgren": valgtSportsgren,
                 "Programtitel": valgtProgramtitel,
                 "Lokation": document.getElementById('Lokation').value,
@@ -1298,6 +1462,11 @@
                 closeModal();
                 document.getElementById('programForm').reset();
                 await loadProgrammer(); 
+                
+                if (scrollContainer) {
+                    scrollContainer.scrollTop = savedScrollPosition;
+                }
+                
             } catch (error) {
                 console.error('Fejl ved gemning:', error);
                 document.getElementById('loader').style.display = 'none';
@@ -1328,7 +1497,6 @@
                 }
             }, 300000);
             
-            // Tilføjer event listener for at folde Premieredato ud, hvis Kanal = Optagelse
             document.getElementById('Kanal').addEventListener('input', function() {
                 if (this.value === 'Optagelse') {
                     document.getElementById('group-Premieredato').style.display = 'flex';
