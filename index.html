@@ -600,9 +600,22 @@
                 header: function() {
                     return {
                         margin: [40, 20, 40, 0],
-                        stack: [
-                            logoData ? { image: logoData, width: 270 } : { text: 'SPORT LIVE', fontSize: 36, bold: true, color: '#dc5e11' },
-                            { text: overskrift, fontSize: 19, bold: true, margin: [10, 6, 0, 0], color: '#000000' } 
+                        columns: [
+                            {
+                                stack: [
+                                    logoData ? { image: logoData, width: 270 } : { text: 'SPORT LIVE', fontSize: 36, bold: true, color: '#dc5e11' },
+                                    { text: overskrift, fontSize: 19, bold: true, margin: [10, 6, 0, 0], color: '#000000' } 
+                                ],
+                                width: '*'
+                            },
+                            {
+                                stack: [
+                                    { text: 'Tid indikerer start på programmet eller transmissionen inkl. optakt.', italics: true, fontSize: 10, alignment: 'right', color: '#000000' },
+                                    { text: 'Se detaljeret programoversigt på sport-live.dk/programoversigt.', italics: true, fontSize: 10, alignment: 'right', color: '#000000', margin: [0, 3, 0, 0] }
+                                ],
+                                width: 'auto',
+                                margin: [0, 42, 10, 0] 
+                            }
                         ]
                     };
                 },
@@ -1310,7 +1323,6 @@
                     formateretNoter = noterTekst.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${url}</a>`);
                 }
 
-                // --- NY LOGIK TIL DYNAMISK PREMIEREDATO I NOTER (OPDATERET TEKST OG FARVE) ---
                 if (program["Kanal"] === 'Optagelse' && program["Premieredato"]) {
                     const premParts = program["Premieredato"].split('-');
                     if (premParts.length === 3) {
@@ -1324,7 +1336,6 @@
                         }
                     }
                 }
-                // ------------------------------------------------------------------------------
 
                 let visProgramtitel = program["Programtitel"] ? program["Programtitel"].trim() : '';
                 if (program["TBC"] && program["TBC"].toUpperCase() === 'X') {
