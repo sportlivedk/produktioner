@@ -15,6 +15,7 @@
             display: flex; 
             flex-direction: column; 
             overflow: hidden; 
+            color: #000000;
         }
         
         /* LOGIN OVERLAY CSS */
@@ -44,7 +45,7 @@
             transform: translateX(-8px);
         } 
         
-        .login-box h2 { margin-top: 0; margin-bottom: 25px; color: #333; font-size: 26px; }
+        .login-box h2 { margin-top: 0; margin-bottom: 25px; color: #000000; font-size: 26px; }
         .login-error { color: #dc3545; font-size: 13px; margin-bottom: 15px; display: none; font-weight: bold; }
         .btn-login { width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
         .login-loader { display: none; margin-top: 15px; font-size: 14px; color: #555; }
@@ -67,7 +68,7 @@
         #loader {
             text-align: center;
             padding: 40px;
-            color: #555;
+            color: #000000;
             font-size: 16px;
             font-weight: 500;
         }
@@ -75,7 +76,7 @@
         .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
         
         .title-wrapper { display: flex; align-items: center; gap: 15px; margin-top: 5px; }
-        h1 { color: #333; font-size: 24px; margin: 0; display: flex; align-items: center; }
+        h1 { color: #000000; font-size: 36px; margin: 0; display: flex; align-items: center; }
         .year-filter { 
             display: flex; 
             align-items: baseline; 
@@ -117,12 +118,12 @@
         #btnExportPDF:hover { background-color: #c91000 !important; }
 
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
-        .user-info-text strong { color: #333; }
+        .user-info-text strong { color: #000000; }
         .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; margin-left: 8px; cursor: pointer; }
         .logout-link:hover { text-decoration: underline; }
 
         .month-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; align-items: center; }
-        .month-btn { background-color: white; border: 1px solid #ccc; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: #555; transition: background-color 0.2s; }
+        .month-btn { background-color: white; border: 1px solid #ccc; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; color: #000000; transition: background-color 0.2s; }
         .month-btn:hover { background-color: #e9ecef; }
         .month-btn.active { background-color: #0056b3; color: white; border-color: #0056b3; }
         
@@ -132,13 +133,13 @@
 
         table { width: 100%; min-width: 1400px; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; table-layout: fixed; word-wrap: break-word; }
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
-        th { background-color: #e9ecef; color: #333; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
+        th { background-color: #e9ecef; color: #000000; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
         
         tbody.program-block.bg-light td { background-color: #ffffff; }
         tbody.program-block.bg-dark td { background-color: #f0f3f5; }
         tbody.program-block:hover td { background-color: #e8f0fe; }
         
-        .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #222; }
+        .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #000000; }
         .date-separator td { border-top: 2px solid rgba(0, 0, 0, 0.3) !important; }
         
         .kanal-badge { display: inline-block; width: 130px; text-align: center; padding: 6px 0; border-radius: 6px; font-size: 12px; font-weight: bold; }
@@ -149,15 +150,15 @@
         .detail-container { display: flex; gap: 20px; }
         
         .detail-card { flex: 1; background-color: white; border: 1px solid #e1e4e8; border-radius: 6px; padding: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .detail-card h4 { margin-top: 0; margin-bottom: 12px; font-size: 13px; text-transform: uppercase; color: #555; border-bottom: 1px solid #eee; padding-bottom: 8px; letter-spacing: 0.5px; }
+        .detail-card h4 { margin-top: 0; margin-bottom: 12px; font-size: 13px; text-transform: uppercase; color: #000000; border-bottom: 1px solid #eee; padding-bottom: 8px; letter-spacing: 0.5px; }
         .detail-card.bemanding { border-top: 4px solid #0056b3; }
         .detail-card.teknik { border-top: 4px solid #28a745; }
         .detail-card.ekstra { border-top: 4px solid #fd7e14; }
         
         .detail-list { display: flex; flex-direction: column; gap: 8px; }
         .detail-list-item { display: flex; justify-content: space-between; font-size: 14px; }
-        .detail-label { font-weight: 600; color: #666; }
-        .detail-value { color: #222; font-weight: 500; text-align: right; }
+        .detail-label { font-weight: 600; color: #000000; }
+        .detail-value { color: #000000; font-weight: 500; text-align: right; }
         
         .toggle-btn, .action-btn { 
             height: 26px; padding: 0 10px; font-size: 12px; border: none; border-radius: 4px; 
@@ -181,37 +182,37 @@
         .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
         .form-group { display: flex; flex-direction: column; text-align: left;}
         .form-group.full-width { grid-column: span 4; }
-        .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .form-group input:not([type="checkbox"]), .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; }
+        .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #000000; }
+        .form-group input:not([type="checkbox"]), .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000;}
         
         .multi-select-container { position: relative; width: 100%; user-select: none; }
-        .multi-select-header { padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: white; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; min-height: 18px; }
+        .multi-select-header { padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: white; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; min-height: 18px; color: #000000;}
         .multi-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; display: none; z-index: 10; border-radius: 4px; margin-top: 2px; }
         .multi-select-dropdown.show { display: block; }
-        .multi-select-option { padding: 6px 10px; display: flex; align-items: center; gap: 8px; }
+        .multi-select-option { padding: 6px 10px; display: flex; align-items: center; gap: 8px; color: #000000;}
         .multi-select-option:hover { background-color: #f0f3f5; }
         .multi-select-option input { margin: 0; cursor: pointer; width: 16px; height: 16px; }
         .multi-select-option label { margin: 0; cursor: pointer; font-weight: normal; font-size: 14px; flex-grow: 1; }
         
         .checkbox-group { display: flex; flex-direction: row; align-items: center; gap: 10px; margin-top: 10px; }
         .checkbox-group input { width: auto; margin: 0; cursor: pointer; width: 16px; height: 16px; }
-        .checkbox-group label { margin: 0; cursor: pointer; font-size: 14px; font-weight: normal; color: #333; }
+        .checkbox-group label { margin: 0; cursor: pointer; font-size: 14px; font-weight: normal; color: #000000; }
         
         .form-actions { margin-top: 20px; display: flex; justify-content: flex-end; }
 
         .custom-dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .custom-dialog-box { background-color: white; padding: 25px 30px; border-radius: 8px; width: 90%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
-        .custom-dialog-message { font-size: 15px; color: #333; margin-bottom: 25px; line-height: 1.5; white-space: pre-wrap; }
+        .custom-dialog-message { font-size: 15px; color: #000000; margin-bottom: 25px; line-height: 1.5; white-space: pre-wrap; }
         .custom-dialog-actions { display: flex; justify-content: center; gap: 15px; }
         .btn-dialog { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; transition: background-color 0.2s; }
         .btn-dialog.primary { background-color: #0056b3; color: white; }
         .btn-dialog.primary:hover { background-color: #004494; }
         .btn-dialog.danger { background-color: #dc3545; color: white; }
         .btn-dialog.danger:hover { background-color: #c82333; }
-        .btn-dialog.secondary { background-color: #e9ecef; color: #333; }
+        .btn-dialog.secondary { background-color: #e9ecef; color: #000000; }
         .btn-dialog.secondary:hover { background-color: #dde0e3; }
         
-        #ingenResultater { display: none; text-align: center; padding: 40px; color: #777; font-size: 16px; }
+        #ingenResultater { display: none; text-align: center; padding: 40px; color: #000000; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -240,7 +241,7 @@
     <div class="top-section">
         <div class="header">
             <div class="title-wrapper">
-                <img src="logo.png" alt="SPORT LIVE Logo" style="height: 45px; width: auto;">
+                <img src="logo.png" alt="SPORT LIVE Logo" style="height: 68px; width: auto;">
                 <h1>
                     Produktioner
                     <div class="year-filter">
@@ -263,7 +264,7 @@
                             <option value="ekstern">Vis kun eksterne modtagere</option>
                             <option value="ob">Vis kun OB-produktioner</option>
                         </select>
-                        <div id="programCountText" style="position: absolute; top: 100%; left: 10px; font-size: 13px; color: #666; margin-top: 6px; white-space: nowrap;">Viser <b>0</b> programmer</div>
+                        <div id="programCountText" style="position: absolute; top: 100%; left: 10px; font-size: 13px; color: #000000; margin-top: 6px; white-space: nowrap;">Viser <b>0</b> programmer</div>
                     </div>
                     
                     <div class="search-container">
@@ -496,28 +497,26 @@
                     if(parts.length === 3) datoStr = parts[2] + "." + parts[1] + "." + parts[0].substring(2,4);
                 }
 
-                let pTid = p["Tid"] || '';
-                let pTX = p["TX"] || '';
+                let pTid = p["Tid"] || '-';
+                let pTX = p["TX"] || '-';
                 
                 if (p["Kanal"] === 'Optagelse') {
-                    pTid = '';
-                    pTX = '';
+                    pTid = '-';
+                    pTX = '-';
                 } else {
-                    if (pTid && pTid.includes('T')) pTid = new Date(pTid).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
-                    else if (pTid) pTid = pTid.substring(0, 5);
+                    if (pTid !== '-' && pTid.includes('T')) pTid = new Date(pTid).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                    else if (pTid !== '-') pTid = pTid.substring(0, 5);
 
-                    if (pTX && pTX.includes('T')) pTX = new Date(pTX).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
-                    else if (pTX) pTX = pTX.substring(0, 5);
+                    if (pTX !== '-' && pTX.includes('T')) pTX = new Date(pTX).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                    else if (pTX !== '-') pTX = pTX.substring(0, 5);
                 }
 
-                // Justeret afkortningsgrænse for smallere Sted-kolonne
                 let pSted = p["Lokation"] && p["Lokation"].trim() !== '' ? p["Lokation"].trim() : 'TBA';
                 let truncSted = truncateText(pSted, 30);
 
                 let rawProduktion = p["Programtitel"] || '';
                 let hasTBC = p["TBC"] && String(p["TBC"]).toUpperCase() === 'X';
                 
-                // Øget afkortningsgrænse for bredere Produktion-kolonne, minus lidt til TBC
                 let prodLimit = hasTBC ? 50 : 55;
                 let truncProduktion = truncateText(rawProduktion, prodLimit);
 
@@ -551,13 +550,16 @@
 
             const docDefinition = {
                 pageOrientation: 'landscape',
-                pageMargins: [30, 95, 30, 30],
+                pageMargins: [30, 110, 60, 30], // Tredje tallet er højre margin sat til 60 for at give "luft"
+                defaultStyle: {
+                    color: '#000000' // Tvinger alt tekst i dokumentet til at være helt sort
+                },
                 header: function() {
                     return {
                         margin: [30, 20, 30, 0],
                         stack: [
-                            logoData ? { image: logoData, width: 180 } : { text: 'SPORT LIVE', fontSize: 24, bold: true, color: '#dc5e11' },
-                            { text: overskrift, fontSize: 16, bold: true, margin: [6, 10, 0, 0], color: '#333' }
+                            logoData ? { image: logoData, width: 270 } : { text: 'SPORT LIVE', fontSize: 36, bold: true, color: '#dc5e11' }, // Skaleret op med 50%
+                            { text: overskrift, fontSize: 24, bold: true, margin: [6, 15, 0, 0], color: '#000000' } // Skaleret op med 50%
                         ]
                     };
                 },
@@ -565,8 +567,6 @@
                     {
                         table: {
                             headerRows: 1,
-                            // Faste kolonnebredder:
-                            // Sportsgren (bredere: 90), Produktion (*), Sted (smallere: 130), TX (mindre margin: 40)
                             widths: ['auto', 90, '*', 130, 'auto', 40, 105, 105],
                             body: tableBody
                         },
@@ -1225,19 +1225,20 @@
                 forrigeDatoFormat = pDatoFormat;
 
                 const pUgedag = program["Ugedag"] || '';
-                let pTid = program["Tid"] || '';
-                let pTX = program["TX"] || '';
+                let pTid = program["Tid"] || '-';
+                let pTX = program["TX"] || '-';
+                let pSted = program["Lokation"] && program["Lokation"].trim() !== '' ? program["Lokation"].trim() : 'TBA';
                 let kanalNavn = program["Kanal"] || '';
                 
-                if (pTid && pTid.includes('T')) {
+                if (pTid !== '-' && pTid.includes('T')) {
                     const t = new Date(pTid);
                     pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
                 }
                 
-                if (pTX && pTX.includes('T')) {
+                if (pTX !== '-' && pTX.includes('T')) {
                     const tTX = new Date(pTX);
                     pTX = tTX.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
-                } else if (pTX) {
+                } else if (pTX !== '-') {
                     pTX = String(pTX).substring(0, 5);
                 }
 
@@ -1255,7 +1256,7 @@
 
                 let kanalDisplay = kanalNavn;
                 if (badgeStyle !== '') kanalDisplay = `<span class="kanal-badge" style="${badgeStyle}">${kanalNavn}</span>`;
-                else if (kanalNavn !== '') kanalDisplay = `<span class="kanal-badge" style="background-color: #e9ecef; color: #333;">${kanalNavn}</span>`;
+                else if (kanalNavn !== '') kanalDisplay = `<span class="kanal-badge" style="background-color: #e9ecef; color: #000000;">${kanalNavn}</span>`;
 
                 let noterTekst = program["Link / Noter"] || '-';
                 let formateretNoter = noterTekst;
@@ -1310,7 +1311,7 @@
                     <td>${kanalDisplay}</td>
                     <td>${program["Sportsgren"] || ''}</td>
                     <td>${visProgramtitel}</td>
-                    <td>${program["Lokation"] || ''}</td>
+                    <td>${pSted}</td>
                     <td>${program["Unit"] || ''}</td>
                     <td style="white-space: nowrap;">${handlingsKnapper}</td>
                 `;
