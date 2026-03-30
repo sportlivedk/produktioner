@@ -508,11 +508,9 @@
                     else if (pTX) pTX = pTX.substring(0, 5);
                 }
 
-                // Øget afkortningsgrænse til 40
                 let pSted = p["Lokation"] && p["Lokation"].trim() !== '' ? p["Lokation"].trim() : 'TBA';
                 let truncSted = truncateText(pSted, 40);
 
-                // Øget afkortningsgrænse til 50
                 let rawProduktion = p["Programtitel"] || '';
                 let truncProduktion = truncateText(rawProduktion, 50);
 
@@ -527,18 +525,22 @@
                     };
                 }
 
+                // NY LOGIK FOR KOMMENTATOR/REPORTER VED OPTAGELSER
                 let kommTxt = p["Kommentator"] || '';
-                if (p["Kanal"] === 'Optagelse') kommTxt = p["Reporter"] || '';
+                if (p["Kanal"] === 'Optagelse' && p["Reporter"] && p["Reporter"].trim() !== '') {
+                    kommTxt = p["Reporter"].trim();
+                }
 
+                // Margin er fjernet fra teksten for at forhindre page-break bugs
                 tableBody.push([
-                    { text: datoStr, fontSize: 9, margin: [0, 4, 0, 4] },
-                    { text: p["Sportsgren"] || '', fontSize: 9, margin: [0, 4, 0, 4] },
-                    { ...produktionCelle, fontSize: 9, margin: [0, 4, 0, 4] },
-                    { text: truncSted, fontSize: 9, margin: [0, 4, 0, 4], noWrap: true },
-                    { text: pTid, fontSize: 9, bold: true, margin: [0, 4, 0, 4] },
-                    { text: pTX, fontSize: 9, bold: true, margin: [0, 4, 0, 4] },
-                    { text: kommTxt, fontSize: 9, margin: [0, 4, 0, 4] },
-                    { text: p["Ekspert"] || '', fontSize: 9, margin: [0, 4, 0, 4] }
+                    { text: datoStr, fontSize: 9 },
+                    { text: p["Sportsgren"] || '', fontSize: 9 },
+                    { ...produktionCelle, fontSize: 9 },
+                    { text: truncSted, fontSize: 9, noWrap: true },
+                    { text: pTid, fontSize: 9, bold: true },
+                    { text: pTX, fontSize: 9, bold: true },
+                    { text: kommTxt, fontSize: 9 },
+                    { text: p["Ekspert"] || '', fontSize: 9 }
                 ]);
             });
 
@@ -550,7 +552,6 @@
                         margin: [30, 20, 30, 0],
                         stack: [
                             logoData ? { image: logoData, width: 180 } : { text: 'SPORT LIVE', fontSize: 24, bold: true, color: '#dc5e11' },
-                            // Herunder justeres indrykket af teksten (12px fra venstre)
                             { text: overskrift, fontSize: 16, bold: true, margin: [12, 10, 0, 0], color: '#333' }
                         ]
                     };
@@ -559,8 +560,8 @@
                     {
                         table: {
                             headerRows: 1,
-                            // Opdateret faste, proportionale kolonnebredder:
-                            widths: ['auto', 'auto', '16*', '11*', 'auto', 'auto', '9*', '9*'],
+                            // Faste kolonnebredder for at forhindre rendering-fejl
+                            widths: ['auto', 'auto', '*', 120, 'auto', 'auto', 95, 95],
                             body: tableBody
                         },
                         layout: {
@@ -575,7 +576,10 @@
                             },
                             hLineColor: function (i, node) {
                                 return '#e1e4e8';
-                            }
+                            },
+                            // Central styring af padding = ensartet rækkehøjde
+                            paddingTop: function(i, node) { return 6; },
+                            paddingBottom: function(i, node) { return 6; }
                         }
                     }
                 ]
