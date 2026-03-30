@@ -550,16 +550,16 @@
 
             const docDefinition = {
                 pageOrientation: 'landscape',
-                pageMargins: [30, 110, 60, 30], // Tredje tallet er højre margin sat til 60 for at give "luft"
+                pageMargins: [40, 110, 40, 30], // Symmetriske marginer (40 pt i både venstre og højre)
                 defaultStyle: {
-                    color: '#000000' // Tvinger alt tekst i dokumentet til at være helt sort
+                    color: '#000000'
                 },
                 header: function() {
                     return {
-                        margin: [30, 20, 30, 0],
+                        margin: [40, 20, 40, 0], // Symmetriske header-marginer
                         stack: [
-                            logoData ? { image: logoData, width: 270 } : { text: 'SPORT LIVE', fontSize: 36, bold: true, color: '#dc5e11' }, // Skaleret op med 50%
-                            { text: overskrift, fontSize: 24, bold: true, margin: [6, 15, 0, 0], color: '#000000' } // Skaleret op med 50%
+                            logoData ? { image: logoData, width: 270 } : { text: 'SPORT LIVE', fontSize: 36, bold: true, color: '#dc5e11' },
+                            { text: overskrift, fontSize: 24, bold: true, margin: [6, 15, 0, 0], color: '#000000' }
                         ]
                     };
                 },
@@ -567,7 +567,8 @@
                     {
                         table: {
                             headerRows: 1,
-                            widths: ['auto', 90, '*', 130, 'auto', 40, 105, 105],
+                            // Opdaterede faste bredder for at balancere forholdet mellem Dato og Sportsgren
+                            widths: [55, 75, '*', 125, 35, 35, 105, 105],
                             body: tableBody
                         },
                         layout: {
@@ -591,7 +592,8 @@
             };
 
             try {
-                pdfMake.createPdf(docDefinition).download(`SPORT_LIVE_Produktioner_${maanedNavn}_${valgtAar}.pdf`);
+                // Opdateret filnavn-syntaks
+                pdfMake.createPdf(docDefinition).download(`SPORT LIVE (${maanedNavn} ${valgtAar}).pdf`);
             } catch(e) {
                 alert('Der skete en fejl ved generering af PDF.');
                 console.error(e);
