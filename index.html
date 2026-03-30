@@ -92,9 +92,9 @@
         .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
         .controls-wrapper { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         
-        .filter-select { padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; cursor: pointer; outline: none; min-width: 220px; }
+        .filter-select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; cursor: pointer; outline: none; min-width: 220px; height: 36px; box-sizing: border-box; }
         .search-container { display: flex; position: relative; }
-        .search-input { padding: 9px; padding-right: 30px; border: 1px solid #ccc; border-radius: 4px; width: 220px; font-size: 14px; outline: none; }
+        .search-input { padding: 8px; padding-right: 30px; border: 1px solid #ccc; border-radius: 4px; width: 220px; font-size: 14px; outline: none; height: 36px; box-sizing: border-box; }
         .search-clear-btn { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #999; font-weight: bold; font-size: 14px; display: none; }
         .search-clear-btn:hover { color: #dc3545; }
 
@@ -102,8 +102,17 @@
         .btn:hover { background-color: #004494; }
         .btn:disabled { background-color: #a0c4e8; cursor: not-allowed; }
         
-        #btnExportPDF { background-color: #dc5e11; margin-right: 5px; }
-        #btnExportPDF:hover { background-color: #ba4e0d !important; }
+        #btnExportPDF { 
+            background-color: #ff1b0e; 
+            margin-right: 5px; 
+            padding: 0 12px; 
+            height: 36px; 
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #btnExportPDF:hover { background-color: #cc150b !important; }
 
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #333; }
@@ -242,7 +251,7 @@
             
             <div class="header-right">
                 <div class="controls-wrapper">
-                    <button id="btnExportPDF" class="btn" style="display: none;" onclick="genererPDF()">⬇ Download PDF</button>
+                    <button id="btnExportPDF" class="btn" style="display: none;" onclick="genererPDF()">Download PDF</button>
 
                     <div style="position: relative;">
                         <select id="typeFilter" class="filter-select" onchange="opdaterVisning()">
@@ -427,6 +436,15 @@
         
         const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
 
+        // Hjælpefunktion til at afkorte tekst i PDF
+        function truncateText(text, maxLength) {
+            if (!text) return '';
+            if (text.length > maxLength) {
+                return text.substring(0, maxLength - 3) + '...';
+            }
+            return text;
+        }
+
         // --- PDF GENERATOR FUNKTION ---
         async function genererPDF() {
             if (valgtMaaned === -1 || !valgtAar) return;
@@ -476,23 +494,36 @@
                     if(parts.length === 3) datoStr = parts[2] + "." + parts[1] + "." + parts[0].substring(2,4);
                 }
 
-                let produktionCelle = { text: p["Programtitel"] || '' };
+                let pTid = p["Tid"] || '';
+                let pTX = p["TX"] || '';
+                
+                if (p["Kanal"] === 'Optagelse') {
+                    pTid = '';
+                    pTX = '';
+                } else {
+                    if (pTid && pTid.includes('T')) pTid = new Date(pTid).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                    else if (pTid) pTid = pTid.substring(0, 5);
+
+                    if (pTX && pTX.includes('T')) pTX = new Date(pTX).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+                    else if (pTX) pTX = pTX.substring(0, 5);
+                }
+
+                let pSted = p["Lokation"] && p["Lokation"].trim() !== '' ? p["Lokation"].trim() : 'TBA';
+                let truncSted = truncateText(pSted, 30);
+
+                let rawProduktion = p["Programtitel"] || '';
+                let truncProduktion = truncateText(rawProduktion, 45);
+
+                let produktionCelle = { text: truncProduktion, noWrap: true };
                 if (p["TBC"] && String(p["TBC"]).toUpperCase() === 'X') {
                     produktionCelle = {
                         text: [
-                            { text: p["Programtitel"] || '' },
+                            { text: truncProduktion },
                             { text: ' TBC', color: 'red', bold: true }
-                        ]
+                        ],
+                        noWrap: true
                     };
                 }
-
-                let pTid = p["Tid"] || '';
-                if (pTid && pTid.includes('T')) pTid = new Date(pTid).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
-                else if (pTid) pTid = pTid.substring(0, 5);
-
-                let pTX = p["TX"] || '';
-                if (pTX && pTX.includes('T')) pTX = new Date(pTX).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
-                else if (pTX) pTX = pTX.substring(0, 5);
 
                 let kommTxt = p["Kommentator"] || '';
                 if (p["Kanal"] === 'Optagelse') kommTxt = p["Reporter"] || '';
@@ -501,7 +532,7 @@
                     { text: datoStr, fontSize: 9, margin: [0, 4, 0, 4] },
                     { text: p["Sportsgren"] || '', fontSize: 9, margin: [0, 4, 0, 4] },
                     { ...produktionCelle, fontSize: 9, margin: [0, 4, 0, 4] },
-                    { text: p["Lokation"] || '', fontSize: 9, margin: [0, 4, 0, 4] },
+                    { text: truncSted, fontSize: 9, margin: [0, 4, 0, 4], noWrap: true },
                     { text: pTid, fontSize: 9, bold: true, margin: [0, 4, 0, 4] },
                     { text: pTX, fontSize: 9, bold: true, margin: [0, 4, 0, 4] },
                     { text: kommTxt, fontSize: 9, margin: [0, 4, 0, 4] },
@@ -511,13 +542,13 @@
 
             const docDefinition = {
                 pageOrientation: 'landscape',
-                pageMargins: [30, 40, 30, 30],
+                pageMargins: [30, 95, 30, 30],
                 header: function() {
                     return {
                         margin: [30, 20, 30, 0],
-                        columns: [
-                            logoData ? { image: logoData, width: 100 } : { text: 'SPORT LIVE', fontSize: 16, bold: true, color: '#dc5e11' },
-                            { text: overskrift, alignment: 'right', fontSize: 14, bold: true, margin: [0, 5, 0, 0], color: '#333' }
+                        stack: [
+                            logoData ? { image: logoData, width: 180 } : { text: 'SPORT LIVE', fontSize: 24, bold: true, color: '#dc5e11' },
+                            { text: overskrift, fontSize: 16, bold: true, margin: [0, 10, 0, 0], color: '#333' }
                         ]
                     };
                 },
@@ -863,7 +894,7 @@
             const pdfBtn = document.getElementById('btnExportPDF');
             if (pdfBtn) {
                 if (valgtMaaned !== -1 && kategoriFilter === 'sportlive') {
-                    pdfBtn.style.display = 'inline-block';
+                    pdfBtn.style.display = 'inline-flex';
                 } else {
                     pdfBtn.style.display = 'none';
                 }
