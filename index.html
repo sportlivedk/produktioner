@@ -1310,12 +1310,12 @@
                     formateretNoter = noterTekst.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${url}</a>`);
                 }
 
-                // --- NY LOGIK TIL DYNAMISK PREMIEREDATO I NOTER ---
+                // --- NY LOGIK TIL DYNAMISK PREMIEREDATO I NOTER (OPDATERET TEKST OG FARVE) ---
                 if (program["Kanal"] === 'Optagelse' && program["Premieredato"]) {
                     const premParts = program["Premieredato"].split('-');
                     if (premParts.length === 3) {
                         const premDatoFormat = premParts[2] + "/" + premParts[1] + "/" + premParts[0];
-                        const premTekst = `<b>Programmet vises første gang ${premDatoFormat}.</b>`;
+                        const premTekst = `<b style="color: green;">Programsat første gang ${premDatoFormat}.</b>`;
                         
                         if (formateretNoter === '-' || formateretNoter.trim() === '') {
                             formateretNoter = premTekst;
@@ -1324,7 +1324,7 @@
                         }
                     }
                 }
-                // ----------------------------------------------------
+                // ------------------------------------------------------------------------------
 
                 let visProgramtitel = program["Programtitel"] ? program["Programtitel"].trim() : '';
                 if (program["TBC"] && program["TBC"].toUpperCase() === 'X') {
