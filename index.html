@@ -520,14 +520,14 @@
                 let prodLimit = hasTBC ? 50 : 55;
                 let truncProduktion = truncateText(rawProduktion, prodLimit);
 
-                let produktionCelle = { text: truncProduktion, noWrap: true };
+                // Fjernet "noWrap: true" så pdfmake selv kan bestemme at teksten skal brydes, hvis den rammer højre margin
+                let produktionCelle = { text: truncProduktion }; 
                 if (hasTBC) {
                     produktionCelle = {
                         text: [
                             { text: truncProduktion },
                             { text: ' TBC', color: 'red', bold: true }
-                        ],
-                        noWrap: true
+                        ]
                     };
                 }
 
@@ -550,16 +550,18 @@
 
             const docDefinition = {
                 pageOrientation: 'landscape',
-                pageMargins: [40, 110, 40, 30], // Symmetriske marginer (40 pt i både venstre og højre)
+                // Øget top-marginen til 125 for at give luft ned til tabellen
+                pageMargins: [40, 125, 40, 30], 
                 defaultStyle: {
                     color: '#000000'
                 },
                 header: function() {
                     return {
-                        margin: [40, 20, 40, 0], // Symmetriske header-marginer
+                        margin: [40, 20, 40, 0],
                         stack: [
                             logoData ? { image: logoData, width: 270 } : { text: 'SPORT LIVE', fontSize: 36, bold: true, color: '#dc5e11' },
-                            { text: overskrift, fontSize: 24, bold: true, margin: [6, 15, 0, 0], color: '#000000' }
+                            // Størrelsen sat ned til 19, og margin-top til 12 for at balancere højden perfekt mellem logo og tabel
+                            { text: overskrift, fontSize: 19, bold: true, margin: [6, 12, 0, 0], color: '#000000' } 
                         ]
                     };
                 },
@@ -567,8 +569,8 @@
                     {
                         table: {
                             headerRows: 1,
-                            // Opdaterede faste bredder for at balancere forholdet mellem Dato og Sportsgren
-                            widths: [55, 75, '*', 125, 35, 35, 105, 105],
+                            // Dato mindsket til 50, Sportsgren mindsket til 65
+                            widths: [50, 65, '*', 125, 35, 35, 105, 105],
                             body: tableBody
                         },
                         layout: {
@@ -592,7 +594,6 @@
             };
 
             try {
-                // Opdateret filnavn-syntaks
                 pdfMake.createPdf(docDefinition).download(`SPORT LIVE (${maanedNavn} ${valgtAar}).pdf`);
             } catch(e) {
                 alert('Der skete en fejl ved generering af PDF.');
