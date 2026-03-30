@@ -105,7 +105,7 @@
         #btnExportPDF { 
             background-color: #ff1b0e; 
             margin-right: 5px; 
-            padding: 0 12px; 
+            padding: 0 16px; 
             height: 36px; 
             box-sizing: border-box;
             display: inline-flex;
@@ -251,7 +251,7 @@
             
             <div class="header-right">
                 <div class="controls-wrapper">
-                    <button id="btnExportPDF" class="btn" style="display: none;" onclick="genererPDF()">Download PDF</button>
+                    <button id="btnExportPDF" class="btn" style="display: none;" onclick="genererPDF()">PDF</button>
 
                     <div style="position: relative;">
                         <select id="typeFilter" class="filter-select" onchange="opdaterVisning()">
@@ -451,7 +451,7 @@
 
             const pdfBtn = document.getElementById('btnExportPDF');
             const orgTekst = pdfBtn.innerHTML;
-            pdfBtn.innerHTML = '⏳ Genererer...';
+            pdfBtn.innerHTML = '⏳';
             pdfBtn.disabled = true;
 
             const maanedNavne = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"];
@@ -508,11 +508,13 @@
                     else if (pTX) pTX = pTX.substring(0, 5);
                 }
 
+                // Øget afkortningsgrænse til 40
                 let pSted = p["Lokation"] && p["Lokation"].trim() !== '' ? p["Lokation"].trim() : 'TBA';
-                let truncSted = truncateText(pSted, 30);
+                let truncSted = truncateText(pSted, 40);
 
+                // Øget afkortningsgrænse til 50
                 let rawProduktion = p["Programtitel"] || '';
-                let truncProduktion = truncateText(rawProduktion, 45);
+                let truncProduktion = truncateText(rawProduktion, 50);
 
                 let produktionCelle = { text: truncProduktion, noWrap: true };
                 if (p["TBC"] && String(p["TBC"]).toUpperCase() === 'X') {
@@ -548,7 +550,8 @@
                         margin: [30, 20, 30, 0],
                         stack: [
                             logoData ? { image: logoData, width: 180 } : { text: 'SPORT LIVE', fontSize: 24, bold: true, color: '#dc5e11' },
-                            { text: overskrift, fontSize: 16, bold: true, margin: [0, 10, 0, 0], color: '#333' }
+                            // Herunder justeres indrykket af teksten (12px fra venstre)
+                            { text: overskrift, fontSize: 16, bold: true, margin: [12, 10, 0, 0], color: '#333' }
                         ]
                     };
                 },
@@ -556,7 +559,8 @@
                     {
                         table: {
                             headerRows: 1,
-                            widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                            // Opdateret faste, proportionale kolonnebredder:
+                            widths: ['auto', 'auto', '16*', '11*', 'auto', 'auto', '9*', '9*'],
                             body: tableBody
                         },
                         layout: {
