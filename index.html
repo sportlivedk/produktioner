@@ -480,7 +480,7 @@
                 { text: 'Sportsgren', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
                 { text: 'Produktion', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
                 { text: 'Sted', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
-                { text: 'Tid', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }, // Denne viser nu TX-data
+                { text: 'Tid', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }, 
                 { text: 'Kommentator/vært', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
                 { text: 'Ekspert/gæst', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }
             ]);
@@ -513,13 +513,13 @@
                 let pSted = p["Lokation"] && p["Lokation"].trim() !== '' ? p["Lokation"].trim() : 'TBA';
                 let truncSted = truncateText(pSted, 30);
 
-                let rawProduktion = p["Programtitel"] || '';
+                // TRICKET: Vi trimmer eventuelle usynlige mellemrum væk fra programtitlen her!
+                let rawProduktion = p["Programtitel"] ? p["Programtitel"].trim() : '';
                 let hasTBC = p["TBC"] && String(p["TBC"]).toUpperCase() === 'X';
                 
                 let prodLimit = hasTBC ? 50 : 55;
                 let truncProduktion = truncateText(rawProduktion, prodLimit);
 
-                // Genindført noWrap: true for at holde det på én linje med tilhørende "..." truncation
                 let produktionCelle = { text: truncProduktion, noWrap: true }; 
                 if (hasTBC) {
                     produktionCelle = {
@@ -541,7 +541,7 @@
                     { text: p["Sportsgren"] || '', fontSize: 9 },
                     { ...produktionCelle, fontSize: 9 },
                     { text: truncSted, fontSize: 9, noWrap: true },
-                    { text: pTX, fontSize: 9, bold: true }, // pTX bruges nu under "Tid"
+                    { text: pTX, fontSize: 9, bold: true }, 
                     { text: kommTxt, fontSize: 9 },
                     { text: p["Ekspert"] || '', fontSize: 9 }
                 ]);
@@ -549,7 +549,6 @@
 
             const docDefinition = {
                 pageOrientation: 'landscape',
-                // Top-margin mindsket til 115 for at trække tabellen lidt længere op
                 pageMargins: [40, 115, 40, 30], 
                 defaultStyle: {
                     color: '#000000'
@@ -559,7 +558,6 @@
                         margin: [40, 20, 40, 0],
                         stack: [
                             logoData ? { image: logoData, width: 270 } : { text: 'SPORT LIVE', fontSize: 36, bold: true, color: '#dc5e11' },
-                            // Rykket 4 pixels til højre (10 istedet for 6) og 6 pixels tættere på logoet (6 istedet for 12)
                             { text: overskrift, fontSize: 19, bold: true, margin: [10, 6, 0, 0], color: '#000000' } 
                         ]
                     };
@@ -568,7 +566,6 @@
                     {
                         table: {
                             headerRows: 1,
-                            // Nu kun 7 kolonner. "Sted" fik +15 px, Kommentator og Ekspert fik +10 px hver.
                             widths: [50, 65, '*', 140, 35, 95, 95],
                             body: tableBody
                         },
@@ -1267,7 +1264,8 @@
                     formateretNoter = noterTekst.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${url}</a>`);
                 }
 
-                let visProgramtitel = program["Programtitel"] || '';
+                // TRICKET GENTAGES HER FOR HTML-TABELLEN: Vi trimmer lige programtitlen for en sikkerheds skyld!
+                let visProgramtitel = program["Programtitel"] ? program["Programtitel"].trim() : '';
                 if (program["TBC"] && program["TBC"].toUpperCase() === 'X') {
                     visProgramtitel += ' <span style="color: red; font-weight: bold;">TBC</span>';
                 }
