@@ -679,6 +679,7 @@
             else valgtMaaned = 0; 
             opdaterFiltreUI();
             opdaterVisning();
+            document.querySelector('.table-container').scrollTop = 0;
         }
 
         function filtrerMaaned(maanedIndex) {
@@ -686,12 +687,14 @@
             valgtMaaned = maanedIndex;
             opdaterFiltreUI();
             opdaterVisning();
+            document.querySelector('.table-container').scrollTop = 0;
         }
 
         function filtrerIdag() {
             visKunIdag = !visKunIdag; 
             opdaterFiltreUI();
             opdaterVisning();
+            document.querySelector('.table-container').scrollTop = 0;
         }
 
         function handterSogning() {
@@ -740,6 +743,7 @@
                 const unitNavn = program["Unit"] || '';
                 
                 if (kategoriFilter === 'fremtidige' && normDato < idagsDatoStr) return false;
+                // SPORT LIVE-filteret tager nu også Optagelse med
                 if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
                 if (kategoriFilter === 'ekstern' && (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse')) return false;
                 if (kategoriFilter === 'ob' && !obUnits.includes(unitNavn)) return false;
@@ -772,6 +776,7 @@
             }
         }
 
+        // Tjekker om formen har fået skrevet/valgt noget (ser bort fra den auto-udfyldte dato)
         function erFormularUdfyldt() {
             const fieldsToCheck = ['Tid', 'TX', 'Kanal', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'Producer', 'Kommentator', 'Ekspert', 'Reporter', 'P-plan', 'Link_Noter', 'Premieredato'];
             for (let id of fieldsToCheck) {
@@ -1178,23 +1183,6 @@
             const valgtTid = document.getElementById('Tid').value;
             const valgtTX = document.getElementById('TX').value; 
             const rowId = document.getElementById('RowId').value;
-            const valgtPremieredato = document.getElementById('Premieredato') ? document.getElementById('Premieredato').value : "";
-
-            // NY VALIDERINGSBLOK 1: TX vs Tid
-            if (valgtTX && valgtTid) {
-                if (valgtTX > valgtTid) {
-                    await visCustomDialog("Transmission (TX) kan ikke begynde senere end starttidspunktet for begivenheden.", 'alert');
-                    return;
-                }
-            }
-
-            // NY VALIDERINGSBLOK 2: Premieredato vs Dato
-            if (valgtKanal === "Optagelse" && valgtPremieredato && valgtDato) {
-                if (valgtPremieredato < valgtDato) {
-                    await visCustomDialog("Premieredato må ikke være tidligere end datoen for begivenheden. Vælg venligst en senere dato.", 'alert');
-                    return;
-                }
-            }
 
             if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
                 await visCustomDialog("Du skal som minimum vælge en dato, en kanal og en sportsgren samt indtaste en programtitel.", 'alert');
@@ -1256,10 +1244,6 @@
                 }
             }
 
-            // HUSK SCROLL-POSITIONEN
-            const scrollContainer = document.querySelector('.table-container');
-            const savedScrollPosition = scrollContainer ? scrollContainer.scrollTop : 0;
-
             document.getElementById('loader').style.display = 'block';
             document.getElementById('programTable').style.display = 'none';
             document.getElementById('ingenResultater').style.display = 'none';
@@ -1284,7 +1268,7 @@
                 "Dato": valgtDato,
                 "Ugedag": beregnetUgedag,
                 "Kanal": valgtKanal,
-                "Premieredato": valgtPremieredato,
+                "Premieredato": document.getElementById('Premieredato') ? document.getElementById('Premieredato').value : "",
                 "Sportsgren": valgtSportsgren,
                 "Programtitel": valgtProgramtitel,
                 "Lokation": document.getElementById('Lokation').value,
@@ -1314,12 +1298,6 @@
                 closeModal();
                 document.getElementById('programForm').reset();
                 await loadProgrammer(); 
-                
-                // RETURNER TIL SAMME SCROLL-POSITION
-                if (scrollContainer) {
-                    scrollContainer.scrollTop = savedScrollPosition;
-                }
-                
             } catch (error) {
                 console.error('Fejl ved gemning:', error);
                 document.getElementById('loader').style.display = 'none';
