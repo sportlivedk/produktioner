@@ -520,14 +520,15 @@
                 let prodLimit = hasTBC ? 50 : 55;
                 let truncProduktion = truncateText(rawProduktion, prodLimit);
 
-                // Fjernet "noWrap: true" så pdfmake selv kan bestemme at teksten skal brydes, hvis den rammer højre margin
-                let produktionCelle = { text: truncProduktion }; 
+                // Genindført noWrap: true for at holde det på én linje med tilhørende "..." truncation
+                let produktionCelle = { text: truncProduktion, noWrap: true }; 
                 if (hasTBC) {
                     produktionCelle = {
                         text: [
                             { text: truncProduktion },
                             { text: ' TBC', color: 'red', bold: true }
-                        ]
+                        ],
+                        noWrap: true
                     };
                 }
 
@@ -550,7 +551,6 @@
 
             const docDefinition = {
                 pageOrientation: 'landscape',
-                // Øget top-marginen til 125 for at give luft ned til tabellen
                 pageMargins: [40, 125, 40, 30], 
                 defaultStyle: {
                     color: '#000000'
@@ -560,7 +560,6 @@
                         margin: [40, 20, 40, 0],
                         stack: [
                             logoData ? { image: logoData, width: 270 } : { text: 'SPORT LIVE', fontSize: 36, bold: true, color: '#dc5e11' },
-                            // Størrelsen sat ned til 19, og margin-top til 12 for at balancere højden perfekt mellem logo og tabel
                             { text: overskrift, fontSize: 19, bold: true, margin: [6, 12, 0, 0], color: '#000000' } 
                         ]
                     };
@@ -569,8 +568,8 @@
                     {
                         table: {
                             headerRows: 1,
-                            // Dato mindsket til 50, Sportsgren mindsket til 65
-                            widths: [50, 65, '*', 125, 35, 35, 105, 105],
+                            // Kommentator og Ekspert er mindsket fra 105 til 85 punkter for at skaffe plads til "Produktion" (*)
+                            widths: [50, 65, '*', 125, 35, 35, 85, 85],
                             body: tableBody
                         },
                         layout: {
