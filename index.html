@@ -103,7 +103,8 @@
         .btn:disabled { background-color: #a0c4e8; cursor: not-allowed; }
         
         #btnExportPDF { 
-            background-color: #ff1b0e; 
+            background-color: #eb1200; 
+            color: white;
             margin-right: 5px; 
             padding: 0 16px; 
             height: 36px; 
@@ -111,8 +112,9 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            font-weight: 500;
         }
-        #btnExportPDF:hover { background-color: #cc150b !important; }
+        #btnExportPDF:hover { background-color: #c91000 !important; }
 
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #333; }
@@ -251,7 +253,7 @@
             
             <div class="header-right">
                 <div class="controls-wrapper">
-                    <button id="btnExportPDF" class="btn" style="display: none;" onclick="genererPDF()">PDF</button>
+                    <button id="btnExportPDF" class="btn" style="display: none;" onclick="genererPDF()">Download PDF</button>
 
                     <div style="position: relative;">
                         <select id="typeFilter" class="filter-select" onchange="opdaterVisning()">
@@ -508,14 +510,15 @@
                     else if (pTX) pTX = pTX.substring(0, 5);
                 }
 
+                // Justeret afkortningsgrænse for smallere Sted-kolonne
                 let pSted = p["Lokation"] && p["Lokation"].trim() !== '' ? p["Lokation"].trim() : 'TBA';
-                let truncSted = truncateText(pSted, 35);
+                let truncSted = truncateText(pSted, 30);
 
                 let rawProduktion = p["Programtitel"] || '';
                 let hasTBC = p["TBC"] && String(p["TBC"]).toUpperCase() === 'X';
                 
-                // Træk 5 tegn fra grænsen, hvis " TBC" skal tilføjes, så vi ikke rammer kanten
-                let prodLimit = hasTBC ? 35 : 40;
+                // Øget afkortningsgrænse for bredere Produktion-kolonne, minus lidt til TBC
+                let prodLimit = hasTBC ? 50 : 55;
                 let truncProduktion = truncateText(rawProduktion, prodLimit);
 
                 let produktionCelle = { text: truncProduktion, noWrap: true };
@@ -554,7 +557,6 @@
                         margin: [30, 20, 30, 0],
                         stack: [
                             logoData ? { image: logoData, width: 180 } : { text: 'SPORT LIVE', fontSize: 24, bold: true, color: '#dc5e11' },
-                            // Margin justeret til 6 for at flugte strammere med logoet
                             { text: overskrift, fontSize: 16, bold: true, margin: [6, 10, 0, 0], color: '#333' }
                         ]
                     };
@@ -563,9 +565,9 @@
                     {
                         table: {
                             headerRows: 1,
-                            // Faste kolonnebredder: 
-                            // Sportsgren (70), Produktion (* = tager rest), Sted (160), TX (50 - giver luft), Kommentator/Ekspert (100)
-                            widths: ['auto', 70, '*', 160, 'auto', 50, 100, 100],
+                            // Faste kolonnebredder:
+                            // Sportsgren (bredere: 90), Produktion (*), Sted (smallere: 130), TX (mindre margin: 40)
+                            widths: ['auto', 90, '*', 130, 'auto', 40, 105, 105],
                             body: tableBody
                         },
                         layout: {
