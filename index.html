@@ -485,7 +485,52 @@
                 { text: 'Ekspert/gæst', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }
             ]);
 
-            aktuelleProgrammerVist.forEach(p => {
+            // Henter søgeterm hvis en sådan er aktiv (så PDF matcher skærmen)
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            // Filtrerer ALLE programmer direkte fra databasen til at matche den valgte måneds PDF
+            let programmerTilPDF = alleProgrammerGlobal.filter(p => {
+                const kanalNavn = p["Kanal"] || '';
+                // PDF eksporten viser kun "SPORT LIVE" og "Optagelse"
+                if (kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
+
+                // PDF-datoen er Premieredato, hvis den findes og det er en Optagelse, ellers NormDato
+                let pdfDato = p["NormDato"] || "";
+                if (kanalNavn === 'Optagelse' && p["Premieredato"]) {
+                    pdfDato = p["Premieredato"];
+                }
+                
+                if (!pdfDato) return false;
+
+                const parts = pdfDato.split('-');
+                if (parts.length !== 3) return false;
+                const pAar = parseInt(parts[0], 10);
+                const pMaaned = parseInt(parts[1], 10) - 1;
+
+                // Er PDF-datoen i den valgte måned og år?
+                if (pAar !== valgtAar || pMaaned !== valgtMaaned) return false;
+
+                // Respekter evt. aktiv søgning
+                if (searchTerm !== '') {
+                    const alleFelterTekst = Object.values(p).join(' ').toLowerCase();
+                    if (!alleFelterTekst.includes(searchTerm)) { return false; }
+                }
+
+                return true;
+            });
+
+            // Sorterer PDF-programmerne kronologisk efter deres PDF-dato
+            programmerTilPDF.sort((a, b) => {
+                const datoA = (a["Kanal"] === 'Optagelse' && a["Premieredato"]) ? a["Premieredato"] : (a["NormDato"] || "");
+                const datoB = (b["Kanal"] === 'Optagelse' && b["Premieredato"]) ? b["Premieredato"] : (b["NormDato"] || "");
+                if (datoA !== datoB) return datoA.localeCompare(datoB);
+                const tidA = a["Tid"] || "23:59";
+                const tidB = b["Tid"] || "23:59";
+                return tidA.localeCompare(tidB);
+            });
+
+            // Bygger selve PDF-tabellen
+            programmerTilPDF.forEach(p => {
                 let rawDato = p["NormDato"];
                 if (p["Kanal"] === 'Optagelse' && p["Premieredato"]) {
                     rawDato = p["Premieredato"];
@@ -513,7 +558,6 @@
                 let pSted = p["Lokation"] && p["Lokation"].trim() !== '' ? p["Lokation"].trim() : 'TBA';
                 let truncSted = truncateText(pSted, 30);
 
-                // TRICKET: Vi trimmer eventuelle usynlige mellemrum væk fra programtitlen her!
                 let rawProduktion = p["Programtitel"] ? p["Programtitel"].trim() : '';
                 let hasTBC = p["TBC"] && String(p["TBC"]).toUpperCase() === 'X';
                 
@@ -827,6 +871,7 @@
                     }
                 }
 
+                // Sortering til skærmen er tilbage til udelukkende at kigge på "Dato"
                 alleProgrammerGlobal.sort((a, b) => {
                     const datoA = a["NormDato"] || "";
                     const datoB = b["NormDato"] || "";
@@ -902,10 +947,10 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             const kategoriFilter = document.getElementById('typeFilter').value;
             
-            // PDF Eksport knap logik
+            // PDF Eksport knappen er kun synlig når vi kigger på en bestemt måned og ikke på "I DAG"
             const pdfBtn = document.getElementById('btnExportPDF');
             if (pdfBtn) {
-                if (valgtMaaned !== -1 && kategoriFilter === 'sportlive') {
+                if (valgtMaaned !== -1 && kategoriFilter === 'sportlive' && !visKunIdag) {
                     pdfBtn.style.display = 'inline-flex';
                 } else {
                     pdfBtn.style.display = 'none';
@@ -915,6 +960,7 @@
             const sysDato = new Date();
             const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
 
+            // Filtreringen til HTML-tabellen kigger nu (igen) KUN på NormDato
             aktuelleProgrammerVist = alleProgrammerGlobal.filter(program => {
                 const normDato = program["NormDato"] || "";
                 if (!normDato) return false;
@@ -1264,7 +1310,6 @@
                     formateretNoter = noterTekst.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${url}</a>`);
                 }
 
-                // TRICKET GENTAGES HER FOR HTML-TABELLEN: Vi trimmer lige programtitlen for en sikkerheds skyld!
                 let visProgramtitel = program["Programtitel"] ? program["Programtitel"].trim() : '';
                 if (program["TBC"] && program["TBC"].toUpperCase() === 'X') {
                     visProgramtitel += ' <span style="color: red; font-weight: bold;">TBC</span>';
