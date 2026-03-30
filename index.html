@@ -509,13 +509,17 @@
                 }
 
                 let pSted = p["Lokation"] && p["Lokation"].trim() !== '' ? p["Lokation"].trim() : 'TBA';
-                let truncSted = truncateText(pSted, 40);
+                let truncSted = truncateText(pSted, 35);
 
                 let rawProduktion = p["Programtitel"] || '';
-                let truncProduktion = truncateText(rawProduktion, 50);
+                let hasTBC = p["TBC"] && String(p["TBC"]).toUpperCase() === 'X';
+                
+                // Træk 5 tegn fra grænsen, hvis " TBC" skal tilføjes, så vi ikke rammer kanten
+                let prodLimit = hasTBC ? 35 : 40;
+                let truncProduktion = truncateText(rawProduktion, prodLimit);
 
                 let produktionCelle = { text: truncProduktion, noWrap: true };
-                if (p["TBC"] && String(p["TBC"]).toUpperCase() === 'X') {
+                if (hasTBC) {
                     produktionCelle = {
                         text: [
                             { text: truncProduktion },
@@ -525,13 +529,11 @@
                     };
                 }
 
-                // NY LOGIK FOR KOMMENTATOR/REPORTER VED OPTAGELSER
                 let kommTxt = p["Kommentator"] || '';
                 if (p["Kanal"] === 'Optagelse' && p["Reporter"] && p["Reporter"].trim() !== '') {
                     kommTxt = p["Reporter"].trim();
                 }
 
-                // Margin er fjernet fra teksten for at forhindre page-break bugs
                 tableBody.push([
                     { text: datoStr, fontSize: 9 },
                     { text: p["Sportsgren"] || '', fontSize: 9 },
@@ -552,7 +554,8 @@
                         margin: [30, 20, 30, 0],
                         stack: [
                             logoData ? { image: logoData, width: 180 } : { text: 'SPORT LIVE', fontSize: 24, bold: true, color: '#dc5e11' },
-                            { text: overskrift, fontSize: 16, bold: true, margin: [12, 10, 0, 0], color: '#333' }
+                            // Margin justeret til 6 for at flugte strammere med logoet
+                            { text: overskrift, fontSize: 16, bold: true, margin: [6, 10, 0, 0], color: '#333' }
                         ]
                     };
                 },
@@ -560,8 +563,9 @@
                     {
                         table: {
                             headerRows: 1,
-                            // Faste kolonnebredder for at forhindre rendering-fejl
-                            widths: ['auto', 'auto', '*', 120, 'auto', 'auto', 95, 95],
+                            // Faste kolonnebredder: 
+                            // Sportsgren (70), Produktion (* = tager rest), Sted (160), TX (50 - giver luft), Kommentator/Ekspert (100)
+                            widths: ['auto', 70, '*', 160, 'auto', 50, 100, 100],
                             body: tableBody
                         },
                         layout: {
@@ -577,7 +581,6 @@
                             hLineColor: function (i, node) {
                                 return '#e1e4e8';
                             },
-                            // Central styring af padding = ensartet rækkehøjde
                             paddingTop: function(i, node) { return 6; },
                             paddingBottom: function(i, node) { return 6; }
                         }
