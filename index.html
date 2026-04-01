@@ -1242,7 +1242,7 @@
             const normDato = program["NormDato"] || "";
             if (!normDato) return false;
 
-            // 1. Tjek tidsrammen (I dag + 14 dage frem)
+            // 1. Tjek tidsrammen (I dag + 21 dage frem)
             const sysDato = new Date();
             sysDato.setHours(0, 0, 0, 0);
             
@@ -1252,7 +1252,7 @@
             const diffTid = pDato.getTime() - sysDato.getTime();
             const diffDage = diffTid / (1000 * 3600 * 24);
             
-            if (diffDage < 0 || diffDage > 14) return false;
+            if (diffDage < 0 || diffDage > 21) return false;
 
             // 2. Hent felternes indhold
             const unit = program["Unit"] || "";
