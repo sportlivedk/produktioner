@@ -1237,6 +1237,51 @@
             }
         }
 
+// --- NY FUNKTION: Tjekker om der mangler bemanding de næste 14 dage ---
+        function skalViseAdvarsel(program) {
+            const normDato = program["NormDato"] || "";
+            if (!normDato) return false;
+
+            // 1. Tjek tidsrammen (I dag + 14 dage frem)
+            const sysDato = new Date();
+            sysDato.setHours(0, 0, 0, 0);
+            
+            const pDato = new Date(normDato);
+            pDato.setHours(0, 0, 0, 0);
+            
+            const diffTid = pDato.getTime() - sysDato.getTime();
+            const diffDage = diffTid / (1000 * 3600 * 24);
+            
+            if (diffDage < 0 || diffDage > 14) return false;
+
+            // 2. Hent felternes indhold
+            const unit = program["Unit"] || "";
+            const kanal = program["Kanal"] || "";
+            const manglerKommentator = (!program["Kommentator"] || program["Kommentator"].trim() === "");
+            const manglerReporter = (!program["Reporter"] || program["Reporter"].trim() === "");
+            const manglerProducer = (!program["Producer"] || program["Producer"].trim() === "");
+
+            // Gør brug af det eksisterende array af OB-enheder til at tjekke, om det er en OB-produktion
+            const obUnitsArr = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
+            const erOB = obUnitsArr.includes(unit);
+
+            // 3. EFP & Optagelse Logik
+            if (unit === "EFP" || kanal === "Optagelse") {
+                if (manglerProducer || (manglerKommentator && manglerReporter)) return true;
+            }
+            // 4. OB-vogne (Minitech, OB 7, OB 9 osv.) Logik
+            else if (erOB) {
+                if (manglerKommentator || manglerProducer) return true;
+            }
+            // 5. Standard Logik for alle andre
+            else {
+                if (manglerKommentator) return true;
+            }
+
+            return false;
+        }
+        // ------------------------------------------------------------------------
+
         function tegnTabel(programmer) {
             const table = document.getElementById('programTable');
             const ingenResultater = document.getElementById('ingenResultater');
@@ -1372,6 +1417,12 @@
                     tbody.appendChild(trSep);
                 }
 
+                // Tjek om vi skal tilføje et rødt udråbstegn for manglende bemanding
+                let visUnit = program["Unit"] || '';
+                if (skalViseAdvarsel(program)) {
+                    visUnit += ' <span style="color: red; font-weight: bold; cursor: help;" title="Mangler bemanding!">!</span>';
+                }
+
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
                 trMain.innerHTML = `
@@ -1383,9 +1434,10 @@
                     <td>${program["Sportsgren"] || ''}</td>
                     <td>${visProgramtitel}</td>
                     <td>${pSted}</td>
-                    <td>${program["Unit"] || ''}</td>
+                    <td>${visUnit}</td>
                     <td style="white-space: nowrap;">${handlingsKnapper}</td>
                 `;
+
                 
                 const trDetail = document.createElement('tr');
                 trDetail.className = 'detail-row';
