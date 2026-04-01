@@ -1420,7 +1420,7 @@
                 // Tjek om vi skal tilføje et rødt udråbstegn for manglende bemanding
                 let visUnit = program["Unit"] || '';
                 if (skalViseAdvarsel(program)) {
-                    visUnit += ' <span style="color: red; font-weight: bold; cursor: help;" title="Mangler bemanding!">!</span>';
+                    visUnit += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #dc3545; color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; margin-left: 6px; cursor: help; transform: translateY(-1px);" title="Mangler bemanding!">!</span>`;
                 }
 
                 const trMain = document.createElement('tr');
