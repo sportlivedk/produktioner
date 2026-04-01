@@ -244,11 +244,7 @@
                 <img src="logo.png" alt="SPORT LIVE Logo" style="height: 68px; width: auto;">
                 <h1>
                     Produktioner
-                    <div class="year-filter">
-                        <span class="year-option" id="year-2026" onclick="filtrerAar(2026)">2026</span>
-                        <span class="year-option" id="year-2027" onclick="filtrerAar(2027)">2027</span>
-                        <span class="year-option" id="year-2028" onclick="filtrerAar(2028)">2028</span>
-                    </div>
+                    <div class="year-filter" id="yearFilterContainer"></div>
                 </h1>
             </div>
             
@@ -1599,6 +1595,17 @@
         }
 
         window.onload = function() {
+            // --- NY KODE: Dynamiske årstal ---
+            const yearContainer = document.getElementById('yearFilterContainer');
+            const aktueltAar = new Date().getFullYear();
+            
+            // Looper fra -1 (sidste år) til +2 (om to år)
+            for (let i = -1; i <= 2; i++) {
+                let a = aktueltAar + i;
+                yearContainer.innerHTML += `<span class="year-option" id="year-${a}" onclick="filtrerAar(${a})">${a}</span>`;
+            }
+            // ---------------------------------
+
             const gemtBruger = sessionStorage.getItem('sportlive_user');
             const gemtRolle = sessionStorage.getItem('sportlive_role');
             
