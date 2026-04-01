@@ -1330,12 +1330,13 @@
                     if (premParts.length === 3) {
                         const premDatoFormat = premParts[2] + "/" + premParts[1] + "/" + premParts[0];
                         const premTekst = `<span style="color: #0056b3; font-weight: 500;">Programsat første gang ${premDatoFormat}.</span>`;
-                        
+
                         if (formateretNoter === '-' || formateretNoter.trim() === '') {
                             formateretNoter = premTekst;
                         } else {
-                            formateretNoter = premTekst + "<br><br>" + formateretNoter;
+                            formateretNoter = `<div style="margin-bottom: 4px;">${premTekst}</div>` + formateretNoter;
                         }
+
                     }
                 }
 
