@@ -263,7 +263,8 @@
                             <option value="sportlive">Vis kun SPORT LIVE</option>
                             <option value="ekstern">Vis kun eksterne modtagere</option>
                             <option value="ob">Vis kun OB-produktioner</option>
-                        </select>
+                            <option value="tbc">Vis kun TBC</option> </select>
+
                         <div id="programCountText" style="position: absolute; top: 100%; left: 10px; font-size: 13px; color: #000000; margin-top: 6px; white-space: nowrap;">Viser <b>0</b> programmer</div>
                     </div>
                     
@@ -996,6 +997,7 @@
                 if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
                 if (kategoriFilter === 'ekstern' && (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse')) return false;
                 if (kategoriFilter === 'ob' && !obUnits.includes(unitNavn)) return false;
+                if (kategoriFilter === 'tbc' && (!program["TBC"] || String(program["TBC"]).toUpperCase() !== 'X')) return false; // Ny linje tilføjet her
                 
                 if (searchTerm !== '') {
                     const alleFelterTekst = Object.values(program).join(' ').toLowerCase();
@@ -1327,7 +1329,7 @@
                     const premParts = program["Premieredato"].split('-');
                     if (premParts.length === 3) {
                         const premDatoFormat = premParts[2] + "/" + premParts[1] + "/" + premParts[0];
-                        const premTekst = `<b style="color: green;">Programsat første gang ${premDatoFormat}.</b>`;
+                        const premTekst = `<span style="color: #0056b3; font-weight: normal;">Programsat første gang ${premDatoFormat}.</span>`;
                         
                         if (formateretNoter === '-' || formateretNoter.trim() === '') {
                             formateretNoter = premTekst;
@@ -1622,18 +1624,6 @@
                 }
             });
             
-            document.querySelectorAll('input[list]').forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.dataset.oldValue = this.value;
-                    this.value = '';
-                });
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Backspace' || e.key === 'Delete') this.dataset.oldValue = ''; 
-                });
-                input.addEventListener('blur', function() {
-                    if (this.value === '') this.value = this.dataset.oldValue || '';
-                });
-            });
         };
 
         var modal = document.getElementById("programModal");
