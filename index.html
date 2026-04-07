@@ -119,7 +119,7 @@
 
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #000000; }
-        .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; margin-left: 8px; cursor: pointer; }
+        .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; margin-left: 4px; cursor: pointer; }
         .logout-link:hover { text-decoration: underline; }
 
         .month-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; align-items: center; }
@@ -241,7 +241,7 @@
     <div class="top-section">
         <div class="header">
             <div class="title-wrapper">
-                <img src="logo.png" alt="SPORT LIVE Logo" style="height: 68px; width: auto;">
+                <img src="logo.png" alt="SPORT LIVE Logo" style="height: 68px; width: auto; cursor: pointer;" onclick="filtrerAar(new Date().getFullYear())" title="Hjem">
                 <h1>
                     Produktioner
                     <div class="year-filter" id="yearFilterContainer"></div>
@@ -274,7 +274,7 @@
                 
                 <div id="userInfoContainer" class="user-info-text">
                     Logget ind som <strong id="displayUsername"></strong> 
-                    <span style="color: #ccc; margin-left: 8px;">|</span>
+                    <span style="color: #ccc; margin-left: 4px;">|</span>
                     <a href="#" class="logout-link" onclick="logUd(event)">Log ud</a>
                 </div>
             </div>
