@@ -306,7 +306,7 @@
         <table id="programTable" style="display: none;">
             <thead>
                 <tr>
-                    <th style="width: 85px;">Dato</th>
+                    <th style="width: 95px;">Dato</th>
                     <th style="width: 75px;">Ugedag</th>
                     <th style="width: 55px;">Tid</th>
                     <th style="width: 55px;">TX</th>
@@ -408,7 +408,14 @@
                         <label>Produktionsplan (inds&aelig;t link)</label>
                         <input type="text" id="P-plan" autocomplete="off">
                     </div>
-                    <div class="form-group full-width"><label>Link/noter</label><input type="text" id="Link_Noter" autocomplete="off"></div>
+                    <div class="form-group full-width">
+                        <label>Teknisk info (inds&aelig;t link)</label>
+                        <input type="text" id="Teknisk_info" autocomplete="off">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Noter</label>
+                        <input type="text" id="Noter" autocomplete="off">
+                    </div>
                     <div class="form-group full-width checkbox-group">
                         <input type="checkbox" id="TBC">
                         <label for="TBC">Afventer endelig bekr&aelig;ftelse (TBC)</label>
@@ -868,7 +875,7 @@
                                 signalDropdown.appendChild(div);
                             });
                         }
-                    } else if (feltNavn !== 'Produktionsplan' && feltNavn !== 'P-plan') {
+                    } else if (feltNavn !== 'Produktionsplan' && feltNavn !== 'P-plan' && feltNavn !== 'Teknisk info') {
                         const datalistElement = document.getElementById('liste-' + feltNavn);
                         if (datalistElement) {
                             datalistElement.innerHTML = ''; 
@@ -993,7 +1000,7 @@
                 if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
                 if (kategoriFilter === 'ekstern' && (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse')) return false;
                 if (kategoriFilter === 'ob' && !obUnits.includes(unitNavn)) return false;
-                if (kategoriFilter === 'tbc' && (!program["TBC"] || String(program["TBC"]).toUpperCase() !== 'X')) return false; // Ny linje tilføjet her
+                if (kategoriFilter === 'tbc' && (!program["TBC"] || String(program["TBC"]).toUpperCase() !== 'X')) return false;
                 
                 if (searchTerm !== '') {
                     const alleFelterTekst = Object.values(program).join(' ').toLowerCase();
@@ -1024,7 +1031,7 @@
         }
 
         function erFormularUdfyldt() {
-            const fieldsToCheck = ['Tid', 'TX', 'Kanal', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'Producer', 'Kommentator', 'Ekspert', 'Reporter', 'P-plan', 'Link_Noter', 'Premieredato'];
+            const fieldsToCheck = ['Tid', 'TX', 'Kanal', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'Producer', 'Kommentator', 'Ekspert', 'Reporter', 'P-plan', 'Teknisk_info', 'Noter', 'Premieredato'];
             for (let id of fieldsToCheck) {
                 const el = document.getElementById(id);
                 if (el && el.value.trim() !== '') return true;
@@ -1133,7 +1140,8 @@
             document.getElementById('Kommentator').value = program["Kommentator"] || '';
             document.getElementById('Ekspert').value = program["Ekspert"] || '';
             document.getElementById('Reporter').value = program["Reporter"] || '';
-            document.getElementById('Link_Noter').value = program["Link / Noter"] || '';
+            document.getElementById('Teknisk_info').value = program["Teknisk info"] || '';
+            document.getElementById('Noter').value = program["Link / Noter"] || '';
             document.getElementById('TBC').checked = (program["TBC"] && program["TBC"].toUpperCase() === 'X');
 
             document.getElementById('modalTitle').textContent = "Rediger program";
@@ -1198,7 +1206,8 @@
             document.getElementById('Kommentator').value = program["Kommentator"] || '';
             document.getElementById('Ekspert').value = program["Ekspert"] || '';
             document.getElementById('Reporter').value = program["Reporter"] || '';
-            document.getElementById('Link_Noter').value = program["Link / Noter"] || '';
+            document.getElementById('Teknisk_info').value = program["Teknisk info"] || '';
+            document.getElementById('Noter').value = program["Link / Noter"] || '';
             document.getElementById('TBC').checked = (program["TBC"] && program["TBC"].toUpperCase() === 'X');
 
             document.getElementById('modalTitle').textContent = "Kopier program";
@@ -1242,17 +1251,22 @@
             const normDato = program["NormDato"] || "";
             if (!normDato) return false;
 
-            // 1. Tjek tidsrammen (I dag + 21 dage frem)
+            // 1. Tjek tidsrammen (I dag og til udgangen af efterfølgende måned)
             const sysDato = new Date();
             sysDato.setHours(0, 0, 0, 0);
             
             const pDato = new Date(normDato);
             pDato.setHours(0, 0, 0, 0);
             
-            const diffTid = pDato.getTime() - sysDato.getTime();
-            const diffDage = diffTid / (1000 * 3600 * 24);
+            // Hvis programmet er i fortiden, vis ingen advarsel
+            if (pDato < sysDato) return false;
             
-            if (diffDage < 0 || diffDage > 21) return false;
+            // Find den sidste dag i næste måned (f.eks. 31. maj, hvis vi er i april)
+            const slutNæsteMaaned = new Date(sysDato.getFullYear(), sysDato.getMonth() + 2, 0);
+            slutNæsteMaaned.setHours(23, 59, 59, 999);
+            
+            // Hvis programmet ligger længere ude i fremtiden end udgangen af næste måned, vis ingen advarsel
+            if (pDato > slutNæsteMaaned) return false;
 
             // 2. Hent felternes indhold
             const unit = program["Unit"] || "";
@@ -1397,6 +1411,14 @@
                     pPlanDisplay = `<a href="${linkUrl}" target="_blank" style="color: #0056b3; font-weight: 500; text-decoration: none;">Klik her for at åbne</a>`;
                 }
 
+                let tInfoTekst = program["Teknisk info"] || '-';
+                let tInfoDisplay = '-';
+                if (tInfoTekst !== '-' && tInfoTekst.trim() !== '') {
+                    let linkUrlTInfo = tInfoTekst.trim();
+                    if (!linkUrlTInfo.startsWith('http://') && !linkUrlTInfo.startsWith('https://')) linkUrlTInfo = 'https://' + linkUrlTInfo;
+                    tInfoDisplay = `<a href="${linkUrlTInfo}" target="_blank" style="color: #0056b3; font-weight: 500; text-decoration: none;">Klik her for at åbne</a>`;
+                }
+
                 let datoCelleStyle = '';
                 if (erIdag) datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #28a745; color: #28a745; font-weight: bold;';
                 else if (erImorgen) datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #d39e00; color: #d39e00; font-weight: bold;';
@@ -1468,10 +1490,11 @@
                                 <h4>Ekstra information</h4>
                                 <div class="detail-list">
                                     <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Teknisk info:</span> <span class="detail-value">${tInfoDisplay}</span></div>
                                 </div>
                                 <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
-                                <div class="detail-label" style="margin-bottom: 4px;">Link/noter:</div>
-                                <div class="detail-value" style="text-align: left; font-weight: 500; font-size: 13px; color: #0056b3;">${formateretNoter}</div>
+                                    <div class="detail-label" style="margin-bottom: 4px;">Noter:</div>
+                                    <div class="detail-value" style="text-align: left; font-weight: 500; font-size: 13px; color: #0056b3;">${formateretNoter}</div>
                                 </div>
                             </div>
                         </div>
@@ -1615,7 +1638,8 @@
                 "Kommentator": document.getElementById('Kommentator').value,
                 "Ekspert": document.getElementById('Ekspert').value,
                 "Reporter": document.getElementById('Reporter').value,
-                "Link / Noter": document.getElementById('Link_Noter').value,
+                "Teknisk info": document.getElementById('Teknisk_info').value,
+                "Link / Noter": document.getElementById('Noter').value,
                 "TBC": tbcStatus,
                 "TX": valgtTX 
             };
