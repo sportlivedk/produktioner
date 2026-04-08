@@ -1373,9 +1373,9 @@
                 if (badgeStyle !== '') kanalDisplay = `<span class="kanal-badge" style="${badgeStyle}">${kanalNavn}</span>`;
                 else if (kanalNavn !== '') kanalDisplay = `<span class="kanal-badge" style="background-color: #e9ecef; color: #000000;">${kanalNavn}</span>`;
 
-                let noterTekst = program["Link / Noter"] || '-';
+                let noterTekst = program["Link / Noter"] || '';
                 let formateretNoter = noterTekst;
-                if (noterTekst !== '-') {
+                if (noterTekst !== '') {
                     const urlRegex = /(https?:\/\/[^\s]+)/g;
                     formateretNoter = noterTekst.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${url}</a>`);
                 }
