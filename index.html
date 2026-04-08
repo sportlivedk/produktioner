@@ -1442,7 +1442,7 @@
                 // Tjek om vi skal tilføje et rødt udråbstegn for manglende bemanding
                 let visUnit = program["Unit"] || '';
                 if (skalViseAdvarsel(program)) {
-                    visUnit += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #dc3545; color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; margin-left: 6px; cursor: help; transform: translateY(-1px);" title="Mangler bemanding!">!</span>`;
+                    visUnit = `<div style="display: flex; justify-content: space-between; align-items: center;"><span>${visUnit}</span><span style="display: inline-flex; align-items: center; justify-content: center; background-color: #dc3545; color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; cursor: help; flex-shrink: 0;" title="Mangler bemanding!">!</span></div>`;
                 }
 
                 const trMain = document.createElement('tr');
@@ -1492,9 +1492,9 @@
                                     <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Teknisk info:</span> <span class="detail-value">${tInfoDisplay}</span></div>
                                 </div>
-                                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
-                                    <div class="detail-label" style="margin-bottom: 4px;">Noter:</div>
-                                    <div class="detail-value" style="text-align: left; font-weight: 500; font-size: 13px; color: #0056b3;">${formateretNoter}</div>
+                                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee; display: flex; align-items: flex-start; gap: 8px;">
+                                    <div class="detail-label" style="margin-top: 1px;">Noter:</div>
+                                    <div class="detail-value" style="text-align: left; font-weight: 500; font-size: 14px; color: #0056b3; flex-grow: 1;">${formateretNoter}</div>
                                 </div>
                             </div>
                         </div>
