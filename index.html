@@ -36,6 +36,7 @@
             width: 100%;
             max-width: 350px;
             text-align: center;
+            box-sizing: border-box;
         }
         
         .login-box img { 
@@ -142,7 +143,7 @@
         tbody.program-block.bg-dark td { background-color: #f0f3f5; }
         tbody.program-block:hover td { background-color: #e8f0fe; }
         
-        .main-row { cursor: pointer; } /* Gør rækken klikbar */
+        .main-row { cursor: pointer; } 
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #000000; }
         .date-separator td { border-top: 2px solid rgba(0, 0, 0, 0.3) !important; }
         
@@ -166,6 +167,9 @@
         
         /* Skjult titel-overskrift til mobil */
         .mobile-only-title { display: none; }
+
+        /* Fælles CSS til "2026" / "26" dato format */
+        .aarhundred { display: inline; }
 
         .toggle-btn, .action-btn { 
             height: 26px; padding: 0 10px; font-size: 12px; border: none; border-radius: 4px; 
@@ -225,10 +229,27 @@
         /* MOBIL OPTIMERING (Media Queries)          */
         /* ========================================= */
         @media (max-width: 900px) {
-            /* Fjern horisontal scroll og lad browseren styre kolonnebredder */
-            table { min-width: 100% !important; table-layout: auto !important; }
-            th, td { padding: 10px 6px !important; font-size: 12px !important; }
+            /* Login skærm */
+            .login-box { padding: 25px 20px !important; width: 90% !important; max-width: 320px !important; box-sizing: border-box; }
+            .login-box h2 { font-size: 22px !important; margin-bottom: 20px !important; }
             
+            /* Fjern horisontal scroll og lad browseren styre kolonnebredder */
+            table { min-width: 100% !important; table-layout: auto !important; width: 100% !important; }
+            th { width: auto !important; }
+            th, td { padding: 10px 4px !important; font-size: 12px !important; }
+            
+            /* Hjulpetekster og århundrede skjul (Dato forkortelse) */
+            .aarhundred { display: none !important; }
+            
+            /* Kanal badges til ren tekst */
+            .kanal-badge { 
+                background: transparent !important; 
+                color: #000000 !important; 
+                padding: 0 !important; 
+                font-weight: 600 !important; 
+                width: auto !important; 
+            }
+
             /* Skjul specifikke kolonner (Ugedag, TX, Lokation, Unit, Handling) */
             th:nth-child(2), td:nth-child(2),
             th:nth-child(4), td:nth-child(4),
@@ -240,22 +261,23 @@
             
             /* Afkort Programtitel så den ikke sprænger skærmen */
             th:nth-child(7), td:nth-child(7) {
-                max-width: 120px; 
+                max-width: 130px; 
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
 
-            /* Hoved-elementer øverst */
-            .header { flex-direction: column; gap: 10px; }
-            .header-right { align-items: flex-start; width: 100%; }
-            .controls-wrapper { width: 100%; flex-direction: column; align-items: flex-start; gap: 8px; }
+            /* Hoved-elementer øverst - Flyt under logo */
+            .header { flex-direction: column; gap: 10px; align-items: flex-start !important; }
+            .title-wrapper { flex-direction: column; align-items: flex-start; gap: 8px; }
+            h1 { font-size: 22px !important; margin-top: 5px !important; }
+            .year-filter { font-size: 15px !important; margin-left: 12px !important; padding-left: 12px !important; border-left: 2px solid #ccc !important; }
+            .year-option.active { font-size: 17px !important; }
+            
+            .header-right { align-items: flex-start; width: 100%; margin-top: 5px; }
+            .controls-wrapper { width: 100%; flex-direction: column; align-items: flex-start; gap: 10px; }
             .search-container { width: 100%; }
-            .search-input { width: 100% !important; }
-            .title-wrapper img { height: 45px !important; }
-            h1 { font-size: 22px !important; }
-            .year-filter { font-size: 14px !important; margin-left: 10px !important; padding-left: 10px !important; }
-            .year-option.active { font-size: 16px !important; }
+            .search-input { width: 100% !important; box-sizing: border-box; }
 
             /* Skjul irrelevante UI elementer */
             #typeFilter, #programCountText, #btnExportPDF, #btnTilfoejProgram { display: none !important; }
@@ -265,22 +287,23 @@
             .mobile-month-select { 
                 display: block; 
                 width: 100%; 
-                padding: 10px; 
+                padding: 8px; 
+                height: 36px;
                 margin-bottom: 15px; 
-                font-size: 16px; /* Undgår auto-zoom på iOS */
+                font-size: 14px; /* Samme som søgefeltet */
                 border-radius: 4px;
                 border: 1px solid #ccc;
                 background-color: white;
+                box-sizing: border-box;
             }
 
             /* Gør log-ud tekst lidt mindre */
-            .user-info-text { font-size: 11px !important; margin-top: 0; width: 100%; text-align: right; }
+            .user-info-text { font-size: 12px !important; margin-top: 0; width: 100%; text-align: right; }
 
             /* Kasser i udvidet visning: Stack dem ovenpå hinanden */
             .detail-container { flex-direction: column; gap: 12px; }
             .mobile-only-title { display: block; font-weight: bold; font-size: 14px; color: #0056b3; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; white-space: normal; }
             .detail-row td { padding: 12px !important; }
-            .kanal-badge { width: auto !important; padding: 4px 6px !important; font-size: 11px !important; display: inline-block; white-space: nowrap; }
         }
     </style>
 </head>
@@ -536,7 +559,7 @@
             return text;
         }
 
-        async function genererPDF() { /* Uændret */
+        async function genererPDF() { 
             if (valgtMaaned === -1 || !valgtAar) return;
 
             const pdfBtn = document.getElementById('btnExportPDF');
@@ -884,7 +907,6 @@
             if (visKunIdag) idagBtn.classList.add('active');
             else idagBtn.classList.remove('active');
 
-            // NY: Opdater den mobile dropdown, så den flugter med skrivebords-valget
             const mobileSelect = document.getElementById('mobileMonthFilter');
             if (mobileSelect) {
                 if (visKunIdag) {
@@ -895,7 +917,6 @@
             }
         }
 
-        // NY: Håndter skift fra mobilens dropdown
         function handterMobileMaanedSkift(val) {
             if (val === 'idag') {
                 visKunIdag = true;
@@ -1099,7 +1120,6 @@
             tegnTabel(aktuelleProgrammerVist);
         }
 
-        // Fold ud / Ind (Fra desktop knap)
         function toggleDetails(btn) {
             const trMain = btn.closest('tr');
             const trDetail = trMain.nextElementSibling;
@@ -1113,9 +1133,7 @@
             }
         }
 
-        // NY: Fold ud / ind fra at tappe på rækken (især til mobil)
         function toggleDetailsFromRow(event, row) {
-            // Undgå fold-ud hvis man har klikket direkte på Rediger/Kopier/Slet knapperne
             if (event.target.tagName === 'BUTTON' || event.target.closest('button')) return;
             
             const trDetail = row.nextElementSibling;
@@ -1409,9 +1427,12 @@
                 const normDato = program["NormDato"] || "";
                 let pDatoFormat = normDato;
                 
+                // Opdateret datologik: Gør århundredet usynligt på mobil
                 if (normDato) {
                     const parts = normDato.split('-');
-                    if(parts.length === 3) pDatoFormat = parts[2] + "/" + parts[1] + "/" + parts[0];
+                    if(parts.length === 3) {
+                        pDatoFormat = parts[2] + "/" + parts[1] + "/<span class='aarhundred'>" + parts[0].substring(0,2) + "</span>" + parts[0].substring(2,4);
+                    }
                 }
                 
                 const erIdag = (normDato === idagStr);
@@ -1530,7 +1551,6 @@
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
-                // NY: Tilføjer onclick til selve rækken (for at den kan foldes ud på mobil ved tap)
                 trMain.onclick = function(e) { toggleDetailsFromRow(e, this); };
                 
                 trMain.innerHTML = `
