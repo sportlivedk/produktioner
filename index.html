@@ -242,6 +242,9 @@
                 margin-bottom: 15px !important; 
             }
             
+            /* Frigør mere lodret plads i toppen af skærmen */
+            .top-section { padding-top: 10px !important; padding-bottom: 0 !important; }
+
             /* Fjern horisontal scroll og lad browseren styre kolonnebredder dynamisk */
             table { min-width: 100% !important; table-layout: auto !important; width: 100% !important; }
             th { width: auto !important; }
@@ -253,6 +256,11 @@
             .date-separator-row td { padding: 0 !important; height: 1px !important; }
             .date-separator-row div { height: 1px !important; background-color: rgba(0,0,0,0.3) !important; }
             
+            /* Sikrer at Kanal ikke deler sig over to linjer */
+            th:nth-child(5), td:nth-child(5) {
+                white-space: nowrap !important;
+            }
+
             /* Kanal text farve matcher desktop badge baggrund */
             .kanal-badge { 
                 background: transparent !important; 
@@ -288,16 +296,16 @@
                 padding-right: 4px !important; /* Nøjagtig samme padding (4px) som til venstre for "Dato" */
             }
 
-            /* Hoved-elementer øverst */
-            .header { flex-direction: column; gap: 10px; align-items: flex-start !important; }
-            .title-wrapper { flex-direction: column; align-items: flex-start; gap: 8px; }
+            /* Hoved-elementer øverst - optimeret plads */
+            .header { flex-direction: column; gap: 5px !important; margin-bottom: 8px !important; align-items: flex-start !important; }
+            .title-wrapper { flex-direction: column; align-items: flex-start; gap: 3px !important; }
             .title-wrapper img { height: 50px !important; transform: translateX(-10px) !important; } 
-            h1 { font-size: 22px !important; margin-top: 5px !important; }
+            h1 { font-size: 22px !important; margin-top: 0 !important; }
             .year-filter { font-size: 15px !important; margin-left: 12px !important; padding-left: 12px !important; border-left: 2px solid #ccc !important; }
             .year-option.active { font-size: 17px !important; }
             
-            .header-right { align-items: flex-start; width: 100%; margin-top: 5px; }
-            .controls-wrapper { width: 100%; flex-direction: column; align-items: flex-start; gap: 10px; }
+            .header-right { align-items: flex-start; width: 100%; margin-top: 0 !important; }
+            .controls-wrapper { width: 100%; flex-direction: column; align-items: flex-start; gap: 8px !important; }
             .search-container { width: 100%; }
             .search-input { width: 100% !important; box-sizing: border-box; }
 
@@ -309,18 +317,18 @@
             .mobile-month-select { 
                 display: block; 
                 width: 100%; 
-                padding: 8px; 
+                padding: 6px 8px; 
                 height: 34px;
-                margin-bottom: 15px; 
-                font-size: 13px; /* Lidt mindre tekst */
+                margin-bottom: 8px !important; 
+                font-size: 13px; 
                 border-radius: 4px;
                 border: 1px solid #ccc;
                 background-color: white;
                 box-sizing: border-box;
             }
 
-            /* Venstrestil og juster "Logget ind som..." på mobil (skubbet 4px til højre for alignment) */
-            .user-info-text { font-size: 12px !important; margin-top: 0; width: 100%; text-align: left !important; padding-left: 4px !important; }
+            /* Venstrestil og juster "Logget ind som..." på mobil */
+            .user-info-text { font-size: 12px !important; margin-top: 0; margin-bottom: 4px !important; width: 100%; text-align: left !important; padding-left: 4px !important; }
 
             /* Saml udvidet boks til én grøn superboks uden overskrifter */
             .detail-container { 
@@ -1604,7 +1612,7 @@
                 if (datoSkift) {
                     const trSep = document.createElement('tr');
                     trSep.className = 'date-separator-row'; 
-                    trSep.innerHTML = `<td colspan="10" style="padding: 0; border: none;"><div style="height: 2px; background-color: rgba(0,0,0,0.2); width: 100%;"></div></td>`;
+                    trSep.innerHTML = `<td colspan="10" style="padding: 0; border: none;"><div style="height: 1px; background-color: rgba(0,0,0,0.3); width: 100%;"></div></td>`;
                     tbody.appendChild(trSep);
                 }
 
