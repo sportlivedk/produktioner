@@ -249,8 +249,9 @@
             
             .aarhundred { display: none !important; }
             
-            /* Skjul dato-skillelinjerne fuldstændig på mobil */
-            .date-separator-row { display: none !important; }
+            /* Tynd separatorlinje mellem datoer uden ekstra højde */
+            .date-separator-row td { padding: 0 !important; height: 1px !important; }
+            .date-separator-row div { height: 1px !important; background-color: rgba(0,0,0,0.3) !important; }
             
             /* Kanal text farve matcher desktop badge baggrund */
             .kanal-badge { 
@@ -274,7 +275,7 @@
                 display: none !important;
             }
             
-            /* Wrapper til at klippe Programtitel (nr 7) og td-padding for at skabe luft til højre */
+            /* Afkort Programtitel - med halveret padding for luft mod kanten */
             .prog-title-wrapper {
                 display: block !important;
                 max-width: 140px; 
@@ -283,7 +284,7 @@
                 text-overflow: clip; 
             }
             th:nth-child(7), td:nth-child(7) {
-                padding-right: 15px !important; 
+                padding-right: 10px !important; /* Ændret fra 20px til 10px for at matche venstre margin */
             }
 
             /* Hoved-elementer øverst */
@@ -317,8 +318,8 @@
                 box-sizing: border-box;
             }
 
-            /* Venstrestil "Logget ind som..." på mobil */
-            .user-info-text { font-size: 12px !important; margin-top: 0; width: 100%; text-align: left !important; }
+            /* Venstrestil og juster "Logget ind som..." på mobil */
+            .user-info-text { font-size: 12px !important; margin-top: 0; width: 100%; text-align: left !important; padding-left: 4px !important; }
 
             /* Saml udvidet boks til én grøn superboks uden overskrifter */
             .detail-container { 
@@ -1564,7 +1565,7 @@
                 }
                 
                 const pSportsgren = program["Sportsgren"] ? program["Sportsgren"].toUpperCase() : '';
-                let sportsgrenHtml = pSportsgren ? `<div style="margin-bottom: 2px; color: #dd5f12;">${pSportsgren}</div>` : '';
+                let sportsgrenHtml = pSportsgren ? `<div style="margin-bottom: 8px; color: #dd5f12;">${pSportsgren}</div>` : '';
 
                 let pPlanTekst = program["P-plan"] || program["Produktionsplan"] || '-';
                 let signalTekst = program["Signal til"] || program["Sling"] || '-';
