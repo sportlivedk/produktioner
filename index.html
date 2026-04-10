@@ -29,7 +29,7 @@
             justify-content: center;
         }
         
-        /* DESKTOP LOGIN BOKS (Urørt) */
+        /* DESKTOP LOGIN BOKS */
         .login-box {
             background-color: white;
             padding: 40px;
@@ -236,7 +236,7 @@
             }
             .login-box h2 { font-size: 22px !important; margin-bottom: 20px !important; }
             .login-box img { 
-                height: 35px !important; 
+                height: 42px !important; /* Større logo på login til mobil (+20%) */
                 transform: none !important; 
                 margin-bottom: 15px !important; 
             }
@@ -255,6 +255,10 @@
                 font-weight: 600 !important; 
                 width: auto !important; 
             }
+            
+            /* Switch til korte kanalnavne på mobil */
+            .kanal-desktop { display: none !important; }
+            .kanal-mobile { display: inline !important; }
 
             /* Skjul specifikke kolonner inklusiv Sportsgren (nr. 6) */
             th:nth-child(2), td:nth-child(2),
@@ -274,10 +278,10 @@
                 text-overflow: ellipsis;
             }
 
-            /* Hoved-elementer øverst - Mindre logo på mobil */
+            /* Hoved-elementer øverst - Større logo på mobil */
             .header { flex-direction: column; gap: 10px; align-items: flex-start !important; }
             .title-wrapper { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .title-wrapper img { height: 34px !important; }
+            .title-wrapper img { height: 50px !important; } /* Gjort ca. 50% større (fra 34px til 50px) */
             h1 { font-size: 22px !important; margin-top: 5px !important; }
             .year-filter { font-size: 15px !important; margin-left: 12px !important; padding-left: 12px !important; border-left: 2px solid #ccc !important; }
             .year-option.active { font-size: 17px !important; }
@@ -307,9 +311,12 @@
 
             .user-info-text { font-size: 12px !important; margin-top: 0; width: 100%; text-align: right; }
 
+            /* Skaler fontstørrelser i udvidet boks ned til 12px så det matcher rækkerne */
             .detail-container { flex-direction: column; gap: 12px; }
-            .mobile-only-title { display: block; font-size: 14px; font-weight: bold; color: #0056b3; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; white-space: normal; }
+            .mobile-only-title { display: block; font-size: 12px !important; font-weight: bold; color: #0056b3; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; white-space: normal; }
             .detail-row td { padding: 12px !important; }
+            .detail-card h4 { font-size: 12px !important; margin-bottom: 8px !important; }
+            .detail-list-item, .detail-label, .detail-value { font-size: 12px !important; }
         }
     </style>
 </head>
@@ -1126,7 +1133,6 @@
             
             const isOpening = (trDetail.style.display === 'none' || trDetail.style.display === '');
 
-            // Luk alle andre rækker
             document.querySelectorAll('.detail-row').forEach(row => {
                 row.style.display = 'none';
                 const prev = row.previousElementSibling;
@@ -1148,7 +1154,6 @@
             const trDetail = row.nextElementSibling;
             const isOpening = (trDetail.style.display === 'none' || trDetail.style.display === '');
 
-            // Luk alle andre rækker
             document.querySelectorAll('.detail-row').forEach(detailRow => {
                 detailRow.style.display = 'none';
                 const prev = detailRow.previousElementSibling;
@@ -1491,9 +1496,20 @@
                 else if (kanalNavn === 'Pluto TV (DE)') badgeStyle = 'background-color: #fff80c; color: black;';
                 else if (kanalNavn === 'SPORT LIVE') badgeStyle = 'background-color: #dc5e11; color: white;';
 
+                // Logik til at forkorte kanalnavne på mobil
+                let kanalKort = kanalNavn;
+                if (kanalNavn === 'Ekstra Bladet+') kanalKort = 'EB+';
+                else if (kanalNavn === 'Pluto TV (DK)') kanalKort = 'Pluto (DK)';
+                else if (kanalNavn === 'Pluto TV (NO)') kanalKort = 'Pluto (NO)';
+                else if (kanalNavn === 'Pluto TV (SE)') kanalKort = 'Pluto (SE)';
+                else if (kanalNavn === 'Pluto TV (DE)') kanalKort = 'Pluto (DE)';
+
                 let kanalDisplay = kanalNavn;
-                if (badgeStyle !== '') kanalDisplay = `<span class="kanal-badge" style="${badgeStyle}">${kanalNavn}</span>`;
-                else if (kanalNavn !== '') kanalDisplay = `<span class="kanal-badge" style="background-color: #e9ecef; color: #000000;">${kanalNavn}</span>`;
+                if (badgeStyle !== '') {
+                    kanalDisplay = `<span class="kanal-badge" style="${badgeStyle}"><span class="kanal-desktop">${kanalNavn}</span><span class="kanal-mobile" style="display:none;">${kanalKort}</span></span>`;
+                } else if (kanalNavn !== '') {
+                    kanalDisplay = `<span class="kanal-badge" style="background-color: #e9ecef; color: #000000;"><span class="kanal-desktop">${kanalNavn}</span><span class="kanal-mobile" style="display:none;">${kanalKort}</span></span>`;
+                }
 
                 let noterTekst = program["Link / Noter"] || '';
                 let formateretNoter = noterTekst;
@@ -1522,7 +1538,7 @@
                 }
                 
                 const pSportsgren = program["Sportsgren"] ? program["Sportsgren"].toUpperCase() : '';
-                let sportsgrenHtml = pSportsgren ? `<div style="font-size: 11px; color: #666; letter-spacing: 1px; margin-bottom: 2px; font-weight: 600;">${pSportsgren}</div>` : '';
+                let sportsgrenHtml = pSportsgren ? `<div style="margin-bottom: 2px;">${pSportsgren}</div>` : '';
 
                 let pPlanTekst = program["P-plan"] || program["Produktionsplan"] || '-';
                 let signalTekst = program["Signal til"] || program["Sling"] || '-';
