@@ -237,7 +237,7 @@
             .login-box h2 { font-size: 22px !important; margin-bottom: 20px !important; }
             .login-box img { 
                 height: 42px !important; 
-                transform: none !important; 
+                transform: translateX(-5px) !important; /* Rettet fra none til -5px for at centrere visuelt */
                 margin-bottom: 15px !important; 
             }
             
@@ -270,19 +270,23 @@
                 display: none !important;
             }
             
-            /* Afkort Programtitel - uden prikker (...) og tilføjet right-padding */
+            /* Afkort Programtitel - med padding for luft mod kanten */
             th:nth-child(7), td:nth-child(7) {
                 max-width: 140px; 
                 white-space: nowrap;
                 overflow: hidden;
-                text-overflow: clip; /* Klipper teksten rent i stedet for ... */
-                padding-right: 15px !important; /* Giver luft ud mod højre kant */
+                text-overflow: clip; 
+                padding-right: 20px !important; /* Ekstra padding så teksten ikke kysser rammen */
+                box-sizing: border-box !important; /* Tvinger paddingen ind i bredden */
             }
 
             /* Hoved-elementer øverst */
             .header { flex-direction: column; gap: 10px; align-items: flex-start !important; }
             .title-wrapper { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .title-wrapper img { height: 50px !important; } 
+            .title-wrapper img { 
+                height: 50px !important; 
+                transform: translateX(-10px) !important; /* Rytter hovedlogo lidt til venstre */
+            } 
             h1 { font-size: 22px !important; margin-top: 5px !important; }
             .year-filter { font-size: 15px !important; margin-left: 12px !important; padding-left: 12px !important; border-left: 2px solid #ccc !important; }
             .year-option.active { font-size: 17px !important; }
@@ -319,7 +323,7 @@
                 background-color: white;
                 border: 1px solid #e1e4e8;
                 border-radius: 6px;
-                border-top: 4px solid #28a745; /* Grøn top fra "teknik" boksen */
+                border-top: 4px solid #28a745; 
                 padding: 12px;
                 box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             }
@@ -329,10 +333,10 @@
                 box-shadow: none !important; 
                 background-color: transparent !important;
             }
-            .detail-card h4 { display: none !important; } /* Skjul overskrifter (Personale, Teknik osv.) */
+            .detail-card h4 { display: none !important; } 
             
-            /* Genskab margin og fjern stiplet linje over "Noter" på mobil */
-            .noter-container { border-top: none !important; margin-top: 12px !important; padding-top: 0 !important; }
+            /* Præcis samme margin til "Noter" som til de andre lister (8px) */
+            .noter-container { border-top: none !important; margin-top: 8px !important; padding-top: 0 !important; }
 
             .mobile-only-title { display: block; font-size: 12px !important; font-weight: bold; color: #0056b3; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; white-space: normal; }
             .detail-row td { padding: 12px !important; background-color: #fafbfc; border-bottom: none !important; }
@@ -1521,7 +1525,7 @@
                 else { badgeBg = '#e9ecef'; badgeFg = '#000000'; mobileColor = '#000000'; } 
 
                 let kanalKort = kanalNavn;
-                if (kanalNavn === 'Ekstra Bladet+') kanalKort = 'EB+';
+                if (kanalNavn === 'Ekstra Bladet+') kanalKort = 'Ekstra Bladet'; /* Rettet til Ekstra Bladet for mobil */
                 else if (kanalNavn === 'Pluto TV (DK)') kanalKort = 'Pluto (DK)';
                 else if (kanalNavn === 'Pluto TV (NO)') kanalKort = 'Pluto (NO)';
                 else if (kanalNavn === 'Pluto TV (SE)') kanalKort = 'Pluto (SE)';
