@@ -131,6 +131,9 @@
         .btn-idag:hover { background-color: #e8f5e9; }
         .btn-idag.active { background-color: #28a745; color: white; border-color: #28a745; }
 
+        /* NY: Dropdown til mobil (skjult på desktop) */
+        .mobile-month-select { display: none; }
+
         table { width: 100%; min-width: 1400px; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 0; table-layout: fixed; word-wrap: break-word; }
         th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
         th { background-color: #e9ecef; color: #000000; font-weight: 600; border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.2); }
@@ -139,6 +142,7 @@
         tbody.program-block.bg-dark td { background-color: #f0f3f5; }
         tbody.program-block:hover td { background-color: #e8f0fe; }
         
+        .main-row { cursor: pointer; } /* Gør rækken klikbar */
         .main-row td { border-bottom: 2px solid transparent; font-weight: 500; color: #000000; }
         .date-separator td { border-top: 2px solid rgba(0, 0, 0, 0.3) !important; }
         
@@ -160,6 +164,9 @@
         .detail-label { font-weight: 600; color: #000000; }
         .detail-value { color: #000000; font-weight: 500; text-align: right; }
         
+        /* Skjult titel-overskrift til mobil */
+        .mobile-only-title { display: none; }
+
         .toggle-btn, .action-btn { 
             height: 26px; padding: 0 10px; font-size: 12px; border: none; border-radius: 4px; 
             cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; vertical-align: middle;
@@ -213,6 +220,68 @@
         .btn-dialog.secondary:hover { background-color: #dde0e3; }
         
         #ingenResultater { display: none; text-align: center; padding: 40px; color: #000000; font-size: 16px; }
+
+        /* ========================================= */
+        /* MOBIL OPTIMERING (Media Queries)          */
+        /* ========================================= */
+        @media (max-width: 900px) {
+            /* Fjern horisontal scroll og lad browseren styre kolonnebredder */
+            table { min-width: 100% !important; table-layout: auto !important; }
+            th, td { padding: 10px 6px !important; font-size: 12px !important; }
+            
+            /* Skjul specifikke kolonner (Ugedag, TX, Lokation, Unit, Handling) */
+            th:nth-child(2), td:nth-child(2),
+            th:nth-child(4), td:nth-child(4),
+            th:nth-child(8), td:nth-child(8),
+            th:nth-child(9), td:nth-child(9),
+            th:nth-child(10), td:nth-child(10) {
+                display: none !important;
+            }
+            
+            /* Afkort Programtitel så den ikke sprænger skærmen */
+            th:nth-child(7), td:nth-child(7) {
+                max-width: 120px; 
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* Hoved-elementer øverst */
+            .header { flex-direction: column; gap: 10px; }
+            .header-right { align-items: flex-start; width: 100%; }
+            .controls-wrapper { width: 100%; flex-direction: column; align-items: flex-start; gap: 8px; }
+            .search-container { width: 100%; }
+            .search-input { width: 100% !important; }
+            .title-wrapper img { height: 45px !important; }
+            h1 { font-size: 22px !important; }
+            .year-filter { font-size: 14px !important; margin-left: 10px !important; padding-left: 10px !important; }
+            .year-option.active { font-size: 16px !important; }
+
+            /* Skjul irrelevante UI elementer */
+            #typeFilter, #programCountText, #btnExportPDF, #btnTilfoejProgram { display: none !important; }
+
+            /* Måneds-filter: Skjul knapper, vis dropdown */
+            .month-filter { display: none !important; }
+            .mobile-month-select { 
+                display: block; 
+                width: 100%; 
+                padding: 10px; 
+                margin-bottom: 15px; 
+                font-size: 16px; /* Undgår auto-zoom på iOS */
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                background-color: white;
+            }
+
+            /* Gør log-ud tekst lidt mindre */
+            .user-info-text { font-size: 11px !important; margin-top: 0; width: 100%; text-align: right; }
+
+            /* Kasser i udvidet visning: Stack dem ovenpå hinanden */
+            .detail-container { flex-direction: column; gap: 12px; }
+            .mobile-only-title { display: block; font-weight: bold; font-size: 14px; color: #0056b3; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; white-space: normal; }
+            .detail-row td { padding: 12px !important; }
+            .kanal-badge { width: auto !important; padding: 4px 6px !important; font-size: 11px !important; display: inline-block; white-space: nowrap; }
+        }
     </style>
 </head>
 <body>
@@ -259,8 +328,8 @@
                             <option value="sportlive">Vis kun SPORT LIVE</option>
                             <option value="ekstern">Vis kun eksterne modtagere</option>
                             <option value="ob">Vis kun OB-produktioner</option>
-                            <option value="tbc">Vis kun ubekræftede (TBC)</option> </select>
-
+                            <option value="tbc">Vis kun ubekræftede (TBC)</option> 
+                        </select>
                         <div id="programCountText" style="position: absolute; top: 100%; left: 10px; font-size: 13px; color: #000000; margin-top: 6px; white-space: nowrap;">Viser <b>0</b> programmer</div>
                     </div>
                     
@@ -294,9 +363,25 @@
             <button class="month-btn" id="btn-month-9" onclick="filtrerMaaned(9)">OKTOBER</button>
             <button class="month-btn" id="btn-month-10" onclick="filtrerMaaned(10)">NOVEMBER</button>
             <button class="month-btn" id="btn-month-11" onclick="filtrerMaaned(11)">DECEMBER</button>
-            
             <button class="month-btn btn-idag" id="btn-idag" onclick="filtrerIdag()">I DAG</button>
         </div>
+        
+        <select id="mobileMonthFilter" class="mobile-month-select" onchange="handterMobileMaanedSkift(this.value)">
+            <option value="-1">ALLE PROGRAMMER</option>
+            <option value="idag">I DAG</option>
+            <option value="0">JANUAR</option>
+            <option value="1">FEBRUAR</option>
+            <option value="2">MARTS</option>
+            <option value="3">APRIL</option>
+            <option value="4">MAJ</option>
+            <option value="5">JUNI</option>
+            <option value="6">JULI</option>
+            <option value="7">AUGUST</option>
+            <option value="8">SEPTEMBER</option>
+            <option value="9">OKTOBER</option>
+            <option value="10">NOVEMBER</option>
+            <option value="11">DECEMBER</option>
+        </select>
     </div>
 
     <div class="table-container">
@@ -443,7 +528,6 @@
         
         const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
 
-        // Hjælpefunktion til at afkorte tekst i PDF
         function truncateText(text, maxLength) {
             if (!text) return '';
             if (text.length > maxLength) {
@@ -452,8 +536,7 @@
             return text;
         }
 
-        // --- PDF GENERATOR FUNKTION ---
-        async function genererPDF() {
+        async function genererPDF() { /* Uændret */
             if (valgtMaaned === -1 || !valgtAar) return;
 
             const pdfBtn = document.getElementById('btnExportPDF');
@@ -474,9 +557,7 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(imgEl, 0, 0);
                 logoData = canvas.toDataURL('image/png');
-            } catch(e) { 
-                console.log('Kunne ikke hente logo til PDF', e); 
-            }
+            } catch(e) { console.log('Kunne ikke hente logo', e); }
 
             const tableBody = [];
             tableBody.push([
@@ -489,16 +570,12 @@
                 { text: 'Ekspert/gæst', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }
             ]);
 
-            // Henter søgeterm hvis en sådan er aktiv (så PDF matcher skærmen)
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
 
-            // Filtrerer ALLE programmer direkte fra databasen til at matche den valgte måneds PDF
             let programmerTilPDF = alleProgrammerGlobal.filter(p => {
                 const kanalNavn = p["Kanal"] || '';
-                // PDF eksporten viser kun "SPORT LIVE" og "Optagelse"
                 if (kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
 
-                // PDF-datoen er Premieredato, hvis den findes og det er en Optagelse, ellers NormDato
                 let pdfDato = p["NormDato"] || "";
                 if (kanalNavn === 'Optagelse' && p["Premieredato"]) {
                     pdfDato = p["Premieredato"];
@@ -511,10 +588,8 @@
                 const pAar = parseInt(parts[0], 10);
                 const pMaaned = parseInt(parts[1], 10) - 1;
 
-                // Er PDF-datoen i den valgte måned og år?
                 if (pAar !== valgtAar || pMaaned !== valgtMaaned) return false;
 
-                // Respekter evt. aktiv søgning
                 if (searchTerm !== '') {
                     const alleFelterTekst = Object.values(p).join(' ').toLowerCase();
                     if (!alleFelterTekst.includes(searchTerm)) { return false; }
@@ -523,7 +598,6 @@
                 return true;
             });
 
-            // Sorterer PDF-programmerne kronologisk efter deres PDF-dato
             programmerTilPDF.sort((a, b) => {
                 const datoA = (a["Kanal"] === 'Optagelse' && a["Premieredato"]) ? a["Premieredato"] : (a["NormDato"] || "");
                 const datoB = (b["Kanal"] === 'Optagelse' && b["Premieredato"]) ? b["Premieredato"] : (b["NormDato"] || "");
@@ -533,7 +607,6 @@
                 return tidA.localeCompare(tidB);
             });
 
-            // Bygger selve PDF-tabellen
             programmerTilPDF.forEach(p => {
                 let rawDato = p["NormDato"];
                 if (p["Kanal"] === 'Optagelse' && p["Premieredato"]) {
@@ -598,12 +671,10 @@
             const docDefinition = {
                 pageOrientation: 'landscape',
                 pageMargins: [40, 115, 40, 30], 
-                defaultStyle: {
-                    color: '#000000'
-                },
+                defaultStyle: { color: '#000000' },
                 header: function() {
                     return {
-                        margin: [32, 20, 40, 0], // Rykket fra 40 til 32 (8 pixels mod venstre)
+                        margin: [32, 20, 40, 0],
                         columns: [
                             {
                                 stack: [
@@ -631,18 +702,10 @@
                             body: tableBody
                         },
                         layout: {
-                            fillColor: function (rowIndex) {
-                                return (rowIndex > 0 && rowIndex % 2 === 0) ? '#f8f9fa' : null;
-                            },
-                            hLineWidth: function (i, node) {
-                                return (i === 0 || i === node.table.body.length) ? 0 : 0.5;
-                            },
-                            vLineWidth: function (i, node) {
-                                return 0;
-                            },
-                            hLineColor: function (i, node) {
-                                return '#e1e4e8';
-                            },
+                            fillColor: function (rowIndex) { return (rowIndex > 0 && rowIndex % 2 === 0) ? '#f8f9fa' : null; },
+                            hLineWidth: function (i, node) { return (i === 0 || i === node.table.body.length) ? 0 : 0.5; },
+                            vLineWidth: function (i, node) { return 0; },
+                            hLineColor: function (i, node) { return '#e1e4e8'; },
                             paddingTop: function(i, node) { return 6; },
                             paddingBottom: function(i, node) { return 6; }
                         }
@@ -661,7 +724,6 @@
             pdfBtn.disabled = false;
         }
 
-        // --- LOGIN FUNKTIONALITET ---
         async function logInd() {
             const user = document.getElementById('loginUsername').value.trim();
             const pass = document.getElementById('loginPassword').value;
@@ -713,10 +775,8 @@
 
         function afslutLogin() {
             document.getElementById('loginOverlay').style.display = "none";
-            
             document.getElementById('userInfoContainer').style.display = "block";
             document.getElementById('displayUsername').textContent = aktuelBruger;
-            
             loadProgrammer();
         }
 
@@ -823,6 +883,31 @@
             const idagBtn = document.getElementById('btn-idag');
             if (visKunIdag) idagBtn.classList.add('active');
             else idagBtn.classList.remove('active');
+
+            // NY: Opdater den mobile dropdown, så den flugter med skrivebords-valget
+            const mobileSelect = document.getElementById('mobileMonthFilter');
+            if (mobileSelect) {
+                if (visKunIdag) {
+                    mobileSelect.value = 'idag';
+                } else {
+                    mobileSelect.value = valgtMaaned.toString();
+                }
+            }
+        }
+
+        // NY: Håndter skift fra mobilens dropdown
+        function handterMobileMaanedSkift(val) {
+            if (val === 'idag') {
+                visKunIdag = true;
+                opdaterFiltreUI();
+                opdaterVisning();
+            } else {
+                visKunIdag = false;
+                valgtMaaned = parseInt(val);
+                opdaterFiltreUI();
+                opdaterVisning();
+            }
+            document.querySelector('.table-container').scrollTop = 0;
         }
 
         async function loadProgrammer(silent = false) {
@@ -888,7 +973,6 @@
                     }
                 }
 
-                // Sortering til skærmen er tilbage til udelukkende at kigge på "Dato"
                 alleProgrammerGlobal.sort((a, b) => {
                     const datoA = a["NormDato"] || "";
                     const datoB = b["NormDato"] || "";
@@ -964,7 +1048,6 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             const kategoriFilter = document.getElementById('typeFilter').value;
             
-            // PDF Eksport knappen er kun synlig når vi kigger på en bestemt måned og ikke på "I DAG"
             const pdfBtn = document.getElementById('btnExportPDF');
             if (pdfBtn) {
                 if (valgtMaaned !== -1 && kategoriFilter === 'sportlive' && !visKunIdag) {
@@ -977,7 +1060,6 @@
             const sysDato = new Date();
             const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
 
-            // Filtreringen til HTML-tabellen kigger nu (igen) KUN på NormDato
             aktuelleProgrammerVist = alleProgrammerGlobal.filter(program => {
                 const normDato = program["NormDato"] || "";
                 if (!normDato) return false;
@@ -1017,6 +1099,7 @@
             tegnTabel(aktuelleProgrammerVist);
         }
 
+        // Fold ud / Ind (Fra desktop knap)
         function toggleDetails(btn) {
             const trMain = btn.closest('tr');
             const trDetail = trMain.nextElementSibling;
@@ -1027,6 +1110,23 @@
             } else {
                 trDetail.style.display = 'none';
                 btn.textContent = '▼'; 
+            }
+        }
+
+        // NY: Fold ud / ind fra at tappe på rækken (især til mobil)
+        function toggleDetailsFromRow(event, row) {
+            // Undgå fold-ud hvis man har klikket direkte på Rediger/Kopier/Slet knapperne
+            if (event.target.tagName === 'BUTTON' || event.target.closest('button')) return;
+            
+            const trDetail = row.nextElementSibling;
+            if (trDetail.style.display === 'none' || trDetail.style.display === '') {
+                trDetail.style.display = 'table-row';
+                const btn = row.querySelector('.toggle-btn');
+                if (btn) btn.textContent = '▲';
+            } else {
+                trDetail.style.display = 'none';
+                const btn = row.querySelector('.toggle-btn');
+                if (btn) btn.textContent = '▼';
             }
         }
 
@@ -1046,9 +1146,7 @@
         async function forsogLukModal() {
             if (erFormularUdfyldt()) {
                 const bekræft = await visCustomDialog("Er du sikker på, at du vil afslutte uden at gemme?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
-                if (bekræft) {
-                    closeModal();
-                }
+                if (bekræft) { closeModal(); }
             } else {
                 closeModal();
             }
@@ -1246,55 +1344,42 @@
             }
         }
 
-// --- NY FUNKTION: Tjekker om der mangler bemanding de næste 14 dage ---
         function skalViseAdvarsel(program) {
             const normDato = program["NormDato"] || "";
             if (!normDato) return false;
 
-            // 1. Tjek tidsrammen (I dag og til udgangen af efterfølgende måned)
             const sysDato = new Date();
             sysDato.setHours(0, 0, 0, 0);
             
             const pDato = new Date(normDato);
             pDato.setHours(0, 0, 0, 0);
             
-            // Hvis programmet er i fortiden, vis ingen advarsel
             if (pDato < sysDato) return false;
             
-            // Find den sidste dag i næste måned (f.eks. 31. maj, hvis vi er i april)
             const slutNæsteMaaned = new Date(sysDato.getFullYear(), sysDato.getMonth() + 2, 0);
             slutNæsteMaaned.setHours(23, 59, 59, 999);
             
-            // Hvis programmet ligger længere ude i fremtiden end udgangen af næste måned, vis ingen advarsel
             if (pDato > slutNæsteMaaned) return false;
 
-            // 2. Hent felternes indhold
             const unit = program["Unit"] || "";
             const kanal = program["Kanal"] || "";
             const manglerKommentator = (!program["Kommentator"] || program["Kommentator"].trim() === "");
             const manglerReporter = (!program["Reporter"] || program["Reporter"].trim() === "");
             const manglerProducer = (!program["Producer"] || program["Producer"].trim() === "");
 
-            // Gør brug af det eksisterende array af OB-enheder til at tjekke, om det er en OB-produktion
             const obUnitsArr = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
             const erOB = obUnitsArr.includes(unit);
 
-            // 3. EFP & Optagelse Logik
             if (unit === "EFP" || kanal === "Optagelse") {
                 if (manglerProducer || (manglerKommentator && manglerReporter)) return true;
-            }
-            // 4. OB-vogne (Minitech, OB 7, OB 9 osv.) Logik
-            else if (erOB) {
+            } else if (erOB) {
                 if (manglerKommentator || manglerProducer) return true;
-            }
-            // 5. Standard Logik for alle andre
-            else {
+            } else {
                 if (manglerKommentator) return true;
             }
 
             return false;
         }
-        // ------------------------------------------------------------------------
 
         function tegnTabel(programmer) {
             const table = document.getElementById('programTable');
@@ -1391,7 +1476,6 @@
                         } else {
                             formateretNoter = `<div style="margin-bottom: 4px;">${premTekst}</div>` + formateretNoter;
                         }
-
                     }
                 }
 
@@ -1439,7 +1523,6 @@
                     tbody.appendChild(trSep);
                 }
 
-                // Tjek om vi skal tilføje et rødt udråbstegn for manglende bemanding
                 let visUnit = program["Unit"] || '';
                 if (skalViseAdvarsel(program)) {
                     visUnit = `<div style="display: flex; justify-content: space-between; align-items: center;"><span>${visUnit}</span><span style="display: inline-flex; align-items: center; justify-content: center; background-color: #dc3545; color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; cursor: help; flex-shrink: 0;" title="Mangler bemanding!">!</span></div>`;
@@ -1447,6 +1530,9 @@
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
+                // NY: Tilføjer onclick til selve rækken (for at den kan foldes ud på mobil ved tap)
+                trMain.onclick = function(e) { toggleDetailsFromRow(e, this); };
+                
                 trMain.innerHTML = `
                     <td style="${datoCelleStyle}">${pDatoFormat}</td>
                     <td>${pUgedag}</td>
@@ -1459,12 +1545,13 @@
                     <td>${visUnit}</td>
                     <td style="white-space: nowrap;">${handlingsKnapper}</td>
                 `;
-
                 
                 const trDetail = document.createElement('tr');
                 trDetail.className = 'detail-row';
                 trDetail.innerHTML = `
                     <td colspan="10">
+                        <div class="mobile-only-title">${visProgramtitel}</div>
+                        
                         <div class="detail-container">
                             <div class="detail-card bemanding">
                                 <h4>Personale</h4>
@@ -1671,16 +1758,13 @@
         }
 
         window.onload = function() {
-            // --- NY KODE: Dynamiske årstal ---
             const yearContainer = document.getElementById('yearFilterContainer');
             const aktueltAar = new Date().getFullYear();
             
-            // Looper fra -1 (sidste år) til +2 (om to år)
             for (let i = -1; i <= 2; i++) {
                 let a = aktueltAar + i;
                 yearContainer.innerHTML += `<span class="year-option" id="year-${a}" onclick="filtrerAar(${a})">${a}</span>`;
             }
-            // ---------------------------------
 
             const gemtBruger = sessionStorage.getItem('sportlive_user');
             const gemtRolle = sessionStorage.getItem('sportlive_role');
