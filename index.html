@@ -79,6 +79,7 @@
         
         .title-wrapper { display: flex; align-items: center; gap: 15px; margin-top: 5px; }
         h1 { color: #000000; font-size: 36px; margin: 0; display: flex; align-items: center; }
+        
         .year-filter { 
             display: flex; 
             align-items: baseline; 
@@ -87,6 +88,8 @@
             padding-left: 20px; 
             border-left: 2px solid #ccc; 
             font-size: 18px; 
+            position: relative;
+            top: 5px; /* Skubber stregen og årstallene lidt ned så de flugter bedre */
         }
         .year-option { color: #aaa; cursor: pointer; transition: all 0.2s; font-weight: normal; }
         .year-option:hover { color: #666; }
@@ -299,9 +302,9 @@
             /* Hoved-elementer øverst - optimeret plads */
             .header { flex-direction: column; gap: 5px !important; margin-bottom: 8px !important; align-items: flex-start !important; }
             .title-wrapper { flex-direction: column; align-items: flex-start; gap: 3px !important; }
-            .title-wrapper img { height: 40px !important; transform: translateX(-8px) !important; } 
-            h1 { font-size: 20px !important; margin-top: 0 !important; }
-            .year-filter { font-size: 15px !important; margin-left: 12px !important; padding-left: 12px !important; border-left: 2px solid #ccc !important; }
+            .title-wrapper img { height: 40px !important; transform: translateX(-10px) !important; } 
+            h1 { font-size: 22px !important; margin-top: 0 !important; }
+            .year-filter { font-size: 15px !important; margin-left: 12px !important; padding-left: 12px !important; border-left: 2px solid #ccc !important; top: 2px !important; }
             .year-option.active { font-size: 17px !important; }
             
             .header-right { align-items: flex-start; width: 100%; margin-top: 0 !important; }
