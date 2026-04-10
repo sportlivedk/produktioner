@@ -248,9 +248,10 @@
             
             .aarhundred { display: none !important; }
             
+            /* Kanal text farve matcher desktop badge baggrund */
             .kanal-badge { 
                 background: transparent !important; 
-                color: #000000 !important; 
+                color: var(--mobile-color) !important; 
                 padding: 0 !important; 
                 font-weight: 600 !important; 
                 width: auto !important; 
@@ -269,12 +270,13 @@
                 display: none !important;
             }
             
-            /* Afkort Programtitel - uden prikker (...) */
+            /* Afkort Programtitel - uden prikker (...) og tilføjet right-padding */
             th:nth-child(7), td:nth-child(7) {
                 max-width: 140px; 
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: clip; /* Klipper teksten rent i stedet for ... */
+                padding-right: 15px !important; /* Giver luft ud mod højre kant */
             }
 
             /* Hoved-elementer øverst */
@@ -329,8 +331,8 @@
             }
             .detail-card h4 { display: none !important; } /* Skjul overskrifter (Personale, Teknik osv.) */
             
-            /* Fjern stiplet linje over "Noter" på mobil */
-            .noter-container { border-top: none !important; margin-top: 0 !important; padding-top: 0 !important; }
+            /* Genskab margin og fjern stiplet linje over "Noter" på mobil */
+            .noter-container { border-top: none !important; margin-top: 12px !important; padding-top: 0 !important; }
 
             .mobile-only-title { display: block; font-size: 12px !important; font-weight: bold; color: #0056b3; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; white-space: normal; }
             .detail-row td { padding: 12px !important; background-color: #fafbfc; border-bottom: none !important; }
@@ -1502,17 +1504,21 @@
                     pTX = String(pTX).substring(0, 5);
                 }
 
-                let badgeStyle = '';
-                if (kanalNavn === 'Feltet+') badgeStyle = 'background-color: #ff0d99; color: white;';
-                else if (kanalNavn === 'Bold+') badgeStyle = 'background-color: #92d050; color: white;';
-                else if (kanalNavn === 'Ekstra Bladet+') badgeStyle = 'background-color: #ff0000; color: white;';
-                else if (kanalNavn === 'JFM') badgeStyle = 'background-color: #175b30; color: white;';
-                else if (kanalNavn === 'Optagelse') badgeStyle = 'background-color: #000000; color: white;';
-                else if (kanalNavn === 'Pluto TV (DK)') badgeStyle = 'background-color: #7030a0; color: white;';
-                else if (kanalNavn === 'Pluto TV (NO)') badgeStyle = 'background-color: #3b201f; color: white;';
-                else if (kanalNavn === 'Pluto TV (SE)') badgeStyle = 'background-color: #3b62d3; color: white;';
-                else if (kanalNavn === 'Pluto TV (DE)') badgeStyle = 'background-color: #fff80c; color: black;';
-                else if (kanalNavn === 'SPORT LIVE') badgeStyle = 'background-color: #dc5e11; color: white;';
+                let badgeBg = '';
+                let badgeFg = 'white';
+                let mobileColor = '';
+
+                if (kanalNavn === 'Feltet+') { badgeBg = '#ff0d99'; mobileColor = '#ff0d99'; }
+                else if (kanalNavn === 'Bold+') { badgeBg = '#92d050'; mobileColor = '#92d050'; }
+                else if (kanalNavn === 'Ekstra Bladet+') { badgeBg = '#ff0000'; mobileColor = '#ff0000'; }
+                else if (kanalNavn === 'JFM') { badgeBg = '#175b30'; mobileColor = '#175b30'; }
+                else if (kanalNavn === 'Optagelse') { badgeBg = '#000000'; mobileColor = '#000000'; }
+                else if (kanalNavn === 'Pluto TV (DK)') { badgeBg = '#7030a0'; mobileColor = '#7030a0'; }
+                else if (kanalNavn === 'Pluto TV (NO)') { badgeBg = '#3b201f'; mobileColor = '#3b201f'; }
+                else if (kanalNavn === 'Pluto TV (SE)') { badgeBg = '#3b62d3'; mobileColor = '#3b62d3'; }
+                else if (kanalNavn === 'Pluto TV (DE)') { badgeBg = '#fff80c'; badgeFg = 'black'; mobileColor = '#d0b800'; } 
+                else if (kanalNavn === 'SPORT LIVE') { badgeBg = '#dc5e11'; mobileColor = '#dc5e11'; }
+                else { badgeBg = '#e9ecef'; badgeFg = '#000000'; mobileColor = '#000000'; } 
 
                 let kanalKort = kanalNavn;
                 if (kanalNavn === 'Ekstra Bladet+') kanalKort = 'EB+';
@@ -1521,12 +1527,7 @@
                 else if (kanalNavn === 'Pluto TV (SE)') kanalKort = 'Pluto (SE)';
                 else if (kanalNavn === 'Pluto TV (DE)') kanalKort = 'Pluto (DE)';
 
-                let kanalDisplay = kanalNavn;
-                if (badgeStyle !== '') {
-                    kanalDisplay = `<span class="kanal-badge" style="${badgeStyle}"><span class="kanal-desktop">${kanalNavn}</span><span class="kanal-mobile" style="display:none;">${kanalKort}</span></span>`;
-                } else if (kanalNavn !== '') {
-                    kanalDisplay = `<span class="kanal-badge" style="background-color: #e9ecef; color: #000000;"><span class="kanal-desktop">${kanalNavn}</span><span class="kanal-mobile" style="display:none;">${kanalKort}</span></span>`;
-                }
+                let kanalDisplay = kanalNavn !== '' ? `<span class="kanal-badge" style="background-color: ${badgeBg}; color: ${badgeFg}; --mobile-color: ${mobileColor};"><span class="kanal-desktop">${kanalNavn}</span><span class="kanal-mobile" style="display:none;">${kanalKort}</span></span>` : '';
 
                 let noterTekst = program["Link / Noter"] || '';
                 let formateretNoter = noterTekst;
