@@ -167,6 +167,7 @@
         
         .mobile-only-title { display: none; }
         .aarhundred { display: inline; }
+        .prog-title-wrapper { display: inline; }
 
         .toggle-btn, .action-btn { 
             height: 26px; padding: 0 10px; font-size: 12px; border: none; border-radius: 4px; 
@@ -237,7 +238,7 @@
             .login-box h2 { font-size: 22px !important; margin-bottom: 20px !important; }
             .login-box img { 
                 height: 42px !important; 
-                transform: translateX(-5px) !important; /* Rettet fra none til -5px for at centrere visuelt */
+                transform: translateX(-5px) !important; 
                 margin-bottom: 15px !important; 
             }
             
@@ -247,6 +248,9 @@
             th, td { padding: 10px 4px !important; font-size: 12px !important; }
             
             .aarhundred { display: none !important; }
+            
+            /* Skjul dato-skillelinjerne fuldstændig på mobil */
+            .date-separator-row { display: none !important; }
             
             /* Kanal text farve matcher desktop badge baggrund */
             .kanal-badge { 
@@ -270,23 +274,22 @@
                 display: none !important;
             }
             
-            /* Afkort Programtitel - med padding for luft mod kanten */
-            th:nth-child(7), td:nth-child(7) {
+            /* Wrapper til at klippe Programtitel (nr 7) og td-padding for at skabe luft til højre */
+            .prog-title-wrapper {
+                display: block !important;
                 max-width: 140px; 
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: clip; 
-                padding-right: 20px !important; /* Ekstra padding så teksten ikke kysser rammen */
-                box-sizing: border-box !important; /* Tvinger paddingen ind i bredden */
+            }
+            th:nth-child(7), td:nth-child(7) {
+                padding-right: 15px !important; 
             }
 
             /* Hoved-elementer øverst */
             .header { flex-direction: column; gap: 10px; align-items: flex-start !important; }
             .title-wrapper { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .title-wrapper img { 
-                height: 50px !important; 
-                transform: translateX(-10px) !important; /* Rytter hovedlogo lidt til venstre */
-            } 
+            .title-wrapper img { height: 50px !important; transform: translateX(-10px) !important; } 
             h1 { font-size: 22px !important; margin-top: 5px !important; }
             .year-filter { font-size: 15px !important; margin-left: 12px !important; padding-left: 12px !important; border-left: 2px solid #ccc !important; }
             .year-option.active { font-size: 17px !important; }
@@ -314,7 +317,8 @@
                 box-sizing: border-box;
             }
 
-            .user-info-text { font-size: 12px !important; margin-top: 0; width: 100%; text-align: right; }
+            /* Venstrestil "Logget ind som..." på mobil */
+            .user-info-text { font-size: 12px !important; margin-top: 0; width: 100%; text-align: left !important; }
 
             /* Saml udvidet boks til én grøn superboks uden overskrifter */
             .detail-container { 
@@ -1525,7 +1529,7 @@
                 else { badgeBg = '#e9ecef'; badgeFg = '#000000'; mobileColor = '#000000'; } 
 
                 let kanalKort = kanalNavn;
-                if (kanalNavn === 'Ekstra Bladet+') kanalKort = 'Ekstra Bladet'; /* Rettet til Ekstra Bladet for mobil */
+                if (kanalNavn === 'Ekstra Bladet+') kanalKort = 'Ekstra Bladet';
                 else if (kanalNavn === 'Pluto TV (DK)') kanalKort = 'Pluto (DK)';
                 else if (kanalNavn === 'Pluto TV (NO)') kanalKort = 'Pluto (NO)';
                 else if (kanalNavn === 'Pluto TV (SE)') kanalKort = 'Pluto (SE)';
@@ -1597,6 +1601,7 @@
 
                 if (datoSkift) {
                     const trSep = document.createElement('tr');
+                    trSep.className = 'date-separator-row'; 
                     trSep.innerHTML = `<td colspan="10" style="padding: 0; border: none;"><div style="height: 2px; background-color: rgba(0,0,0,0.2); width: 100%;"></div></td>`;
                     tbody.appendChild(trSep);
                 }
@@ -1617,7 +1622,7 @@
                     <td><b>${pTX}</b></td>
                     <td>${kanalDisplay}</td>
                     <td>${program["Sportsgren"] || ''}</td>
-                    <td>${visProgramtitel}</td>
+                    <td><div class="prog-title-wrapper">${visProgramtitel}</div></td>
                     <td>${pSted}</td>
                     <td>${visUnit}</td>
                     <td style="white-space: nowrap;">${handlingsKnapper}</td>
