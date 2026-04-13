@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SPORT LIVE | Produktioner</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -16,6 +16,7 @@
             flex-direction: column; 
             overflow: hidden; 
             color: #000000;
+            -webkit-text-size-adjust: 100%; /* Forhindrer iOS i at ændre tekststørrelser automatisk */
         }
         
         /* LOGIN OVERLAY CSS */
@@ -89,7 +90,7 @@
             border-left: 2px solid #ccc; 
             font-size: 18px; 
             position: relative;
-            top: 5px; /* Skubber stregen og årstallene lidt ned så de flugter bedre */
+            top: 5px; 
         }
         .year-option { color: #aaa; cursor: pointer; transition: all 0.2s; font-weight: normal; }
         .year-option:hover { color: #666; }
@@ -245,8 +246,9 @@
                 margin-bottom: 15px !important; 
             }
             
-            /* Frigør mere lodret plads i toppen af skærmen */
-            .top-section { padding-top: 10px !important; padding-bottom: 0 !important; }
+            /* Låser sidens ydre kasser, så margin er konstant på iOS */
+            .top-section { padding: 15px 12px 0 12px !important; }
+            .table-container { padding: 0 12px 15px 12px !important; }
 
             /* Fjern horisontal scroll og lad browseren styre kolonnebredder dynamisk */
             table { min-width: 100% !important; table-layout: auto !important; width: 100% !important; }
@@ -295,8 +297,9 @@
             }
             th:nth-child(7), td:nth-child(7) {
                 width: 100% !important;
-                max-width: 0 !important; /* Lader kolonnen sluge restpladsen */
-                padding-right: 4px !important; /* Nøjagtig samme padding (4px) som til venstre for "Dato" */
+                max-width: 0 !important; 
+                min-width: 0 !important;
+                padding-right: 4px !important; 
             }
 
             /* Hoved-elementer øverst - optimeret plads */
