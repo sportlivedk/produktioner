@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SPORT LIVE | Produktioner</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -11,12 +11,13 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #f4f6f8; 
             margin: 0; 
-            height: 100vh; 
+            height: 100vh; /* Fallback til ældre browsere */
+            height: 100dvh; /* Moderne fix så iOS ikke skjuler bunden */
             display: flex; 
             flex-direction: column; 
             overflow: hidden; 
             color: #000000;
-            -webkit-text-size-adjust: 100%; /* Forhindrer iOS i at ændre tekststørrelser automatisk */
+            -webkit-text-size-adjust: 100%; 
         }
         
         /* LOGIN OVERLAY CSS */
@@ -54,7 +55,8 @@
         .login-loader { display: none; margin-top: 15px; font-size: 14px; color: #555; }
 
         .top-section { 
-            padding: 20px 20px 0 20px; 
+            /* Apple Safe Area Inset tilføjet for at undgå at indhold skjules bag "hakket" */
+            padding: calc(20px + env(safe-area-inset-top)) 20px 0 20px; 
             flex-shrink: 0; 
             background-color: #f4f6f8; 
             z-index: 100; 
@@ -64,8 +66,10 @@
             flex-grow: 1; 
             overflow-y: scroll; 
             overflow-x: auto; 
-            padding: 0 20px 20px 20px; 
+            /* Safe area i bunden så tabellen ikke fanges bag iPhone-stregen */
+            padding: 0 20px calc(20px + env(safe-area-inset-bottom)) 20px; 
             position: relative;
+            -webkit-overflow-scrolling: touch; 
         }
 
         #loader {
@@ -231,6 +235,9 @@
         /* MOBIL OPTIMERING (Media Queries)          */
         /* ========================================= */
         @media (max-width: 900px) {
+            /* Tvinger ALLE indtastningsfelter op på 16px for at undgå iOS auto-zoom på fokus */
+            input, select, textarea { font-size: 16px !important; }
+
             /* Login skærm - Formindsket og centreret */
             .login-box { 
                 padding: 30px 20px !important; 
@@ -246,9 +253,9 @@
                 margin-bottom: 15px !important; 
             }
             
-            /* Låser sidens ydre kasser, så margin er konstant på iOS */
-            .top-section { padding: 15px 12px 0 12px !important; }
-            .table-container { padding: 0 12px 15px 12px !important; }
+            /* Låser sidens ydre kasser og inkorporerer iOS "Safe Area" for at forhindre indhold under notchen */
+            .top-section { padding: calc(10px + env(safe-area-inset-top)) 12px 0 12px !important; }
+            .table-container { padding: 0 12px calc(15px + env(safe-area-inset-bottom)) 12px !important; }
 
             /* Fjern horisontal scroll og lad browseren styre kolonnebredder dynamisk */
             table { min-width: 100% !important; table-layout: auto !important; width: 100% !important; }
@@ -313,7 +320,7 @@
             .header-right { align-items: flex-start; width: 100%; margin-top: 0 !important; }
             .controls-wrapper { width: 100%; flex-direction: column; align-items: flex-start; gap: 8px !important; }
             .search-container { width: 100%; }
-            .search-input { width: 100% !important; box-sizing: border-box; }
+            .search-input { width: 100% !important; box-sizing: border-box; } /* Fontstørrelse er nu overstyret til 16px via globale input-regel ovenfor */
 
             /* Skjul irrelevante UI elementer */
             #typeFilter, #programCountText, #btnExportPDF, #btnTilfoejProgram { display: none !important; }
@@ -326,7 +333,7 @@
                 padding: 6px 8px; 
                 height: 34px;
                 margin-bottom: 8px !important; 
-                font-size: 13px; 
+                /* Fontstørrelse overstyres til 16px øverst i medie-query for at redde iOS */
                 border-radius: 4px;
                 border: 1px solid #ccc;
                 background-color: white;
