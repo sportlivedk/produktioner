@@ -264,6 +264,16 @@
             th { width: auto !important; }
             th, td { padding: 10px 4px !important; font-size: 12px !important; }
             
+            /* SKABER LUFT MELLEM KOLONNERNE */
+            /* Kolonne 1 (Dato): Lidt ekstra padding i højre side */
+            th:nth-child(1), .main-row td:nth-child(1) { padding-right: 14px !important; padding-left: 4px !important; }
+            
+            /* Kolonne 3 (Tid): Padding på både højre og venstre side for at skubbe væk fra Dato og Kanal */
+            th:nth-child(3), .main-row td:nth-child(3) { padding-left: 14px !important; padding-right: 14px !important; }
+            
+            /* Kolonne 5 (Kanal): Padding på højre og venstre side for at skubbe væk fra Tid og Sportsgren */
+            th:nth-child(5), .main-row td:nth-child(5) { padding-left: 14px !important; padding-right: 14px !important; }
+            
             .aarhundred { display: none !important; }
             
             /* Tynd separatorlinje mellem datoer uden ekstra højde */
@@ -306,11 +316,14 @@
                 text-transform: uppercase;
                 color: #000000;
             }
-            th:nth-child(6), td:nth-child(6) {
+            
+            /* Kolonne 6 (Sportsgren): Spiser restpladsen, padding venstre for luft, og 4px padding højre for kant-flugt */
+            th:nth-child(6), .main-row td:nth-child(6) {
                 width: 100% !important;
                 max-width: 0 !important; 
                 min-width: 0 !important;
-                padding-right: 4px !important; /* Giver den perfekte 4px padding ud mod højre skærmkant */
+                padding-left: 14px !important; 
+                padding-right: 4px !important; 
             }
 
             /* Hoved-elementer øverst - optimeret plads */
@@ -339,6 +352,7 @@
                 padding: 6px 8px; 
                 height: 34px;
                 margin-bottom: 8px !important; 
+                /* Fontstørrelse overstyres til 16px øverst i medie-query for at redde iOS */
                 border-radius: 4px;
                 border: 1px solid #ccc;
                 background-color: white;
@@ -1650,7 +1664,7 @@
                     <td><b>${pTX}</b></td>
                     <td>${kanalDisplay}</td>
                     <td><div class="mobile-sportsgren-wrapper">${program["Sportsgren"] || ''}</div></td>
-                    <td>${visProgramtitel}</td>
+                    <td><div class="prog-title-wrapper">${visProgramtitel}</div></td>
                     <td>${pSted}</td>
                     <td>${visUnit}</td>
                     <td style="white-space: nowrap;">${handlingsKnapper}</td>
