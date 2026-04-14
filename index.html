@@ -297,11 +297,11 @@
             .kanal-desktop { display: none !important; }
             .kanal-mobile { display: inline !important; }
 
-            /* Skjul specifikke kolonner (nu skjules Programtitel nr. 7, og Sportsgren nr. 6 vises) */
+            /* Skjul specifikke kolonner (nu skjules Programtitel nr. 7 og den nye Kommentator nr. 8, og Sportsgren nr. 6 vises) */
             th:nth-child(2), td:nth-child(2),
             th:nth-child(4), td:nth-child(4),
             th:nth-child(7), td:nth-child(7), /* Programtitel skjult */
-            th:nth-child(8), td:nth-child(8),
+            th:nth-child(8), td:nth-child(8), /* Kommentator/vært skjult på mobil oversigt */
             th:nth-child(9), td:nth-child(9),
             th:nth-child(10), td:nth-child(10) {
                 display: none !important;
@@ -352,7 +352,6 @@
                 padding: 6px 8px; 
                 height: 34px;
                 margin-bottom: 8px !important; 
-                /* Fontstørrelse overstyres til 16px øverst i medie-query for at redde iOS */
                 border-radius: 4px;
                 border: 1px solid #ccc;
                 background-color: white;
@@ -380,9 +379,6 @@
                 background-color: transparent !important;
             }
             .detail-card h4 { display: none !important; } 
-            
-            /* Præcis samme margin til "Noter" som til de andre lister (8px) */
-            .noter-container { border-top: none !important; margin-top: 8px !important; padding-top: 0 !important; }
 
             .mobile-only-title { display: block; font-size: 12px !important; font-weight: bold; color: #0056b3; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; white-space: normal; }
             .detail-row td { padding: 12px !important; background-color: #fafbfc; border-bottom: none !important; }
@@ -504,7 +500,7 @@
                     <th style="width: 140px;">Kanal</th>
                     <th style="width: 90px;">Sportsgren</th>
                     <th style="width: 310px;">Programtitel</th>
-                    <th style="width: 270px;">Lokation</th>
+                    <th style="width: 270px;">Kommentator/vært</th>
                     <th style="width: 70px;">Unit</th>
                     <th style="width: 210px;">Handling</th>
                 </tr>
@@ -1476,14 +1472,14 @@
             const manglerKommentator = (!program["Kommentator"] || program["Kommentator"].trim() === "");
             const manglerReporter = (!program["Reporter"] || program["Reporter"].trim() === "");
             const manglerProducer = (!program["Producer"] || program["Producer"].trim() === "");
+            const manglerEkspert = (!program["Ekspert"] || program["Ekspert"].trim() === "");
 
-            const obUnitsArr = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
-            const erOB = obUnitsArr.includes(unit);
+            const obUnitsArr = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
 
             if (unit === "EFP" || kanal === "Optagelse") {
                 if (manglerProducer || (manglerKommentator && manglerReporter)) return true;
-            } else if (erOB) {
-                if (manglerKommentator || manglerProducer) return true;
+            } else if (obUnitsArr.includes(unit)) {
+                if (manglerKommentator || manglerProducer || manglerEkspert) return true;
             } else {
                 if (manglerKommentator) return true;
             }
@@ -1539,7 +1535,8 @@
                 const pUgedag = program["Ugedag"] || '';
                 let pTid = program["Tid"] || '-';
                 let pTX = program["TX"] || '-';
-                let pSted = program["Lokation"] && program["Lokation"].trim() !== '' ? program["Lokation"].trim() : 'TBA';
+                let pSted = program["Lokation"] && program["Lokation"].trim() !== '' ? program["Lokation"].trim() : '-';
+                let pKomm = program["Kommentator"] && program["Kommentator"].trim() !== '' ? program["Kommentator"].trim() : '-';
                 let kanalNavn = program["Kanal"] || '';
                 
                 if (pTid !== '-' && pTid.includes('T')) {
@@ -1665,7 +1662,7 @@
                     <td>${kanalDisplay}</td>
                     <td><div class="mobile-sportsgren-wrapper">${program["Sportsgren"] || ''}</div></td>
                     <td><div class="prog-title-wrapper">${visProgramtitel}</div></td>
-                    <td>${pSted}</td>
+                    <td>${pKomm}</td>
                     <td>${visUnit}</td>
                     <td style="white-space: nowrap;">${handlingsKnapper}</td>
                 `;
@@ -1703,12 +1700,10 @@
                             <div class="detail-card ekstra">
                                 <h4>Ekstra information</h4>
                                 <div class="detail-list">
+                                    <div class="detail-list-item"><span class="detail-label">Lokation:</span> <span class="detail-value">${pSted}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Teknisk info:</span> <span class="detail-value">${tInfoDisplay}</span></div>
-                                </div>
-                                <div class="noter-container" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee; display: flex; align-items: baseline; gap: 4px;">
-                                    <div class="detail-label">Noter:</div>
-                                    <div class="detail-value" style="text-align: left; font-weight: 500; font-size: 14px; color: #0056b3; flex-grow: 1;">${formateretNoter}</div>
+                                    <div class="detail-list-item"><span class="detail-label">Noter:</span> <span class="detail-value" style="color: #0056b3; text-align: right; max-width: 75%; word-break: break-word;">${formateretNoter}</span></div>
                                 </div>
                             </div>
                         </div>
