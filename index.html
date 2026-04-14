@@ -632,8 +632,8 @@
         let brugerRolle = ""; 
         let aktuelBruger = "";
         
-        const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
-
+        // Hent obUnits logik ændret - se funktionen skalViseAdvarsel()
+        
         function truncateText(text, maxLength) {
             if (!text) return '';
             if (text.length > maxLength) {
@@ -759,8 +759,11 @@
                 }
 
                 let kommTxt = p["Kommentator"] || '';
-                if (p["Kanal"] === 'Optagelse' && p["Reporter"] && p["Reporter"].trim() !== '') {
-                    kommTxt = p["Reporter"].trim();
+                // Opdateret logik for PDF, så det matcher oversigten
+                if (p["Kanal"] === 'Optagelse' && p["Unit"] === 'EFP') {
+                    if (kommTxt.trim() === '' && p["Reporter"] && p["Reporter"].trim() !== '') {
+                        kommTxt = p["Reporter"].trim();
+                    }
                 }
 
                 tableBody.push([
@@ -1479,12 +1482,23 @@
             const manglerEkspert = (!program["Ekspert"] || program["Ekspert"].trim() === "");
 
             const obUnitsArr = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
+            const erOB = obUnitsArr.includes(unit);
+            const unitLower = unit.toLowerCase();
 
-            if (unit === "EFP" || kanal === "Optagelse") {
+            if (kanal === "Optagelse" && unit === "EFP") {
+                // Optagelse + EFP: Kræver (Kommentator ELLER Reporter) - Advarsel kun hvis begge mangler
+                if (manglerKommentator && manglerReporter) return true;
+            } else if (kanal === "Optagelse" && unitLower.startsWith("studie")) {
+                // Optagelse + Studie: Kræver Producer OG Kommentator
+                if (manglerProducer || manglerKommentator) return true;
+            } else if (unit === "EFP" || kanal === "Optagelse") {
+                // Generel EFP eller Optagelse (som ikke er dækket af ovenstående to)
                 if (manglerProducer || (manglerKommentator && manglerReporter)) return true;
-            } else if (obUnitsArr.includes(unit)) {
+            } else if (erOB) {
+                // OB produktioner kræver nu også Ekspert
                 if (manglerKommentator || manglerProducer || manglerEkspert) return true;
             } else {
+                // Standard for resten
                 if (manglerKommentator) return true;
             }
 
@@ -1540,8 +1554,16 @@
                 let pTid = program["Tid"] || '-';
                 let pTX = program["TX"] || '-';
                 let pSted = program["Lokation"] && program["Lokation"].trim() !== '' ? program["Lokation"].trim() : '-';
-                let pKomm = program["Kommentator"] && program["Kommentator"].trim() !== '' ? program["Kommentator"].trim() : '-';
                 let kanalNavn = program["Kanal"] || '';
+                
+                let pKomm = program["Kommentator"] && program["Kommentator"].trim() !== '' ? program["Kommentator"].trim() : '';
+                // Dynamisk udskiftning af Kommentator med Reporter i tabellen for Optagelse + EFP
+                if (kanalNavn === 'Optagelse' && program["Unit"] === 'EFP') {
+                    if (pKomm === '' && program["Reporter"] && program["Reporter"].trim() !== '') {
+                        pKomm = program["Reporter"].trim();
+                    }
+                }
+                if (pKomm === '') pKomm = '-';
                 
                 if (pTid !== '-' && pTid.includes('T')) {
                     const t = new Date(pTid);
