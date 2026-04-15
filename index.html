@@ -129,6 +129,10 @@
 
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #000000; }
+        
+        /* NYE PROFIL LINKS */
+        .profil-link { color: #28a745; text-decoration: none; font-weight: bold; margin-left: 4px; margin-right: 4px; cursor: pointer; }
+        .profil-link:hover { text-decoration: underline; }
         .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; margin-left: 4px; cursor: pointer; }
         .logout-link:hover { text-decoration: underline; }
 
@@ -237,91 +241,43 @@
         /* MOBIL OPTIMERING (Media Queries)          */
         /* ========================================= */
         @media (max-width: 900px) {
-            /* Tvinger ALLE indtastningsfelter op på 16px for at undgå iOS auto-zoom på fokus */
             input, select, textarea { font-size: 16px !important; }
 
-            /* Login skærm - Formindsket og centreret */
-            .login-box { 
-                padding: 30px 20px !important; 
-                width: 90% !important; 
-                max-width: 300px !important; 
-                box-sizing: border-box !important; 
-                margin: 0 auto !important; 
-            }
+            .login-box { padding: 30px 20px !important; width: 90% !important; max-width: 300px !important; box-sizing: border-box !important; margin: 0 auto !important; }
             .login-box h2 { font-size: 22px !important; margin-bottom: 20px !important; }
-            .login-box img { 
-                height: 42px !important; 
-                transform: translateX(-5px) !important; 
-                margin-bottom: 15px !important; 
-            }
+            .login-box img { height: 42px !important; transform: translateX(-5px) !important; margin-bottom: 15px !important; }
             
-            /* Låser sidens ydre kasser og inkorporerer iOS "Safe Area" for at forhindre indhold under notchen */
             .top-section { padding: calc(10px + env(safe-area-inset-top)) 12px 0 12px !important; }
             .table-container { padding: 0 12px calc(15px + env(safe-area-inset-bottom)) 12px !important; }
 
-            /* Fjern horisontal scroll og lad browseren styre kolonnebredder dynamisk */
             table { min-width: 100% !important; table-layout: auto !important; width: 100% !important; }
             th { width: auto !important; }
             th, td { padding: 10px 4px !important; font-size: 12px !important; }
             
-            /* SKABER LUFT MELLEM KOLONNERNE */
             th:nth-child(1), .main-row td:nth-child(1) { padding-right: 14px !important; padding-left: 4px !important; }
             th:nth-child(3), .main-row td:nth-child(3) { padding-left: 14px !important; padding-right: 14px !important; }
             th:nth-child(5), .main-row td:nth-child(5) { padding-left: 14px !important; padding-right: 14px !important; }
             
             .aarhundred { display: none !important; }
-            
-            /* Tynd separatorlinje mellem datoer uden ekstra højde */
             .date-separator-row td { padding: 0 !important; height: 1px !important; }
             .date-separator-row div { height: 1px !important; background-color: rgba(0,0,0,0.3) !important; }
-            
-            /* Sikrer at Kanal ikke deler sig over to linjer */
-            th:nth-child(5), td:nth-child(5) {
-                white-space: nowrap !important;
-            }
+            th:nth-child(5), td:nth-child(5) { white-space: nowrap !important; }
 
-            /* Kanal text farve matcher desktop badge baggrund */
-            .kanal-badge { 
-                background: transparent !important; 
-                color: var(--mobile-color) !important; 
-                padding: 0 !important; 
-                font-weight: 600 !important; 
-                width: auto !important; 
-            }
-            
+            .kanal-badge { background: transparent !important; color: var(--mobile-color) !important; padding: 0 !important; font-weight: 600 !important; width: auto !important; }
             .kanal-desktop { display: none !important; }
             .kanal-mobile { display: inline !important; }
 
-            /* Skjul specifikke kolonner */
             th:nth-child(2), td:nth-child(2),
             th:nth-child(4), td:nth-child(4),
-            th:nth-child(7), td:nth-child(7), /* Programtitel skjult */
-            th:nth-child(8), td:nth-child(8), /* Kommentator/vært skjult på mobil oversigt */
+            th:nth-child(7), td:nth-child(7),
+            th:nth-child(8), td:nth-child(8),
             th:nth-child(9), td:nth-child(9),
-            th:nth-child(10), td:nth-child(10) {
-                display: none !important;
-            }
+            th:nth-child(10), td:nth-child(10) { display: none !important; }
             
-            /* Formatér Sportsgren-kolonnen */
-            .mobile-sportsgren-wrapper {
-                display: block !important;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: clip; 
-                text-transform: uppercase;
-                color: #000000;
-            }
+            .mobile-sportsgren-wrapper { display: block !important; white-space: nowrap; overflow: hidden; text-overflow: clip; text-transform: uppercase; color: #000000; }
             
-            /* Kolonne 6 (Sportsgren): Spiser restpladsen */
-            th:nth-child(6), .main-row td:nth-child(6) {
-                width: 100% !important;
-                max-width: 0 !important; 
-                min-width: 0 !important;
-                padding-left: 14px !important; 
-                padding-right: 4px !important; 
-            }
+            th:nth-child(6), .main-row td:nth-child(6) { width: 100% !important; max-width: 0 !important; min-width: 0 !important; padding-left: 14px !important; padding-right: 4px !important; }
 
-            /* Hoved-elementer øverst - optimeret plads */
             .header { flex-direction: column; gap: 5px !important; margin-bottom: 8px !important; align-items: flex-start !important; }
             .title-wrapper { flex-direction: column; align-items: flex-start; gap: 3px !important; }
             .title-wrapper img { height: 40px !important; transform: translateX(-10px) !important; } 
@@ -335,43 +291,18 @@
             .search-container { width: 100%; }
             .search-input { width: 100% !important; box-sizing: border-box; }
 
-            /* Skjul irrelevante UI elementer */
             #typeFilter, #programCountText, #btnExportPDF, #btnTilfoejProgram { display: none !important; }
 
-            /* Måneds-filter */
             .month-filter { display: none !important; }
-            .mobile-month-select { 
-                display: block; 
-                width: 100%; 
-                padding: 6px 8px; 
-                height: 34px;
-                margin-bottom: 8px !important; 
-                border-radius: 4px;
-                border: 1px solid #ccc;
-                background-color: white;
-                box-sizing: border-box;
-            }
+            .mobile-month-select { display: block; width: 100%; padding: 6px 8px; height: 34px; margin-bottom: 8px !important; border-radius: 4px; border: 1px solid #ccc; background-color: white; box-sizing: border-box; }
 
-            /* Venstrestil og juster "Logget ind som..." på mobil */
             .user-info-text { font-size: 12px !important; margin-top: 0; margin-bottom: 4px !important; width: 100%; text-align: left !important; padding-left: 4px !important; }
+            
+            /* Skjul Profil-knap og divier på mobil som anmodet */
+            .profil-link, .desktop-only-divider { display: none !important; }
 
-            /* Saml udvidet boks til én grøn superboks */
-            .detail-container { 
-                flex-direction: column; 
-                gap: 8px; 
-                background-color: white;
-                border: 1px solid #e1e4e8;
-                border-radius: 6px;
-                border-top: 4px solid #28a745; 
-                padding: 12px;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            }
-            .detail-card { 
-                border: none !important; 
-                padding: 0 !important; 
-                box-shadow: none !important; 
-                background-color: transparent !important;
-            }
+            .detail-container { flex-direction: column; gap: 8px; background-color: white; border: 1px solid #e1e4e8; border-radius: 6px; border-top: 4px solid #28a745; padding: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+            .detail-card { border: none !important; padding: 0 !important; box-shadow: none !important; background-color: transparent !important; }
             .detail-card h4 { display: none !important; } 
             
             .noter-container { border-top: none !important; margin-top: 8px !important; padding-top: 0 !important; }
@@ -441,6 +372,8 @@
                 
                 <div id="userInfoContainer" class="user-info-text">
                     Logget ind som <strong id="displayUsername"></strong> 
+                    <span class="desktop-only-divider" style="color: #ccc; margin-left: 4px;">|</span>
+                    <a href="#" class="profil-link" onclick="aabenProfil(event)">Profil</a>
                     <span style="color: #ccc; margin-left: 4px;">|</span>
                     <a href="#" class="logout-link" onclick="logUd(event)">Log ud</a>
                 </div>
@@ -508,6 +441,57 @@
         <div class="custom-dialog-box">
             <div id="dialogMessage" class="custom-dialog-message"></div>
             <div id="dialogActions" class="custom-dialog-actions"></div>
+        </div>
+    </div>
+
+    <div id="profileModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close" onclick="lukProfil()">&times;</span>
+            
+            <div id="profileView" style="text-align: center;">
+                <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Profiloplysninger</h2>
+                
+                <div style="margin-top: 20px; font-size: 20px; font-weight: bold; color: #000000;" id="profileNameText">Dit Navn</div>
+                
+                <div style="margin-top: 15px; font-size: 14px; color: #666;">Brugernavn</div>
+                <div style="font-size: 16px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
+                
+                <div style="margin-top: 15px; font-size: 14px; color: #666;">Adgangskode</div>
+                <div style="font-size: 16px; font-weight: bold; color: #000000; letter-spacing: 2px;" id="profilePasswordText">********</div>
+                
+                <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-top: 25px; margin-bottom: 25px; color: #dc3545; font-size: 15px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
+                
+                <button class="btn btn-dialog secondary" style="width: 100%;" onclick="lukProfil()">Luk</button>
+            </div>
+
+            <div id="changePasswordView" style="display: none; text-align: left;">
+                <h2 style="font-size: 26px; margin-top: 0; text-align: center; color: #000000;">Skift adgangskode</h2>
+                <div id="passwordErrorMsg" style="color: #dc3545; font-size: 14px; font-weight: bold; margin-bottom: 15px; text-align: center; display: none;">Fejlbesked</div>
+                
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Nuværende adgangskode</label>
+                    <input type="password" id="inputCurrentPassword">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Ny adgangskode</label>
+                    <input type="password" id="inputNewPassword">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>Gentag ny adgangskode</label>
+                    <input type="password" id="inputRepeatNewPassword">
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-dialog danger" style="flex: 1;" onclick="visProfilInfo()">Afbryd</button>
+                    <button id="btnConfirmPass" class="btn btn-dialog primary" style="flex: 1; background-color: #28a745;" onclick="udfoerSkiftAdgangskode()">Bekræft</button>
+                </div>
+            </div>
+
+            <div id="passwordSuccessView" style="display: none; text-align: center;">
+                <h2 style="font-size: 26px; margin-top: 0; color: #28a745;">Adgangskode ændret</h2>
+                <p style="font-size: 15px; line-height: 1.5; color: #000000; margin-bottom: 25px;">Din adgangskode er blevet ændret, og du vil nu blive ført tilbage til login-siden, hvor du skal logge ind med din nye adgangskode.</p>
+                <div style="font-size: 30px;">⏳</div>
+            </div>
         </div>
     </div>
 
@@ -623,7 +607,8 @@
         
         let brugerRolle = ""; 
         let aktuelBruger = "";
-        let aktueltNavn = ""; // Tilføjet variabel til brugerens fulde navn
+        let aktueltNavn = ""; 
+        let aktuelPassLen = 8; // Default, opdateres ved login
         
         function truncateText(text, maxLength) {
             if (!text) return '';
@@ -852,13 +837,13 @@
                 if (result.success) {
                     brugerRolle = result.rolle || "Læser";
                     aktuelBruger = user;
-                    // Vi forsøger at hente 'navn' fra Google Apps Script svaret.
-                    // Hvis Apps Scriptet ikke er opdateret til at sende 'navn' endnu, falder vi bare tilbage og bruger e-mailen (user).
                     aktueltNavn = result.navn || user; 
+                    aktuelPassLen = result.passLength || 8; 
                     
                     sessionStorage.setItem('sportlive_user', aktuelBruger);
                     sessionStorage.setItem('sportlive_role', brugerRolle);
                     sessionStorage.setItem('sportlive_navn', aktueltNavn);
+                    sessionStorage.setItem('sportlive_passlen', aktuelPassLen); 
                     
                     afslutLogin();
                 } else {
@@ -879,7 +864,6 @@
         function afslutLogin() {
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('userInfoContainer').style.display = "block";
-            // Her skriver vi det fulde navn ind i toppen af skærmen
             document.getElementById('displayUsername').textContent = aktueltNavn;
             loadProgrammer();
         }
@@ -889,10 +873,12 @@
             
             sessionStorage.removeItem('sportlive_user');
             sessionStorage.removeItem('sportlive_role');
-            sessionStorage.removeItem('sportlive_navn'); // Rydder også navnet i hukommelsen
+            sessionStorage.removeItem('sportlive_navn'); 
+            sessionStorage.removeItem('sportlive_passlen'); 
             brugerRolle = "";
             aktuelBruger = "";
             aktueltNavn = "";
+            aktuelPassLen = 8;
             
             alleProgrammerGlobal = [];
             aktuelleProgrammerVist = [];
@@ -906,6 +892,106 @@
             document.getElementById('loginOverlay').style.display = "flex";
             document.getElementById('loginUsername').focus();
         }
+
+        // ==========================================
+        // NYT: FUNKTIONER TIL PROFIL OG ADGANGSKODE
+        // ==========================================
+        function aabenProfil(e) {
+            if(e) e.preventDefault();
+            
+            document.getElementById('profileView').style.display = 'block';
+            document.getElementById('changePasswordView').style.display = 'none';
+            document.getElementById('passwordSuccessView').style.display = 'none';
+            
+            document.getElementById('profileNameText').textContent = aktueltNavn;
+            document.getElementById('profileUsernameText').textContent = aktuelBruger;
+            
+            let pLen = sessionStorage.getItem('sportlive_passlen') || 8;
+            document.getElementById('profilePasswordText').textContent = "*".repeat(pLen);
+            
+            document.getElementById('profileModal').style.display = 'block';
+        }
+
+        function lukProfil() {
+            document.getElementById('profileModal').style.display = 'none';
+        }
+
+        function visSkiftAdgangskode(e) {
+            if(e) e.preventDefault();
+            document.getElementById('profileView').style.display = 'none';
+            document.getElementById('changePasswordView').style.display = 'block';
+            document.getElementById('passwordErrorMsg').style.display = 'none';
+            
+            document.getElementById('inputCurrentPassword').value = '';
+            document.getElementById('inputNewPassword').value = '';
+            document.getElementById('inputRepeatNewPassword').value = '';
+        }
+
+        function visProfilInfo() {
+            document.getElementById('profileView').style.display = 'block';
+            document.getElementById('changePasswordView').style.display = 'none';
+        }
+
+        async function udfoerSkiftAdgangskode() {
+            const curPass = document.getElementById('inputCurrentPassword').value;
+            const newPass = document.getElementById('inputNewPassword').value;
+            const repPass = document.getElementById('inputRepeatNewPassword').value;
+            const errorMsg = document.getElementById('passwordErrorMsg');
+            const btnConfirm = document.getElementById('btnConfirmPass');
+            
+            if (!curPass || !newPass || !repPass) {
+                errorMsg.textContent = "Udfyld venligst alle felter.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (newPass !== repPass) {
+                errorMsg.textContent = "De nye adgangskoder er ikke ens.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+            
+            errorMsg.style.display = 'none';
+            const originalText = btnConfirm.textContent;
+            btnConfirm.textContent = "Gemmer...";
+            btnConfirm.disabled = true;
+            
+            try {
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: "change_password", 
+                        username: aktuelBruger,
+                        current_password: curPass,
+                        new_password: newPass
+                    }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('changePasswordView').style.display = 'none';
+                    document.getElementById('passwordSuccessView').style.display = 'block';
+                    
+                    // Logger ud og lukker efter 5 sekunder
+                    setTimeout(() => {
+                        logUd();
+                        lukProfil();
+                    }, 5000);
+                } else {
+                    errorMsg.textContent = result.message || "Der opstod en fejl.";
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                console.error(error);
+                errorMsg.textContent = "Netværksfejl. Prøv at opdatere siden.";
+                errorMsg.style.display = 'block';
+            } finally {
+                btnConfirm.textContent = originalText;
+                btnConfirm.disabled = false;
+            }
+        }
+        // ==========================================
 
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.multi-select-container')) {
@@ -1934,11 +2020,13 @@
             const gemtBruger = sessionStorage.getItem('sportlive_user');
             const gemtRolle = sessionStorage.getItem('sportlive_role');
             const gemtNavn = sessionStorage.getItem('sportlive_navn');
+            const gemtPassLen = sessionStorage.getItem('sportlive_passlen');
             
             if (gemtBruger && gemtRolle) {
                 aktuelBruger = gemtBruger;
                 brugerRolle = gemtRolle;
                 aktueltNavn = gemtNavn || gemtBruger;
+                aktuelPassLen = gemtPassLen || 8;
                 afslutLogin();
             } else {
                 document.getElementById('loginOverlay').style.display = 'flex';
@@ -1962,6 +2050,8 @@
         };
 
         var modal = document.getElementById("programModal");
+        var profilModal = document.getElementById("profileModal");
+        
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
         
@@ -1969,6 +2059,9 @@
             if (event.target == modal) { 
                 forsogLukModal();
             } 
+            if (event.target == profilModal) {
+                lukProfil();
+            }
         };
     </script>
 </body>
