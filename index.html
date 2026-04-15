@@ -1753,11 +1753,11 @@
                 let datoCelleStyle = '';
                 let ugedagCelleStyle = '';
                 if (erIdag) {
-                    datoCelleStyle = 'background-color: #28a745; color: white; font-weight: bold;';
-                    ugedagCelleStyle = 'background-color: #28a745; color: white; font-weight: bold;';
+                    datoCelleStyle = 'background-color: #d4edda; color: black; font-weight: bold;';
+                    ugedagCelleStyle = 'background-color: #d4edda; color: black; font-weight: bold;';
                 } else if (erImorgen) {
-                    datoCelleStyle = 'background-color: #ffc107; color: black; font-weight: bold;';
-                    ugedagCelleStyle = 'background-color: #ffc107; color: black; font-weight: bold;';
+                    datoCelleStyle = 'background-color: #fff3cd; color: black; font-weight: bold;';
+                    ugedagCelleStyle = 'background-color: #fff3cd; color: black; font-weight: bold;';
                 }
 
                 let handlingsKnapper = `
@@ -1784,7 +1784,6 @@
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
-                trMain.onclick = function(e) { toggleDetailsFromRow(e, this); };
                 
                 trMain.innerHTML = `
                     <td style="${datoCelleStyle}">${pDatoFormat}</td>
