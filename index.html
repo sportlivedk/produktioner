@@ -130,7 +130,6 @@
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #000000; }
         
-        /* NYE PROFIL LINKS (Farve opdateret til systemblå) */
         .profil-link { color: #0056b3; text-decoration: none; font-weight: bold; margin-left: 4px; margin-right: 4px; cursor: pointer; }
         .profil-link:hover { text-decoration: underline; }
         .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; cursor: pointer; }
@@ -180,7 +179,6 @@
         .mobile-only-title { display: none; }
         .aarhundred { display: inline; }
         
-        /* Desktop fallback til indpakningen (for en sikkerheds skyld) */
         .mobile-sportsgren-wrapper { display: inline; }
 
         .toggle-btn, .action-btn { 
@@ -1753,11 +1751,11 @@
                 let datoCelleStyle = '';
                 let ugedagCelleStyle = '';
                 if (erIdag) {
-                    datoCelleStyle = 'background-color: #d4edda; color: black; font-weight: bold;';
-                    ugedagCelleStyle = 'background-color: #d4edda; color: black; font-weight: bold;';
+                    datoCelleStyle = 'background-color: #a3d9b1; color: black; font-weight: bold;';
+                    ugedagCelleStyle = 'background-color: #a3d9b1; color: black; font-weight: bold;';
                 } else if (erImorgen) {
-                    datoCelleStyle = 'background-color: #fff3cd; color: black; font-weight: bold;';
-                    ugedagCelleStyle = 'background-color: #fff3cd; color: black; font-weight: bold;';
+                    datoCelleStyle = 'background-color: #ffe58f; color: black; font-weight: bold;';
+                    ugedagCelleStyle = 'background-color: #ffe58f; color: black; font-weight: bold;';
                 }
 
                 let handlingsKnapper = `
@@ -2051,12 +2049,7 @@
             
         };
 
-        var modal = document.getElementById("programModal");
-        var profilModal = document.getElementById("profileModal");
-        
-        function openModal() { modal.style.display = "block"; }
-        function closeModal() { modal.style.display = "none"; }
-        
+        // Window onclick fjernet for at vinduerne ikke lukker ved klik på baggrunden.
     </script>
 </body>
 </html>
