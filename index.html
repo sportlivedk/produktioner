@@ -1218,6 +1218,21 @@
             if (isOpening) {
                 trDetail.style.display = 'table-row';
                 btn.textContent = '▲'; 
+                
+                // --- NYT: Sørg for at den foldede boks scroller ind i synsfeltet ---
+                setTimeout(() => {
+                    const container = document.querySelector('.table-container');
+                    const detailRect = trDetail.getBoundingClientRect();
+                    const containerRect = container.getBoundingClientRect();
+                    
+                    // Tjekker om bunden af infoboksen er længere nede end bunden af den synlige tabel
+                    if (detailRect.bottom > containerRect.bottom) {
+                        container.scrollBy({
+                            top: (detailRect.bottom - containerRect.bottom) + 15, // +15px for lidt luft i bunden
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 50); // Lidt forsinkelse så browseren kan nå at tegne boksen først
             }
         }
 
@@ -1240,6 +1255,20 @@
                 trDetail.style.display = 'table-row';
                 const btn = row.querySelector('.toggle-btn');
                 if (btn) btn.textContent = '▲';
+                
+                // --- NYT: Sørg for at den foldede boks scroller ind i synsfeltet ---
+                setTimeout(() => {
+                    const container = document.querySelector('.table-container');
+                    const detailRect = trDetail.getBoundingClientRect();
+                    const containerRect = container.getBoundingClientRect();
+                    
+                    if (detailRect.bottom > containerRect.bottom) {
+                        container.scrollBy({
+                            top: (detailRect.bottom - containerRect.bottom) + 15,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 50);
             }
         }
 
