@@ -130,8 +130,8 @@
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #000000; }
         
-        /* NYE PROFIL LINKS */
-        .profil-link { color: #000000; text-decoration: none; font-weight: bold; cursor: pointer; }
+        /* NYE PROFIL LINKS (Farve opdateret til systemblå) */
+        .profil-link { color: #0056b3; text-decoration: none; font-weight: bold; margin-left: 4px; margin-right: 4px; cursor: pointer; }
         .profil-link:hover { text-decoration: underline; }
         .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; cursor: pointer; }
         .logout-link:hover { text-decoration: underline; }
@@ -298,7 +298,6 @@
 
             .user-info-text { font-size: 12px !important; margin-top: 0; margin-bottom: 4px !important; width: 100%; text-align: left !important; padding-left: 4px !important; }
             
-            /* Skjul Profil-knap og divier på mobil som anmodet */
             .profil-link, .desktop-only-divider { display: none !important; }
 
             .detail-container { flex-direction: column; gap: 8px; background-color: white; border: 1px solid #e1e4e8; border-radius: 6px; border-top: 4px solid #28a745; padding: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
@@ -444,8 +443,8 @@
         </div>
     </div>
 
-    <div id="profileModal" class="modal">
-        <div class="modal-content" style="max-width: 400px;">
+    <div id="profileModal" class="modal" style="align-items: center; justify-content: center;">
+        <div class="modal-content" style="max-width: 400px; margin: auto;">
             <span class="close" onclick="lukProfil()">&times;</span>
             
             <div id="profileView" style="text-align: left;">
@@ -455,10 +454,10 @@
                 <div style="font-size: 20px; font-weight: bold; color: #0056b3;" id="profileNameText">Dit Navn</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Brugernavn</div>
-                <div style="font-size: 16px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
+                <div style="font-size: 20px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Adgangskode</div>
-                <div style="font-size: 16px; font-weight: bold; color: #000000; letter-spacing: 2px;" id="profilePasswordText">********</div>
+                <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 2px;" id="profilePasswordText">********</div>
                 
                 <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-top: 25px; margin-bottom: 25px; color: #dc3545; font-size: 15px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
                 
@@ -909,7 +908,8 @@
             let pLen = sessionStorage.getItem('sportlive_passlen') || 8;
             document.getElementById('profilePasswordText').textContent = "*".repeat(pLen);
             
-            document.getElementById('profileModal').style.display = 'block';
+            // Flex bruges for at centrere boksen automatisk på skærmen
+            document.getElementById('profileModal').style.display = 'flex';
         }
 
         function lukProfil() {
@@ -976,7 +976,7 @@
                     setTimeout(() => {
                         logUd();
                         lukProfil();
-                    }, 5000);
+                    }, 7000);
                 } else {
                     errorMsg.textContent = result.message || "Der opstod en fejl.";
                     errorMsg.style.display = 'block';
