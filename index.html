@@ -131,9 +131,9 @@
         .user-info-text strong { color: #000000; }
         
         /* NYE PROFIL LINKS */
-        .profil-link { color: #28a745; text-decoration: none; font-weight: bold; margin-left: 4px; margin-right: 4px; cursor: pointer; }
+        .profil-link { color: #000000; text-decoration: none; font-weight: bold; cursor: pointer; }
         .profil-link:hover { text-decoration: underline; }
-        .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; margin-left: 4px; cursor: pointer; }
+        .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; cursor: pointer; }
         .logout-link:hover { text-decoration: underline; }
 
         .month-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; align-items: center; }
@@ -372,9 +372,9 @@
                 
                 <div id="userInfoContainer" class="user-info-text">
                     Logget ind som <strong id="displayUsername"></strong> 
-                    <span class="desktop-only-divider" style="color: #ccc; margin-left: 4px;">|</span>
+                    <span class="desktop-only-divider" style="color: #ccc; margin: 0 4px;">|</span>
                     <a href="#" class="profil-link" onclick="aabenProfil(event)">Profil</a>
-                    <span style="color: #ccc; margin-left: 4px;">|</span>
+                    <span style="color: #ccc; margin: 0 4px;">|</span>
                     <a href="#" class="logout-link" onclick="logUd(event)">Log ud</a>
                 </div>
             </div>
@@ -448,10 +448,11 @@
         <div class="modal-content" style="max-width: 400px;">
             <span class="close" onclick="lukProfil()">&times;</span>
             
-            <div id="profileView" style="text-align: center;">
+            <div id="profileView" style="text-align: left;">
                 <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Profiloplysninger</h2>
                 
-                <div style="margin-top: 20px; font-size: 20px; font-weight: bold; color: #000000;" id="profileNameText">Dit Navn</div>
+                <div style="margin-top: 20px; font-size: 14px; color: #666;">Navn</div>
+                <div style="font-size: 20px; font-weight: bold; color: #0056b3;" id="profileNameText">Dit Navn</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Brugernavn</div>
                 <div style="font-size: 16px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
@@ -461,11 +462,13 @@
                 
                 <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-top: 25px; margin-bottom: 25px; color: #dc3545; font-size: 15px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
                 
-                <button class="btn btn-dialog secondary" style="width: 100%;" onclick="lukProfil()">Luk</button>
+                <div style="display: flex;">
+                    <button class="btn btn-dialog primary" style="width: 100%; background-color: #0056b3;" onclick="lukProfil()">Luk</button>
+                </div>
             </div>
 
             <div id="changePasswordView" style="display: none; text-align: left;">
-                <h2 style="font-size: 26px; margin-top: 0; text-align: center; color: #000000;">Skift adgangskode</h2>
+                <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Skift adgangskode</h2>
                 <div id="passwordErrorMsg" style="color: #dc3545; font-size: 14px; font-weight: bold; margin-bottom: 15px; text-align: center; display: none;">Fejlbesked</div>
                 
                 <div class="form-group" style="margin-bottom: 12px;">
@@ -487,10 +490,10 @@
                 </div>
             </div>
 
-            <div id="passwordSuccessView" style="display: none; text-align: center;">
+            <div id="passwordSuccessView" style="display: none; text-align: left;">
                 <h2 style="font-size: 26px; margin-top: 0; color: #28a745;">Adgangskode ændret</h2>
-                <p style="font-size: 15px; line-height: 1.5; color: #000000; margin-bottom: 25px;">Din adgangskode er blevet ændret, og du vil nu blive ført tilbage til login-siden, hvor du skal logge ind med din nye adgangskode.</p>
-                <div style="font-size: 30px;">⏳</div>
+                <p style="font-size: 15px; line-height: 1.5; color: #000000; margin-bottom: 25px;">Din adgangskode er blevet ændret.<br><br>Du skal nu logge ind med din nye adgangskode.</p>
+                <div style="font-size: 30px; text-align: center;">⏳</div>
             </div>
         </div>
     </div>
@@ -608,7 +611,7 @@
         let brugerRolle = ""; 
         let aktuelBruger = "";
         let aktueltNavn = ""; 
-        let aktuelPassLen = 8; // Default, opdateres ved login
+        let aktuelPassLen = 8; 
         
         function truncateText(text, maxLength) {
             if (!text) return '';
@@ -893,9 +896,6 @@
             document.getElementById('loginUsername').focus();
         }
 
-        // ==========================================
-        // NYT: FUNKTIONER TIL PROFIL OG ADGANGSKODE
-        // ==========================================
         function aabenProfil(e) {
             if(e) e.preventDefault();
             
@@ -973,7 +973,6 @@
                     document.getElementById('changePasswordView').style.display = 'none';
                     document.getElementById('passwordSuccessView').style.display = 'block';
                     
-                    // Logger ud og lukker efter 5 sekunder
                     setTimeout(() => {
                         logUd();
                         lukProfil();
@@ -991,7 +990,6 @@
                 btnConfirm.disabled = false;
             }
         }
-        // ==========================================
 
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.multi-select-container')) {
@@ -2055,14 +2053,7 @@
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
         
-        window.onclick = async function(event) { 
-            if (event.target == modal) { 
-                forsogLukModal();
-            } 
-            if (event.target == profilModal) {
-                lukProfil();
-            }
-        };
+        // Fjernet window.onclick for at undgå at modal lukker ved klik uden for boksen
     </script>
 </body>
 </html>
