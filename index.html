@@ -130,6 +130,7 @@
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #000000; }
         
+        /* PROFIL LINKS */
         .profil-link { color: #0056b3; text-decoration: none; font-weight: bold; margin-left: 4px; margin-right: 4px; cursor: pointer; }
         .profil-link:hover { text-decoration: underline; }
         .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; cursor: pointer; }
@@ -1782,6 +1783,7 @@
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
+                trMain.onclick = function(e) { toggleDetailsFromRow(e, this); };
                 
                 trMain.innerHTML = `
                     <td style="${datoCelleStyle}">${pDatoFormat}</td>
@@ -2049,7 +2051,13 @@
             
         };
 
-        // Window onclick fjernet for at vinduerne ikke lukker ved klik på baggrunden.
+        var modal = document.getElementById("programModal");
+        var profilModal = document.getElementById("profileModal");
+        
+        function openModal() { modal.style.display = "block"; }
+        function closeModal() { modal.style.display = "none"; }
+        
+        // Fjernet window.onclick for at undgå at modal lukker ved klik uden for boksen
     </script>
 </body>
 </html>
