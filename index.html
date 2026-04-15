@@ -349,7 +349,7 @@
                     <button id="btnExportPDF" class="btn" style="display: none;" onclick="genererPDF()">Download PDF</button>
 
                     <div style="position: relative;">
-                        <select id="typeFilter" class="filter-select" onchange="opdaterVisning()">
+                        <select id="typeFilter" class="filter-select" onchange="handterFilterSkift()">
                             <option value="alle">Vis alle programmer</option>
                             <option value="fremtidige">Vis kun fremtidige</option>
                             <option value="sportlive">Vis kun SPORT LIVE</option>
@@ -1082,6 +1082,14 @@
             }
         }
 
+        // NYT: Håndterer både filtrering via dropdown og resetter scrollbaren til toppen
+        function handterFilterSkift() {
+            const dropdown = document.getElementById('typeFilter');
+            if (dropdown) opdaterVisning();
+            const container = document.querySelector('.table-container');
+            if (container) container.scrollTop = 0;
+        }
+
         function handterMobileMaanedSkift(val) {
             if (val === 'idag') {
                 visKunIdag = true;
@@ -1215,6 +1223,9 @@
             const clearBtn = document.getElementById('clearSearchBtn');
             clearBtn.style.display = input.length > 0 ? 'block' : 'none';
             opdaterVisning();
+            // NYT: Spol til toppen ved søgning
+            const container = document.querySelector('.table-container');
+            if (container) container.scrollTop = 0;
         }
 
         function rydSogning() {
@@ -1222,6 +1233,9 @@
             input.value = '';
             document.getElementById('clearSearchBtn').style.display = 'none';
             opdaterVisning();
+            // NYT: Spol til toppen når søgning ryddes
+            const container = document.querySelector('.table-container');
+            if (container) container.scrollTop = 0;
         }
 
         function opdaterVisning() {
@@ -2057,7 +2071,7 @@
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
         
-        // Fjernet window.onclick for at undgå at modal lukker ved klik uden for boksen
+        // Window onclick er fjernet, så modalvinduer ikke lukker ved et uheld
     </script>
 </body>
 </html>
