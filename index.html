@@ -908,7 +908,6 @@
             let pLen = sessionStorage.getItem('sportlive_passlen') || 8;
             document.getElementById('profilePasswordText').textContent = "*".repeat(pLen);
             
-            // Flex bruges for at centrere boksen automatisk på skærmen
             document.getElementById('profileModal').style.display = 'flex';
         }
 
@@ -1683,7 +1682,7 @@
                 let mobileColor = '';
 
                 if (kanalNavn === 'Feltet+') { badgeBg = '#ff0d99'; mobileColor = '#ff0d99'; }
-                else if (kanalNavn === 'Bold+') { badgeBg = '#92d050'; mobileColor = '#92d050'; }
+                else if (kanalNavn === 'Bold+') { badgeBg = '#92d050'; badgeFg = 'black'; mobileColor = '#92d050'; }
                 else if (kanalNavn === 'Ekstra Bladet+') { badgeBg = '#ff0000'; mobileColor = '#ff0000'; }
                 else if (kanalNavn === 'JFM') { badgeBg = '#175b30'; mobileColor = '#175b30'; }
                 else if (kanalNavn === 'Optagelse') { badgeBg = '#000000'; mobileColor = '#000000'; }
@@ -1752,8 +1751,14 @@
                 }
 
                 let datoCelleStyle = '';
-                if (erIdag) datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #28a745; color: #28a745; font-weight: bold;';
-                else if (erImorgen) datoCelleStyle = 'box-shadow: inset 4px 0 0 0 #d39e00; color: #d39e00; font-weight: bold;';
+                let ugedagCelleStyle = '';
+                if (erIdag) {
+                    datoCelleStyle = 'background-color: #28a745; color: white; font-weight: bold;';
+                    ugedagCelleStyle = 'background-color: #28a745; color: white; font-weight: bold;';
+                } else if (erImorgen) {
+                    datoCelleStyle = 'background-color: #ffc107; color: black; font-weight: bold;';
+                    ugedagCelleStyle = 'background-color: #ffc107; color: black; font-weight: bold;';
+                }
 
                 let handlingsKnapper = `
                     <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
@@ -1783,7 +1788,7 @@
                 
                 trMain.innerHTML = `
                     <td style="${datoCelleStyle}">${pDatoFormat}</td>
-                    <td>${pUgedag}</td>
+                    <td style="${ugedagCelleStyle}">${pUgedag}</td>
                     <td><b>${pTid}</b></td>
                     <td><b>${pTX}</b></td>
                     <td>${kanalDisplay}</td>
@@ -2053,7 +2058,6 @@
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
         
-        // Fjernet window.onclick for at undgå at modal lukker ved klik uden for boksen
     </script>
 </body>
 </html>
