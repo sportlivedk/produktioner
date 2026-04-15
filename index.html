@@ -265,13 +265,8 @@
             th, td { padding: 10px 4px !important; font-size: 12px !important; }
             
             /* SKABER LUFT MELLEM KOLONNERNE */
-            /* Kolonne 1 (Dato): Lidt ekstra padding i højre side */
             th:nth-child(1), .main-row td:nth-child(1) { padding-right: 14px !important; padding-left: 4px !important; }
-            
-            /* Kolonne 3 (Tid): Padding på både højre og venstre side for at skubbe væk fra Dato og Kanal */
             th:nth-child(3), .main-row td:nth-child(3) { padding-left: 14px !important; padding-right: 14px !important; }
-            
-            /* Kolonne 5 (Kanal): Padding på højre og venstre side for at skubbe væk fra Tid og Sportsgren */
             th:nth-child(5), .main-row td:nth-child(5) { padding-left: 14px !important; padding-right: 14px !important; }
             
             .aarhundred { display: none !important; }
@@ -297,7 +292,7 @@
             .kanal-desktop { display: none !important; }
             .kanal-mobile { display: inline !important; }
 
-            /* Skjul specifikke kolonner (nu skjules Programtitel nr. 7 og den nye Kommentator nr. 8, og Sportsgren nr. 6 vises) */
+            /* Skjul specifikke kolonner */
             th:nth-child(2), td:nth-child(2),
             th:nth-child(4), td:nth-child(4),
             th:nth-child(7), td:nth-child(7), /* Programtitel skjult */
@@ -307,7 +302,7 @@
                 display: none !important;
             }
             
-            /* Formatér Sportsgren-kolonnen (nr. 6) med sort farve, versaler og højre-margin */
+            /* Formatér Sportsgren-kolonnen */
             .mobile-sportsgren-wrapper {
                 display: block !important;
                 white-space: nowrap;
@@ -317,7 +312,7 @@
                 color: #000000;
             }
             
-            /* Kolonne 6 (Sportsgren): Spiser restpladsen, padding venstre for luft, og 4px padding højre for kant-flugt */
+            /* Kolonne 6 (Sportsgren): Spiser restpladsen */
             th:nth-child(6), .main-row td:nth-child(6) {
                 width: 100% !important;
                 max-width: 0 !important; 
@@ -333,7 +328,6 @@
             h1 { font-size: 22px !important; margin-top: 0 !important; }
             .year-filter { font-size: 15px !important; margin-left: 12px !important; padding-left: 12px !important; border-left: 2px solid #ccc !important; top: 2px !important; }
             .year-option.active { font-size: 17px !important; }
-            /* Skjul det sidste årstal (2028) på små skærme, så man undgår scroll */
             .year-option:last-child { display: none !important; }
             
             .header-right { align-items: flex-start; width: 100%; margin-top: 0 !important; }
@@ -352,7 +346,6 @@
                 padding: 6px 8px; 
                 height: 34px;
                 margin-bottom: 8px !important; 
-                /* Fontstørrelse overstyres til 16px øverst i medie-query for at redde iOS */
                 border-radius: 4px;
                 border: 1px solid #ccc;
                 background-color: white;
@@ -362,7 +355,7 @@
             /* Venstrestil og juster "Logget ind som..." på mobil */
             .user-info-text { font-size: 12px !important; margin-top: 0; margin-bottom: 4px !important; width: 100%; text-align: left !important; padding-left: 4px !important; }
 
-            /* Saml udvidet boks til én grøn superboks uden overskrifter */
+            /* Saml udvidet boks til én grøn superboks */
             .detail-container { 
                 flex-direction: column; 
                 gap: 8px; 
@@ -381,7 +374,6 @@
             }
             .detail-card h4 { display: none !important; } 
             
-            /* Præcis samme margin til "Noter" som til de andre lister (8px) */
             .noter-container { border-top: none !important; margin-top: 8px !important; padding-top: 0 !important; }
 
             .mobile-only-title { display: block; font-size: 12px !important; font-weight: bold; color: #0056b3; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; white-space: normal; }
@@ -631,8 +623,7 @@
         
         let brugerRolle = ""; 
         let aktuelBruger = "";
-        
-        // Hent obUnits logik ændret - se funktionen skalViseAdvarsel()
+        let aktueltNavn = ""; // Tilføjet variabel til brugerens fulde navn
         
         function truncateText(text, maxLength) {
             if (!text) return '';
@@ -759,7 +750,6 @@
                 }
 
                 let kommTxt = p["Kommentator"] || '';
-                // Opdateret logik for PDF, så det matcher oversigten
                 if (p["Kanal"] === 'Optagelse' && p["Unit"] === 'EFP') {
                     if (kommTxt.trim() === '' && p["Reporter"] && p["Reporter"].trim() !== '') {
                         kommTxt = p["Reporter"].trim();
@@ -862,9 +852,13 @@
                 if (result.success) {
                     brugerRolle = result.rolle || "Læser";
                     aktuelBruger = user;
+                    // Vi forsøger at hente 'navn' fra Google Apps Script svaret.
+                    // Hvis Apps Scriptet ikke er opdateret til at sende 'navn' endnu, falder vi bare tilbage og bruger e-mailen (user).
+                    aktueltNavn = result.navn || user; 
                     
                     sessionStorage.setItem('sportlive_user', aktuelBruger);
                     sessionStorage.setItem('sportlive_role', brugerRolle);
+                    sessionStorage.setItem('sportlive_navn', aktueltNavn);
                     
                     afslutLogin();
                 } else {
@@ -885,7 +879,8 @@
         function afslutLogin() {
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('userInfoContainer').style.display = "block";
-            document.getElementById('displayUsername').textContent = aktuelBruger;
+            // Her skriver vi det fulde navn ind i toppen af skærmen
+            document.getElementById('displayUsername').textContent = aktueltNavn;
             loadProgrammer();
         }
 
@@ -894,8 +889,10 @@
             
             sessionStorage.removeItem('sportlive_user');
             sessionStorage.removeItem('sportlive_role');
+            sessionStorage.removeItem('sportlive_navn'); // Rydder også navnet i hukommelsen
             brugerRolle = "";
             aktuelBruger = "";
+            aktueltNavn = "";
             
             alleProgrammerGlobal = [];
             aktuelleProgrammerVist = [];
@@ -1219,20 +1216,18 @@
                 trDetail.style.display = 'table-row';
                 btn.textContent = '▲'; 
                 
-                // --- NYT: Sørg for at den foldede boks scroller ind i synsfeltet ---
                 setTimeout(() => {
                     const container = document.querySelector('.table-container');
                     const detailRect = trDetail.getBoundingClientRect();
                     const containerRect = container.getBoundingClientRect();
                     
-                    // Tjekker om bunden af infoboksen er længere nede end bunden af den synlige tabel
                     if (detailRect.bottom > containerRect.bottom) {
                         container.scrollBy({
-                            top: (detailRect.bottom - containerRect.bottom) + 15, // +15px for lidt luft i bunden
+                            top: (detailRect.bottom - containerRect.bottom) + 15,
                             behavior: 'smooth'
                         });
                     }
-                }, 50); // Lidt forsinkelse så browseren kan nå at tegne boksen først
+                }, 50);
             }
         }
 
@@ -1256,7 +1251,6 @@
                 const btn = row.querySelector('.toggle-btn');
                 if (btn) btn.textContent = '▲';
                 
-                // --- NYT: Sørg for at den foldede boks scroller ind i synsfeltet ---
                 setTimeout(() => {
                     const container = document.querySelector('.table-container');
                     const detailRect = trDetail.getBoundingClientRect();
@@ -1515,19 +1509,14 @@
             const unitLower = unit.toLowerCase();
 
             if (kanal === "Optagelse" && unit === "EFP") {
-                // Optagelse + EFP: Kræver (Kommentator ELLER Reporter) - Advarsel kun hvis begge mangler
                 if (manglerKommentator && manglerReporter) return true;
             } else if (kanal === "Optagelse" && unitLower.startsWith("studie")) {
-                // Optagelse + Studie: Kræver Producer OG Kommentator
                 if (manglerProducer || manglerKommentator) return true;
             } else if (unit === "EFP" || kanal === "Optagelse") {
-                // Generel EFP eller Optagelse (som ikke er dækket af ovenstående to)
                 if (manglerProducer || (manglerKommentator && manglerReporter)) return true;
             } else if (erOB) {
-                // OB produktioner kræver nu også Ekspert
                 if (manglerKommentator || manglerProducer || manglerEkspert) return true;
             } else {
-                // Standard for resten
                 if (manglerKommentator) return true;
             }
 
@@ -1586,7 +1575,6 @@
                 let kanalNavn = program["Kanal"] || '';
                 
                 let pKomm = program["Kommentator"] && program["Kommentator"].trim() !== '' ? program["Kommentator"].trim() : '';
-                // Dynamisk udskiftning af Kommentator med Reporter i tabellen for Optagelse + EFP
                 if (kanalNavn === 'Optagelse' && program["Unit"] === 'EFP') {
                     if (pKomm === '' && program["Reporter"] && program["Reporter"].trim() !== '') {
                         pKomm = program["Reporter"].trim();
@@ -1945,10 +1933,12 @@
 
             const gemtBruger = sessionStorage.getItem('sportlive_user');
             const gemtRolle = sessionStorage.getItem('sportlive_role');
+            const gemtNavn = sessionStorage.getItem('sportlive_navn');
             
             if (gemtBruger && gemtRolle) {
                 aktuelBruger = gemtBruger;
                 brugerRolle = gemtRolle;
+                aktueltNavn = gemtNavn || gemtBruger;
                 afslutLogin();
             } else {
                 document.getElementById('loginOverlay').style.display = 'flex';
