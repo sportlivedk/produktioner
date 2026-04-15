@@ -1082,7 +1082,6 @@
             }
         }
 
-        // NYT: Håndterer både filtrering via dropdown og resetter scrollbaren til toppen
         function handterFilterSkift() {
             const dropdown = document.getElementById('typeFilter');
             if (dropdown) opdaterVisning();
@@ -1223,7 +1222,6 @@
             const clearBtn = document.getElementById('clearSearchBtn');
             clearBtn.style.display = input.length > 0 ? 'block' : 'none';
             opdaterVisning();
-            // NYT: Spol til toppen ved søgning
             const container = document.querySelector('.table-container');
             if (container) container.scrollTop = 0;
         }
@@ -1233,7 +1231,6 @@
             input.value = '';
             document.getElementById('clearSearchBtn').style.display = 'none';
             opdaterVisning();
-            // NYT: Spol til toppen når søgning ryddes
             const container = document.querySelector('.table-container');
             if (container) container.scrollTop = 0;
         }
@@ -1275,7 +1272,13 @@
                 if (kategoriFilter === 'fremtidige' && normDato < idagsDatoStr) return false;
                 if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
                 if (kategoriFilter === 'ekstern' && (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse')) return false;
-                if (kategoriFilter === 'ob' && !obUnits.includes(unitNavn)) return false;
+                
+                // NYT: Sikker og robust filtrering af OB-produktioner
+                if (kategoriFilter === 'ob') {
+                    const obFilterArr = ["MINITECH", "NOWTEK OB1", "NOWTEK OB2", "OB 7", "OB 9", "SAM OB"];
+                    if (!obFilterArr.includes(unitNavn.toUpperCase())) return false;
+                }
+
                 if (kategoriFilter === 'tbc' && (!program["TBC"] || String(program["TBC"]).toUpperCase() !== 'X')) return false;
                 
                 if (searchTerm !== '') {
@@ -2071,7 +2074,6 @@
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
         
-        // Window onclick er fjernet, så modalvinduer ikke lukker ved et uheld
     </script>
 </body>
 </html>
