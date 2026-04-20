@@ -1802,7 +1802,8 @@
                         ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #dc3545; color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; cursor: help; flex-shrink: 0;" title="Mangler bemanding!">!</span>`;
                     }
                     if (hasSignal) {
-                        ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #28a745; color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; font-family: 'Times New Roman', Times, serif; font-style: italic; cursor: help; flex-shrink: 0;" title="Signal skal sendes til ${signalTekst}">i</span>`;
+    ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #d39e00; color: white; width: 16px; height: 16px; border-radius: 50%; border: 1px solid #000000; font-size: 12px; font-weight: bold; font-family: 'Times New Roman', Times, serif; font-style: italic; cursor: help; flex-shrink: 0;" title="Signal skal sendes til: ${signalTekst}">i</span>`;
+}
                     }
                     visUnit = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 5px;">${visUnit}</span><div style="display: flex; gap: 8px; flex-shrink: 0;">${ikoner}</div></div>`;
                 }
