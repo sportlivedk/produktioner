@@ -427,8 +427,8 @@
                     <th style="width: 140px;">Kanal</th>
                     <th style="width: 90px;">Sportsgren</th>
                     <th style="width: 360px;">Programtitel</th>
-                    <th style="width: 220px;">Kommentator/vært</th>
-                    <th style="width: 70px;">Unit</th>
+                    <th style="width: 200px;">Kommentator/vært</th>
+                    <th style="width: 90px;">Unit</th>
                     <th style="width: 210px;">Handling</th>
                 </tr>
             </thead>
@@ -1273,7 +1273,6 @@
                 if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
                 if (kategoriFilter === 'ekstern' && (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse')) return false;
                 
-                // NYT: Sikker og robust filtrering af OB-produktioner
                 if (kategoriFilter === 'ob') {
                     const obFilterArr = ["MINITECH", "NOWTEK OB1", "NOWTEK OB2", "OB 7", "OB 9", "SAM OB"];
                     if (!obFilterArr.includes(unitNavn.toUpperCase())) return false;
@@ -1794,8 +1793,18 @@
                 }
 
                 let visUnit = program["Unit"] || '';
-                if (skalViseAdvarsel(program)) {
-                    visUnit = `<div style="display: flex; justify-content: space-between; align-items: center;"><span>${visUnit}</span><span style="display: inline-flex; align-items: center; justify-content: center; background-color: #dc3545; color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; cursor: help; flex-shrink: 0;" title="Mangler bemanding!">!</span></div>`;
+                let hasAdvarsel = skalViseAdvarsel(program);
+                let hasSignal = (signalTekst !== '-' && signalTekst.trim() !== '');
+
+                if (hasAdvarsel || hasSignal) {
+                    let ikoner = '';
+                    if (hasAdvarsel) {
+                        ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #dc3545; color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; cursor: help; flex-shrink: 0;" title="Mangler bemanding!">!</span>`;
+                    }
+                    if (hasSignal) {
+                        ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #ffe58f; color: black; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; font-family: 'Times New Roman', Times, serif; font-style: italic; cursor: help; flex-shrink: 0;" title="Eksternt signal: ${signalTekst}">i</span>`;
+                    }
+                    visUnit = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 5px;">${visUnit}</span><div style="display: flex; gap: 4px; flex-shrink: 0;">${ikoner}</div></div>`;
                 }
 
                 const trMain = document.createElement('tr');
@@ -2074,6 +2083,7 @@
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
         
+        // Window onclick er fjernet, så modalvinduer ikke lukker ved et uheld
     </script>
 </body>
 </html>
