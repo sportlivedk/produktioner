@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SPORT LIVE | Produktioner</title>
+    
+    <link rel="icon" type="image/png" href="favicon.png">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <style>
@@ -450,13 +453,13 @@
                 <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Profiloplysninger</h2>
                 
                 <div style="margin-top: 20px; font-size: 14px; color: #666;">Navn</div>
-                <div style="font-size: 18px; font-weight: bold; color: #000000;" id="profileNameText">Dit Navn</div>
+                <div style="font-size: 20px; font-weight: bold; color: #0056b3;" id="profileNameText">Dit Navn</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Brugernavn</div>
-                <div style="font-size: 18px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
+                <div style="font-size: 20px; font-weight: bold; color: #0056b3;" id="profileUsernameText">email@email.dk</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Adgangskode</div>
-                <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 2px;" id="profilePasswordText">********</div>
+                <div style="font-size: 20px; font-weight: bold; color: #0056b3; letter-spacing: 2px;" id="profilePasswordText">********</div>
                 
                 <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-top: 25px; margin-bottom: 25px; color: #dc3545; font-size: 15px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
                 
@@ -1802,9 +1805,9 @@
                         ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #dc3545; color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; cursor: help; flex-shrink: 0;" title="Mangler bemanding!">!</span>`;
                     }
                     if (hasSignal) {
-                        ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #fdd932; color: black; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; font-family: 'Times New Roman', Times, serif; font-style: italic; cursor: help; flex-shrink: 0;" title="Signal skal sendes til ${signalTekst}">i</span>`;
+                        ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #fdd932; color: black; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; font-family: 'Times New Roman', Times, serif; font-style: italic; cursor: help; flex-shrink: 0;" title="Signal skal sendes til: ${signalTekst}">i</span>`;
                     }
-                    visUnit = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 3px;">${visUnit}</span><div style="display: flex; gap: 5px; flex-shrink: 0;">${ikoner}</div></div>`;
+                    visUnit = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 2px;">${visUnit}</span><div style="display: flex; gap: 3px; flex-shrink: 0;">${ikoner}</div></div>`;
                 }
 
                 const trMain = document.createElement('tr');
