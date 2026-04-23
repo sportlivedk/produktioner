@@ -453,13 +453,13 @@
                 <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Profiloplysninger</h2>
                 
                 <div style="margin-top: 20px; font-size: 14px; color: #666;">Navn</div>
-                <div style="font-size: 18px; font-weight: bold; color: #000000;" id="profileNameText">Dit Navn</div>
+                <div style="font-size: 20px; font-weight: bold; color: #0056b3;" id="profileNameText">Dit Navn</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Brugernavn</div>
-                <div style="font-size: 18px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
+                <div style="font-size: 20px; font-weight: bold; color: #0056b3;" id="profileUsernameText">email@email.dk</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Adgangskode</div>
-                <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 2px;" id="profilePasswordText">********</div>
+                <div style="font-size: 20px; font-weight: bold; color: #0056b3; letter-spacing: 2px;" id="profilePasswordText">********</div>
                 
                 <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-top: 25px; margin-bottom: 25px; color: #dc3545; font-size: 15px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
                 
@@ -1418,6 +1418,54 @@
             openModal();
         }
 
+        function skalViseAdvarsel(program) {
+            const normDato = program["NormDato"] || "";
+            if (!normDato) return false;
+
+            const sysDato = new Date();
+            sysDato.setHours(0, 0, 0, 0);
+            
+            const pDato = new Date(normDato);
+            pDato.setHours(0, 0, 0, 0);
+            
+            if (pDato < sysDato) return false;
+            
+            const slutNæsteMaaned = new Date(sysDato.getFullYear(), sysDato.getMonth() + 2, 0);
+            slutNæsteMaaned.setHours(23, 59, 59, 999);
+            
+            if (pDato > slutNæsteMaaned) return false;
+
+            // NYT: Hvis programmet er TBC, vises der ingen advarsel
+            if (program["TBC"] && String(program["TBC"]).toUpperCase() === 'X') {
+                return false;
+            }
+
+            const unit = program["Unit"] || "";
+            const kanal = program["Kanal"] || "";
+            const manglerKommentator = (!program["Kommentator"] || program["Kommentator"].trim() === "");
+            const manglerReporter = (!program["Reporter"] || program["Reporter"].trim() === "");
+            const manglerProducer = (!program["Producer"] || program["Producer"].trim() === "");
+            const manglerEkspert = (!program["Ekspert"] || program["Ekspert"].trim() === "");
+
+            const obUnitsArr = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
+            const erOB = obUnitsArr.includes(unit);
+            const unitLower = unit.toLowerCase();
+
+            if (kanal === "Optagelse" && unit === "EFP") {
+                if (manglerKommentator && manglerReporter) return true;
+            } else if (kanal === "Optagelse" && unitLower.startsWith("studie")) {
+                if (manglerProducer || manglerKommentator) return true;
+            } else if (unit === "EFP" || kanal === "Optagelse") {
+                if (manglerProducer || (manglerKommentator && manglerReporter)) return true;
+            } else if (erOB) {
+                if (manglerKommentator || manglerProducer || manglerEkspert) return true;
+            } else {
+                if (manglerKommentator) return true;
+            }
+
+            return false;
+        }
+
         async function redigerProgram(rowId) {
             if (brugerRolle !== "Admin") {
                 await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
@@ -1578,464 +1626,6 @@
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('programTable').style.display = 'table';
                 await visCustomDialog("Der skete en fejl under sletning. Prøv igen.", 'alert');
-            }
-        }
-
-        function skalViseAdvarsel(program) {
-            const normDato = program["NormDato"] || "";
-            if (!normDato) return false;
-
-            const sysDato = new Date();
-            sysDato.setHours(0, 0, 0, 0);
-            
-            const pDato = new Date(normDato);
-            pDato.setHours(0, 0, 0, 0);
-            
-            if (pDato < sysDato) return false;
-            
-            const slutNæsteMaaned = new Date(sysDato.getFullYear(), sysDato.getMonth() + 2, 0);
-            slutNæsteMaaned.setHours(23, 59, 59, 999);
-            
-            if (pDato > slutNæsteMaaned) return false;
-
-            const unit = program["Unit"] || "";
-            const kanal = program["Kanal"] || "";
-            const manglerKommentator = (!program["Kommentator"] || program["Kommentator"].trim() === "");
-            const manglerReporter = (!program["Reporter"] || program["Reporter"].trim() === "");
-            const manglerProducer = (!program["Producer"] || program["Producer"].trim() === "");
-            const manglerEkspert = (!program["Ekspert"] || program["Ekspert"].trim() === "");
-
-            const obUnitsArr = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
-            const erOB = obUnitsArr.includes(unit);
-            const unitLower = unit.toLowerCase();
-
-            if (kanal === "Optagelse" && unit === "EFP") {
-                if (manglerKommentator && manglerReporter) return true;
-            } else if (kanal === "Optagelse" && unitLower.startsWith("studie")) {
-                if (manglerProducer || manglerKommentator) return true;
-            } else if (unit === "EFP" || kanal === "Optagelse") {
-                if (manglerProducer || (manglerKommentator && manglerReporter)) return true;
-            } else if (erOB) {
-                if (manglerKommentator || manglerProducer || manglerEkspert) return true;
-            } else {
-                if (manglerKommentator) return true;
-            }
-
-            return false;
-        }
-
-        function tegnTabel(programmer) {
-            const table = document.getElementById('programTable');
-            const ingenResultater = document.getElementById('ingenResultater');
-            
-            table.querySelectorAll('tbody').forEach(tb => tb.remove()); 
-
-            if (programmer.length === 0) {
-                table.style.display = 'none';
-                ingenResultater.style.display = 'block';
-                return;
-            } else {
-                table.style.display = 'table';
-                ingenResultater.style.display = 'none';
-            }
-
-            const sysDato = new Date();
-            const idagStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
-            const dImorgen = new Date(sysDato);
-            dImorgen.setDate(dImorgen.getDate() + 1);
-            const imorgenStr = dImorgen.getFullYear() + "-" + String(dImorgen.getMonth() + 1).padStart(2, '0') + "-" + String(dImorgen.getDate()).padStart(2, '0');
-
-            let forrigeDatoFormat = '';
-            let isLightBg = true;
-
-            programmer.forEach(program => {
-                const normDato = program["NormDato"] || "";
-                let pDatoFormat = normDato;
-                
-                if (normDato) {
-                    const parts = normDato.split('-');
-                    if(parts.length === 3) {
-                        pDatoFormat = parts[2] + "/" + parts[1] + "/<span class='aarhundred'>" + parts[0].substring(0,2) + "</span>" + parts[0].substring(2,4);
-                    }
-                }
-                
-                const erIdag = (normDato === idagStr);
-                const erImorgen = (normDato === imorgenStr);
-                
-                let datoSkift = false;
-                if (forrigeDatoFormat !== '' && forrigeDatoFormat !== pDatoFormat) {
-                    datoSkift = true;
-                    isLightBg = !isLightBg;
-                }
-                forrigeDatoFormat = pDatoFormat;
-
-                const pUgedag = program["Ugedag"] || '';
-                let pTid = program["Tid"] || '-';
-                let pTX = program["TX"] || '-';
-                let pSted = program["Lokation"] && program["Lokation"].trim() !== '' ? program["Lokation"].trim() : '-';
-                let kanalNavn = program["Kanal"] || '';
-                
-                let pKomm = program["Kommentator"] && program["Kommentator"].trim() !== '' ? program["Kommentator"].trim() : '';
-                if (kanalNavn === 'Optagelse' && program["Unit"] === 'EFP') {
-                    if (pKomm === '' && program["Reporter"] && program["Reporter"].trim() !== '') {
-                        pKomm = program["Reporter"].trim();
-                    }
-                }
-                if (pKomm === '') pKomm = '-';
-                
-                if (pTid !== '-' && pTid.includes('T')) {
-                    const t = new Date(pTid);
-                    pTid = t.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
-                }
-                
-                if (pTX !== '-' && pTX.includes('T')) {
-                    const tTX = new Date(pTX);
-                    pTX = tTX.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
-                } else if (pTX !== '-') {
-                    pTX = String(pTX).substring(0, 5);
-                }
-
-                let badgeBg = '';
-                let badgeFg = 'white';
-                let mobileColor = '';
-
-                if (kanalNavn === 'Feltet+') { badgeBg = '#ff0d99'; mobileColor = '#ff0d99'; }
-                else if (kanalNavn === 'Bold+') { badgeBg = '#92d050'; badgeFg = 'black'; mobileColor = '#92d050'; }
-                else if (kanalNavn === 'Ekstra Bladet+') { badgeBg = '#ff0000'; mobileColor = '#ff0000'; }
-                else if (kanalNavn === 'JFM') { badgeBg = '#175b30'; mobileColor = '#175b30'; }
-                else if (kanalNavn === 'Optagelse') { badgeBg = '#000000'; mobileColor = '#000000'; }
-                else if (kanalNavn === 'Pluto TV (DK)') { badgeBg = '#7030a0'; mobileColor = '#7030a0'; }
-                else if (kanalNavn === 'Pluto TV (NO)') { badgeBg = '#3b201f'; mobileColor = '#3b201f'; }
-                else if (kanalNavn === 'Pluto TV (SE)') { badgeBg = '#3b62d3'; mobileColor = '#3b62d3'; }
-                else if (kanalNavn === 'Pluto TV (DE)') { badgeBg = '#fff80c'; badgeFg = 'black'; mobileColor = '#d0b800'; } 
-                else if (kanalNavn === 'SPORT LIVE') { badgeBg = '#dc5e11'; mobileColor = '#dc5e11'; }
-                else { badgeBg = '#e9ecef'; badgeFg = '#000000'; mobileColor = '#000000'; } 
-
-                let kanalKort = kanalNavn;
-                if (kanalNavn === 'Ekstra Bladet+') kanalKort = 'Ekstra Bladet';
-                else if (kanalNavn === 'Pluto TV (DK)') kanalKort = 'Pluto (DK)';
-                else if (kanalNavn === 'Pluto TV (NO)') kanalKort = 'Pluto (NO)';
-                else if (kanalNavn === 'Pluto TV (SE)') kanalKort = 'Pluto (SE)';
-                else if (kanalNavn === 'Pluto TV (DE)') kanalKort = 'Pluto (DE)';
-
-                let kanalDisplay = kanalNavn !== '' ? `<span class="kanal-badge" style="background-color: ${badgeBg}; color: ${badgeFg}; --mobile-color: ${mobileColor};"><span class="kanal-desktop">${kanalNavn}</span><span class="kanal-mobile" style="display:none;">${kanalKort}</span></span>` : '';
-
-                let noterTekst = program["Link / Noter"] || '';
-                let formateretNoter = noterTekst;
-                if (noterTekst !== '') {
-                    const urlRegex = /(https?:\/\/[^\s]+)/g;
-                    formateretNoter = noterTekst.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${url}</a>`);
-                }
-
-                if (program["Kanal"] === 'Optagelse' && program["Premieredato"]) {
-                    const premParts = program["Premieredato"].split('-');
-                    if (premParts.length === 3) {
-                        const premDatoFormat = premParts[2] + "/" + premParts[1] + "/" + premParts[0];
-                        const premTekst = `<span style="color: #0056b3; font-weight: 500;">Programsat første gang ${premDatoFormat}.</span>`;
-
-                        if (formateretNoter === '-' || formateretNoter.trim() === '') {
-                            formateretNoter = premTekst;
-                        } else {
-                            formateretNoter = `<div style="margin-bottom: 4px;">${premTekst}</div>` + formateretNoter;
-                        }
-                    }
-                }
-
-                let visProgramtitel = program["Programtitel"] ? program["Programtitel"].trim() : '';
-                if (program["TBC"] && program["TBC"].toUpperCase() === 'X') {
-                    visProgramtitel += ' <span style="color: red; font-weight: bold;">TBC</span>';
-                }
-                
-                const pSportsgren = program["Sportsgren"] ? program["Sportsgren"].toUpperCase() : '';
-                let sportsgrenHtml = pSportsgren ? `<div style="margin-bottom: 8px; color: #dd5f12;">${pSportsgren}</div>` : '';
-
-                let pPlanTekst = program["P-plan"] || program["Produktionsplan"] || '-';
-                let signalTekst = program["Signal til"] || program["Sling"] || '-';
-                let signalStyling = signalTekst !== '-' ? 'color: red; font-weight: bold;' : '';
-                
-                let pPlanDisplay = '-';
-                if (pPlanTekst !== '-' && pPlanTekst.trim() !== '') {
-                    let linkUrl = pPlanTekst.trim();
-                    if (!linkUrl.startsWith('http://') && !linkUrl.startsWith('https://')) linkUrl = 'https://' + linkUrl;
-                    pPlanDisplay = `<a href="${linkUrl}" target="_blank" style="color: #0056b3; font-weight: 500; text-decoration: none;">Klik her for at åbne</a>`;
-                }
-
-                let tInfoTekst = program["Teknisk info"] || '-';
-                let tInfoDisplay = '-';
-                if (tInfoTekst !== '-' && tInfoTekst.trim() !== '') {
-                    let linkUrlTInfo = tInfoTekst.trim();
-                    if (!linkUrlTInfo.startsWith('http://') && !linkUrlTInfo.startsWith('https://')) linkUrlTInfo = 'https://' + linkUrlTInfo;
-                    tInfoDisplay = `<a href="${linkUrlTInfo}" target="_blank" style="color: #0056b3; font-weight: 500; text-decoration: none;">Klik her for at åbne</a>`;
-                }
-
-                let datoCelleStyle = '';
-                let ugedagCelleStyle = '';
-                if (erIdag) {
-                    datoCelleStyle = 'background-color: #a3d9b1; color: black; font-weight: bold;';
-                    ugedagCelleStyle = 'background-color: #a3d9b1; color: black; font-weight: bold;';
-                } else if (erImorgen) {
-                    datoCelleStyle = 'background-color: #ffe58f; color: black; font-weight: bold;';
-                    ugedagCelleStyle = 'background-color: #ffe58f; color: black; font-weight: bold;';
-                }
-
-                let handlingsKnapper = `
-                    <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
-                    <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
-                    <button class="action-btn kopier-btn" onclick="kopierProgram(${program.RowId})" title="Kopier program">Kopier</button>
-                    <button class="action-btn slet-btn" onclick="bekraeftSlet(${program.RowId})" title="Slet program">✖</button>
-                `;
-
-                const tbody = document.createElement('tbody');
-                tbody.className = 'program-block ' + (isLightBg ? 'bg-light' : 'bg-dark');
-
-                if (datoSkift) {
-                    const trSep = document.createElement('tr');
-                    trSep.className = 'date-separator-row'; 
-                    trSep.innerHTML = `<td colspan="10" style="padding: 0; border: none;"><div style="height: 1px; background-color: rgba(0,0,0,0.3); width: 100%;"></div></td>`;
-                    tbody.appendChild(trSep);
-                }
-
-                let visUnit = program["Unit"] || '';
-                let hasAdvarsel = skalViseAdvarsel(program);
-                let hasSignal = (signalTekst !== '-' && signalTekst.trim() !== '');
-
-                if (hasAdvarsel || hasSignal) {
-                    let ikoner = '';
-                    if (hasAdvarsel) {
-                        ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #dc3545; color: white; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; cursor: help; flex-shrink: 0;" title="Mangler bemanding!">!</span>`;
-                    }
-                    if (hasSignal) {
-                        ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #fdd932; color: black; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; font-family: 'Times New Roman', Times, serif; font-style: italic; cursor: help; flex-shrink: 0;" title="Signal skal sendes til: ${signalTekst}">i</span>`;
-                    }
-                    visUnit = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 2px;">${visUnit}</span><div style="display: flex; gap: 3px; flex-shrink: 0;">${ikoner}</div></div>`;
-                }
-
-                const trMain = document.createElement('tr');
-                trMain.className = 'main-row';
-                trMain.onclick = function(e) { toggleDetailsFromRow(e, this); };
-                
-                trMain.innerHTML = `
-                    <td style="${datoCelleStyle}">${pDatoFormat}</td>
-                    <td style="${ugedagCelleStyle}">${pUgedag}</td>
-                    <td><b>${pTid}</b></td>
-                    <td><b>${pTX}</b></td>
-                    <td>${kanalDisplay}</td>
-                    <td><div class="mobile-sportsgren-wrapper">${program["Sportsgren"] || ''}</div></td>
-                    <td><div class="prog-title-wrapper">${visProgramtitel}</div></td>
-                    <td>${pKomm}</td>
-                    <td>${visUnit}</td>
-                    <td style="white-space: nowrap;">${handlingsKnapper}</td>
-                `;
-                
-                const trDetail = document.createElement('tr');
-                trDetail.className = 'detail-row';
-                trDetail.innerHTML = `
-                    <td colspan="10">
-                        <div class="mobile-only-title">
-                            ${sportsgrenHtml}
-                            <div>${visProgramtitel}</div>
-                        </div>
-                        
-                        <div class="detail-container">
-                            <div class="detail-card bemanding">
-                                <h4>Personale</h4>
-                                <div class="detail-list">
-                                    <div class="detail-list-item"><span class="detail-label">Producer:</span> <span class="detail-value">${program["Producer"] || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Kommentator/vært:</span> <span class="detail-value">${program["Kommentator"] || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Ekspert/gæst:</span> <span class="detail-value">${program["Ekspert"] || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Reporter:</span> <span class="detail-value">${program["Reporter"] || '-'}</span></div>
-                                </div>
-                            </div>
-                            
-                            <div class="detail-card teknik">
-                                <h4>Tekniske specifikationer</h4>
-                                <div class="detail-list">
-                                    <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${program["Unit"] || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Format:</span> <span class="detail-value">${program["Format"] || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">RX:</span> <span class="detail-value">${program["RX"] || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="${signalStyling}">${signalTekst}</span></div>
-                                </div>
-                            </div>
-                            
-                            <div class="detail-card ekstra">
-                                <h4>Ekstra information</h4>
-                                <div class="detail-list">
-                                    <div class="detail-list-item"><span class="detail-label">Lokation:</span> <span class="detail-value">${pSted}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Teknisk info:</span> <span class="detail-value">${tInfoDisplay}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Noter:</span> <span class="detail-value" style="color: #0056b3; text-align: right; max-width: 75%; word-break: break-word;">${formateretNoter}</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                `;
-
-                tbody.appendChild(trMain);
-                tbody.appendChild(trDetail);
-                table.appendChild(tbody);
-            });
-        }
-
-        async function gemProgram() {
-            if (brugerRolle !== "Admin") {
-                await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
-                return;
-            }
-            
-            const valgtDato = document.getElementById('Dato').value;
-            const valgtKanal = document.getElementById('Kanal').value;
-            const valgtSportsgren = document.getElementById('Sportsgren').value;
-            const valgtProgramtitel = document.getElementById('Programtitel').value;
-            const valgtTid = document.getElementById('Tid').value;
-            const valgtTX = document.getElementById('TX').value; 
-            const rowId = document.getElementById('RowId').value;
-            const valgtPremieredato = document.getElementById('Premieredato') ? document.getElementById('Premieredato').value : "";
-
-            if (valgtTX && valgtTid) {
-                if (valgtTX > valgtTid) {
-                    await visCustomDialog("Transmission (TX) kan ikke begynde senere end starttidspunktet for begivenheden.", 'alert');
-                    return;
-                }
-            }
-
-            if (valgtKanal === "Optagelse" && valgtPremieredato && valgtDato) {
-                if (valgtPremieredato < valgtDato) {
-                    await visCustomDialog("Premieredato må ikke være tidligere end datoen for begivenheden.", 'alert');
-                    return;
-                }
-            }
-
-            if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
-                await visCustomDialog("Du skal som minimum vælge en dato, en kanal og en sportsgren samt indtaste en programtitel.", 'alert');
-                return; 
-            }
-
-            const felterTilValidering = [
-                { id: 'Kanal', label: 'Kanal' },
-                { id: 'Sportsgren', label: 'Sportsgren' },
-                { id: 'Unit', label: 'Unit' },
-                { id: 'Format', label: 'Format' },
-                { id: 'RX', label: 'RX' }
-            ];
-
-            for (let felt of felterTilValidering) {
-                const inputVal = document.getElementById(felt.id).value;
-                if (inputVal) {
-                    const datalist = document.getElementById('liste-' + felt.id);
-                    if (datalist) {
-                        const gyldigeValg = Array.from(datalist.options).map(opt => opt.value);
-                        if (!gyldigeValg.includes(inputVal)) {
-                            await visCustomDialog(`"${inputVal}" er ikke tilladt i feltet "${felt.label}". Vælg venligst en gyldig mulighed fra listen.`, 'alert');
-                            return; 
-                        }
-                    }
-                }
-            }
-
-            const sysDato = new Date();
-            const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
-
-            if (valgtDato < idagsDatoStr) {
-                const confirmPast = await visCustomDialog("Du er i gang med at tilføje et program på en dato, som ligger i fortiden. Vil du fortsætte?", 'confirm');
-                if (!confirmPast) return; 
-            }
-
-            if (valgtKanal === "SPORT LIVE" && valgtDato && valgtTid) {
-                const collision = alleProgrammerGlobal.find(p => {
-                    if (rowId && String(p.RowId) === String(rowId)) return false;
-                    if (p.Kanal !== "SPORT LIVE") return false;
-
-                    const vTidFormatted = valgtTid.substring(0, 5);
-                    let pTidFormatted = "";
-                    if (p.Tid) {
-                        const t = new Date(p.Tid);
-                        if (!isNaN(t.getTime()) && String(p.Tid).includes('T')) {
-                            pTidFormatted = String(t.getHours()).padStart(2, '0') + ":" + String(t.getMinutes()).padStart(2, '0');
-                        } else {
-                            pTidFormatted = String(p.Tid).substring(0, 5);
-                        }
-                    }
-
-                    return (p.NormDato === valgtDato) && (pTidFormatted === vTidFormatted);
-                });
-
-                if (collision) {
-                    const confirmCollision = await visCustomDialog(`Der ligger allerede et program på SPORT LIVE på denne dato og tidspunkt:\n\n"${collision.Programtitel}"\n\nVil du gemme programmet alligevel?`, 'confirm');
-                    if (!confirmCollision) return; 
-                }
-            }
-
-            const scrollContainer = document.querySelector('.table-container');
-            const savedScrollPosition = scrollContainer ? scrollContainer.scrollTop : 0;
-
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('programTable').style.display = 'none';
-            document.getElementById('ingenResultater').style.display = 'none';
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = "Gemmer...";
-            submitBtn.disabled = true;
-
-            let beregnetUgedag = "";
-            if (valgtDato) {
-                const datoObjekt = new Date(valgtDato);
-                const ugedage = ["S\u00f8ndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "L\u00f8rdag"];
-                beregnetUgedag = ugedage[datoObjekt.getDay()];
-            }
-
-            const tbcStatus = document.getElementById('TBC').checked ? "X" : "";
-            const valgteSignaler = Array.from(document.querySelectorAll('#signalDropdown input[type="checkbox"]:checked')).map(cb => cb.value).join(', ');
-
-            const nyProduktion = {
-                "RowId": rowId, 
-                "Dato": valgtDato,
-                "Ugedag": beregnetUgedag,
-                "Kanal": valgtKanal,
-                "Premieredato": valgtPremieredato,
-                "Sportsgren": valgtSportsgren,
-                "Programtitel": valgtProgramtitel,
-                "Lokation": document.getElementById('Lokation').value,
-                "Tid": valgtTid,
-                "Unit": document.getElementById('Unit').value,
-                "Format": document.getElementById('Format').value,
-                "RX": document.getElementById('RX').value,
-                "P-plan": document.getElementById('P-plan').value,
-                "Sling": valgteSignaler, 
-                "Signal til": valgteSignaler, 
-                "Producer": document.getElementById('Producer').value,
-                "Kommentator": document.getElementById('Kommentator').value,
-                "Ekspert": document.getElementById('Ekspert').value,
-                "Reporter": document.getElementById('Reporter').value,
-                "Teknisk info": document.getElementById('Teknisk_info').value,
-                "Link / Noter": document.getElementById('Noter').value,
-                "TBC": tbcStatus,
-                "TX": valgtTX 
-            };
-
-            try {
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify(nyProduktion),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                });
-                
-                closeModal();
-                document.getElementById('programForm').reset();
-                await loadProgrammer(); 
-                
-                if (scrollContainer) {
-                    scrollContainer.scrollTop = savedScrollPosition;
-                }
-                
-            } catch (error) {
-                console.error('Fejl ved gemning:', error);
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('programTable').style.display = 'table';
-                await visCustomDialog("Der skete en fejl. Prøv igen.", 'alert');
-            } finally {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
             }
         }
 
