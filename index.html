@@ -453,13 +453,13 @@
                 <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Profiloplysninger</h2>
                 
                 <div style="margin-top: 20px; font-size: 14px; color: #666;">Navn</div>
-                <div style="font-size: 18px; font-weight: bold; color: #000000;" id="profileNameText">Dit Navn</div>
+                <div style="font-size: 20px; font-weight: bold; color: #0056b3;" id="profileNameText">Dit Navn</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Brugernavn</div>
-                <div style="font-size: 18px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
+                <div style="font-size: 20px; font-weight: bold; color: #0056b3;" id="profileUsernameText">email@email.dk</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Adgangskode</div>
-                <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 2px;" id="profilePasswordText">********</div>
+                <div style="font-size: 20px; font-weight: bold; color: #0056b3; letter-spacing: 2px;" id="profilePasswordText">********</div>
                 
                 <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-top: 25px; margin-bottom: 25px; color: #dc3545; font-size: 15px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
                 
@@ -659,7 +659,7 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
 
             let programmerTilPDF = alleProgrammerGlobal.filter(p => {
-                const kanalNavn = p["Kanal"] || '';
+                const kanalNavn = String(p["Kanal"] || '');
                 if (kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
 
                 let pdfDato = p["NormDato"] || "";
@@ -669,7 +669,7 @@
                 
                 if (!pdfDato) return false;
 
-                const parts = pdfDato.split('-');
+                const parts = String(pdfDato).split('-');
                 if (parts.length !== 3) return false;
                 const pAar = parseInt(parts[0], 10);
                 const pMaaned = parseInt(parts[1], 10) - 1;
@@ -677,7 +677,7 @@
                 if (pAar !== valgtAar || pMaaned !== valgtMaaned) return false;
 
                 if (searchTerm !== '') {
-                    const alleFelterTekst = Object.values(p).join(' ').toLowerCase();
+                    const alleFelterTekst = Object.values(p).map(v => String(v)).join(' ').toLowerCase();
                     if (!alleFelterTekst.includes(searchTerm)) { return false; }
                 }
 
@@ -685,29 +685,29 @@
             });
 
             programmerTilPDF.sort((a, b) => {
-                const datoA = (a["Kanal"] === 'Optagelse' && a["Premieredato"]) ? a["Premieredato"] : (a["NormDato"] || "");
-                const datoB = (b["Kanal"] === 'Optagelse' && b["Premieredato"]) ? b["Premieredato"] : (b["NormDato"] || "");
+                const datoA = (String(a["Kanal"]) === 'Optagelse' && a["Premieredato"]) ? String(a["Premieredato"]) : String(a["NormDato"] || "");
+                const datoB = (String(b["Kanal"]) === 'Optagelse' && b["Premieredato"]) ? String(b["Premieredato"]) : String(b["NormDato"] || "");
                 if (datoA !== datoB) return datoA.localeCompare(datoB);
-                const tidA = a["Tid"] || "23:59";
-                const tidB = b["Tid"] || "23:59";
+                const tidA = String(a["Tid"] || "23:59");
+                const tidB = String(b["Tid"] || "23:59");
                 return tidA.localeCompare(tidB);
             });
 
             programmerTilPDF.forEach(p => {
                 let rawDato = p["NormDato"];
-                if (p["Kanal"] === 'Optagelse' && p["Premieredato"]) {
+                if (String(p["Kanal"]) === 'Optagelse' && p["Premieredato"]) {
                     rawDato = p["Premieredato"];
                 }
                 let datoStr = "";
                 if (rawDato) {
-                    const parts = rawDato.split('-');
+                    const parts = String(rawDato).split('-');
                     if(parts.length === 3) datoStr = parts[2] + "." + parts[1] + "." + parts[0].substring(2,4);
                 }
 
-                let pTid = p["Tid"] || '-';
-                let pTX = p["TX"] || '-';
+                let pTid = String(p["Tid"] || '-');
+                let pTX = String(p["TX"] || '-');
                 
-                if (p["Kanal"] === 'Optagelse') {
+                if (String(p["Kanal"]) === 'Optagelse') {
                     pTid = '-';
                     pTX = '-';
                 } else {
@@ -718,10 +718,10 @@
                     else if (pTX !== '-') pTX = pTX.substring(0, 5);
                 }
 
-                let pSted = p["Lokation"] && p["Lokation"].trim() !== '' ? p["Lokation"].trim() : 'TBA';
+                let pSted = p["Lokation"] && String(p["Lokation"]).trim() !== '' ? String(p["Lokation"]).trim() : 'TBA';
                 let truncSted = truncateText(pSted, 30);
 
-                let rawProduktion = p["Programtitel"] ? p["Programtitel"].trim() : '';
+                let rawProduktion = p["Programtitel"] ? String(p["Programtitel"]).trim() : '';
                 let hasTBC = p["TBC"] && String(p["TBC"]).toUpperCase() === 'X';
                 
                 let prodLimit = hasTBC ? 50 : 55;
@@ -738,21 +738,21 @@
                     };
                 }
 
-                let kommTxt = p["Kommentator"] || '';
-                if (p["Kanal"] === 'Optagelse' && p["Unit"] === 'EFP') {
-                    if (kommTxt.trim() === '' && p["Reporter"] && p["Reporter"].trim() !== '') {
-                        kommTxt = p["Reporter"].trim();
+                let kommTxt = String(p["Kommentator"] || '');
+                if (String(p["Kanal"]) === 'Optagelse' && String(p["Unit"]) === 'EFP') {
+                    if (kommTxt.trim() === '' && p["Reporter"] && String(p["Reporter"]).trim() !== '') {
+                        kommTxt = String(p["Reporter"]).trim();
                     }
                 }
 
                 tableBody.push([
                     { text: datoStr, fontSize: 9 },
-                    { text: p["Sportsgren"] || '', fontSize: 9 },
+                    { text: String(p["Sportsgren"] || ''), fontSize: 9 },
                     { ...produktionCelle, fontSize: 9 },
                     { text: truncSted, fontSize: 9, noWrap: true },
                     { text: pTX, fontSize: 9, bold: true }, 
                     { text: kommTxt, fontSize: 9 },
-                    { text: p["Ekspert"] || '', fontSize: 9 }
+                    { text: String(p["Ekspert"] || ''), fontSize: 9 }
                 ]);
             });
 
@@ -1269,8 +1269,8 @@
                     if (valgtMaaned !== -1 && pMaaned !== valgtMaaned) return false;
                 }
                 
-                const kanalNavn = program["Kanal"] || '';
-                const unitNavn = program["Unit"] || '';
+                const kanalNavn = String(program["Kanal"] || '');
+                const unitNavn = String(program["Unit"] || '');
                 
                 if (kategoriFilter === 'fremtidige' && normDato < idagsDatoStr) return false;
                 if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
@@ -1284,7 +1284,7 @@
                 if (kategoriFilter === 'tbc' && (!program["TBC"] || String(program["TBC"]).toUpperCase() !== 'X')) return false;
                 
                 if (searchTerm !== '') {
-                    const alleFelterTekst = Object.values(program).join(' ').toLowerCase();
+                    const alleFelterTekst = Object.values(program).map(v => String(v)).join(' ').toLowerCase();
                     if (!alleFelterTekst.includes(searchTerm)) { return false; }
                 }
                 return true;
@@ -1418,6 +1418,54 @@
             openModal();
         }
 
+        function skalViseAdvarsel(program) {
+            const normDato = program["NormDato"] || "";
+            if (!normDato) return false;
+
+            const sysDato = new Date();
+            sysDato.setHours(0, 0, 0, 0);
+            
+            const pDato = new Date(normDato);
+            pDato.setHours(0, 0, 0, 0);
+            
+            if (pDato < sysDato) return false;
+            
+            const slutNæsteMaaned = new Date(sysDato.getFullYear(), sysDato.getMonth() + 2, 0);
+            slutNæsteMaaned.setHours(23, 59, 59, 999);
+            
+            if (pDato > slutNæsteMaaned) return false;
+
+            // NYT: Hvis programmet er TBC, vises der ingen advarsel
+            if (program["TBC"] && String(program["TBC"]).toUpperCase() === 'X') {
+                return false;
+            }
+
+            const unit = String(program["Unit"] || "");
+            const kanal = String(program["Kanal"] || "");
+            const manglerKommentator = (!program["Kommentator"] || String(program["Kommentator"]).trim() === "");
+            const manglerReporter = (!program["Reporter"] || String(program["Reporter"]).trim() === "");
+            const manglerProducer = (!program["Producer"] || String(program["Producer"]).trim() === "");
+            const manglerEkspert = (!program["Ekspert"] || String(program["Ekspert"]).trim() === "");
+
+            const obUnitsArr = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
+            const erOB = obUnitsArr.includes(unit);
+            const unitLower = unit.toLowerCase();
+
+            if (kanal === "Optagelse" && unit === "EFP") {
+                if (manglerKommentator && manglerReporter) return true;
+            } else if (kanal === "Optagelse" && unitLower.startsWith("studie")) {
+                if (manglerProducer || manglerKommentator) return true;
+            } else if (unit === "EFP" || kanal === "Optagelse") {
+                if (manglerProducer || (manglerKommentator && manglerReporter)) return true;
+            } else if (erOB) {
+                if (manglerKommentator || manglerProducer || manglerEkspert) return true;
+            } else {
+                if (manglerKommentator) return true;
+            }
+
+            return false;
+        }
+
         async function redigerProgram(rowId) {
             if (brugerRolle !== "Admin") {
                 await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
@@ -1477,7 +1525,7 @@
             document.getElementById('Reporter').value = program["Reporter"] || '';
             document.getElementById('Teknisk_info').value = program["Teknisk info"] || '';
             document.getElementById('Noter').value = program["Link / Noter"] || '';
-            document.getElementById('TBC').checked = (program["TBC"] && program["TBC"].toUpperCase() === 'X');
+            document.getElementById('TBC').checked = (program["TBC"] && String(program["TBC"]).toUpperCase() === 'X');
 
             document.getElementById('modalTitle').textContent = "Rediger program";
             document.getElementById('submitBtn').textContent = "Opdater program";
@@ -1543,7 +1591,7 @@
             document.getElementById('Reporter').value = program["Reporter"] || '';
             document.getElementById('Teknisk_info').value = program["Teknisk info"] || '';
             document.getElementById('Noter').value = program["Link / Noter"] || '';
-            document.getElementById('TBC').checked = (program["TBC"] && program["TBC"].toUpperCase() === 'X');
+            document.getElementById('TBC').checked = (program["TBC"] && String(program["TBC"]).toUpperCase() === 'X');
 
             document.getElementById('modalTitle').textContent = "Kopier program";
             document.getElementById('submitBtn').textContent = "Gem program";
@@ -1579,49 +1627,6 @@
                 document.getElementById('programTable').style.display = 'table';
                 await visCustomDialog("Der skete en fejl under sletning. Prøv igen.", 'alert');
             }
-        }
-
-        function skalViseAdvarsel(program) {
-            const normDato = program["NormDato"] || "";
-            if (!normDato) return false;
-
-            const sysDato = new Date();
-            sysDato.setHours(0, 0, 0, 0);
-            
-            const pDato = new Date(normDato);
-            pDato.setHours(0, 0, 0, 0);
-            
-            if (pDato < sysDato) return false;
-            
-            const slutNæsteMaaned = new Date(sysDato.getFullYear(), sysDato.getMonth() + 2, 0);
-            slutNæsteMaaned.setHours(23, 59, 59, 999);
-            
-            if (pDato > slutNæsteMaaned) return false;
-
-            const unit = program["Unit"] || "";
-            const kanal = program["Kanal"] || "";
-            const manglerKommentator = (!program["Kommentator"] || program["Kommentator"].trim() === "");
-            const manglerReporter = (!program["Reporter"] || program["Reporter"].trim() === "");
-            const manglerProducer = (!program["Producer"] || program["Producer"].trim() === "");
-            const manglerEkspert = (!program["Ekspert"] || program["Ekspert"].trim() === "");
-
-            const obUnitsArr = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
-            const erOB = obUnitsArr.includes(unit);
-            const unitLower = unit.toLowerCase();
-
-            if (kanal === "Optagelse" && unit === "EFP") {
-                if (manglerKommentator && manglerReporter) return true;
-            } else if (kanal === "Optagelse" && unitLower.startsWith("studie")) {
-                if (manglerProducer || manglerKommentator) return true;
-            } else if (unit === "EFP" || kanal === "Optagelse") {
-                if (manglerProducer || (manglerKommentator && manglerReporter)) return true;
-            } else if (erOB) {
-                if (manglerKommentator || manglerProducer || manglerEkspert) return true;
-            } else {
-                if (manglerKommentator) return true;
-            }
-
-            return false;
         }
 
         function tegnTabel(programmer) {
@@ -1670,15 +1675,15 @@
                 forrigeDatoFormat = pDatoFormat;
 
                 const pUgedag = program["Ugedag"] || '';
-                let pTid = program["Tid"] || '-';
-                let pTX = program["TX"] || '-';
-                let pSted = program["Lokation"] && program["Lokation"].trim() !== '' ? program["Lokation"].trim() : '-';
-                let kanalNavn = program["Kanal"] || '';
+                let pTid = String(program["Tid"] || '-');
+                let pTX = String(program["TX"] || '-');
+                let pSted = program["Lokation"] && String(program["Lokation"]).trim() !== '' ? String(program["Lokation"]).trim() : '-';
+                let kanalNavn = String(program["Kanal"] || '');
                 
-                let pKomm = program["Kommentator"] && program["Kommentator"].trim() !== '' ? program["Kommentator"].trim() : '';
-                if (kanalNavn === 'Optagelse' && program["Unit"] === 'EFP') {
-                    if (pKomm === '' && program["Reporter"] && program["Reporter"].trim() !== '') {
-                        pKomm = program["Reporter"].trim();
+                let pKomm = program["Kommentator"] && String(program["Kommentator"]).trim() !== '' ? String(program["Kommentator"]).trim() : '';
+                if (kanalNavn === 'Optagelse' && String(program["Unit"]) === 'EFP') {
+                    if (pKomm === '' && program["Reporter"] && String(program["Reporter"]).trim() !== '') {
+                        pKomm = String(program["Reporter"]).trim();
                     }
                 }
                 if (pKomm === '') pKomm = '-';
@@ -1720,15 +1725,15 @@
 
                 let kanalDisplay = kanalNavn !== '' ? `<span class="kanal-badge" style="background-color: ${badgeBg}; color: ${badgeFg}; --mobile-color: ${mobileColor};"><span class="kanal-desktop">${kanalNavn}</span><span class="kanal-mobile" style="display:none;">${kanalKort}</span></span>` : '';
 
-                let noterTekst = program["Link / Noter"] || '';
+                let noterTekst = String(program["Link / Noter"] || '');
                 let formateretNoter = noterTekst;
                 if (noterTekst !== '') {
                     const urlRegex = /(https?:\/\/[^\s]+)/g;
                     formateretNoter = noterTekst.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${url}</a>`);
                 }
 
-                if (program["Kanal"] === 'Optagelse' && program["Premieredato"]) {
-                    const premParts = program["Premieredato"].split('-');
+                if (String(program["Kanal"]) === 'Optagelse' && program["Premieredato"]) {
+                    const premParts = String(program["Premieredato"]).split('-');
                     if (premParts.length === 3) {
                         const premDatoFormat = premParts[2] + "/" + premParts[1] + "/" + premParts[0];
                         const premTekst = `<span style="color: #0056b3; font-weight: 500;">Programsat første gang ${premDatoFormat}.</span>`;
@@ -1741,16 +1746,16 @@
                     }
                 }
 
-                let visProgramtitel = program["Programtitel"] ? program["Programtitel"].trim() : '';
-                if (program["TBC"] && program["TBC"].toUpperCase() === 'X') {
+                let visProgramtitel = program["Programtitel"] ? String(program["Programtitel"]).trim() : '';
+                if (program["TBC"] && String(program["TBC"]).toUpperCase() === 'X') {
                     visProgramtitel += ' <span style="color: red; font-weight: bold;">TBC</span>';
                 }
                 
-                const pSportsgren = program["Sportsgren"] ? program["Sportsgren"].toUpperCase() : '';
+                const pSportsgren = program["Sportsgren"] ? String(program["Sportsgren"]).toUpperCase() : '';
                 let sportsgrenHtml = pSportsgren ? `<div style="margin-bottom: 8px; color: #dd5f12;">${pSportsgren}</div>` : '';
 
-                let pPlanTekst = program["P-plan"] || program["Produktionsplan"] || '-';
-                let signalTekst = program["Signal til"] || program["Sling"] || '-';
+                let pPlanTekst = String(program["P-plan"] || program["Produktionsplan"] || '-');
+                let signalTekst = String(program["Signal til"] || program["Sling"] || '-');
                 let signalStyling = signalTekst !== '-' ? 'color: red; font-weight: bold;' : '';
                 
                 let pPlanDisplay = '-';
@@ -1760,7 +1765,7 @@
                     pPlanDisplay = `<a href="${linkUrl}" target="_blank" style="color: #0056b3; font-weight: 500; text-decoration: none;">Klik her for at åbne</a>`;
                 }
 
-                let tInfoTekst = program["Teknisk info"] || '-';
+                let tInfoTekst = String(program["Teknisk info"] || '-');
                 let tInfoDisplay = '-';
                 if (tInfoTekst !== '-' && tInfoTekst.trim() !== '') {
                     let linkUrlTInfo = tInfoTekst.trim();
@@ -1795,7 +1800,7 @@
                     tbody.appendChild(trSep);
                 }
 
-                let visUnit = program["Unit"] || '';
+                let visUnit = String(program["Unit"] || '');
                 let hasAdvarsel = skalViseAdvarsel(program);
                 let hasSignal = (signalTekst !== '-' && signalTekst.trim() !== '');
 
@@ -2086,7 +2091,6 @@
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
         
-        // Window onclick er fjernet, så modalvinduer ikke lukker ved et uheld
     </script>
 </body>
 </html>
