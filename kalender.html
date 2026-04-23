@@ -38,13 +38,13 @@
             border-right: none;
         }
 
-        /* Overskrift for måneden */
+        /* Overskrift for måneden - Gjort lavere og med mindre skrift */
         .month-header {
-            height: 5vh; /* Fast højde til overskriften */
+            height: 3.5vh; /* NYT: Optimeret fra 5vh til 3.5vh for at vinde plads */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8vw; /* Skalerer efter skærmens bredde */
+            font-size: 1.4vw; /* NYT: Mindre skrift, optimeret fra 1.8vw */
             font-weight: 800;
             text-transform: uppercase;
             border-bottom: 2px solid #a0a0a0;
@@ -54,7 +54,7 @@
 
         /* Række for hver dag (31 rækker i alt per måned for at holde nettet lige) */
         .day-row {
-            height: calc(95vh / 31); /* Deler den resterende plads i præcis 31 dele */
+            height: calc(96.5vh / 31); /* NYT: 96.5vh fordeles nu mellem rækkerne (pga overskriften blev lavere) */
             display: flex;
             border-bottom: 1px solid #eaeaea;
             box-sizing: border-box;
@@ -64,9 +64,9 @@
             border-bottom: none;
         }
 
-        /* Feltet til dato-tallet */
+        /* Feltet til dato-tallet - Gjort lidt smallere */
         .date-number {
-            width: 2.5vw;
+            width: 2.0vw; /* NYT: Reduceret fra 2.5vw for at vinde lidt bredde til tekst */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -82,7 +82,6 @@
             padding: 0 0.5vw;
             display: flex;
             align-items: center;
-            /* Forberedt til produktionstekst senere */
             font-size: 0.9vw;
             font-weight: 500;
             overflow: hidden;
