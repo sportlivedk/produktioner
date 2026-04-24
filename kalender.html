@@ -33,7 +33,6 @@
             box-sizing: border-box;
         }
         
-        /* Fjern højre kant på den sidste kolonne */
         .month-column:last-child {
             border-right: none;
         }
@@ -50,9 +49,10 @@
             border-bottom: 2px solid #a0a0a0;
             background-color: #fdfdfd; 
             letter-spacing: 2px;
+            z-index: 10;
         }
 
-        /* Række for hver dag (31 rækker i alt per måned for at holde nettet lige) */
+        /* Række for hver dag */
         .day-row {
             height: calc(96.5vh / 31); 
             display: flex;
@@ -76,7 +76,7 @@
             background-color: #f4f4f4; 
         }
 
-        /* Det tomme område til højre for tallet, hvor data skal vises senere */
+        /* Det område hvor data skal vises senere */
         .date-content {
             flex: 1;
             padding: 0 0.5vw;
@@ -90,13 +90,25 @@
 
         /* Weekend og helligdag styling */
         .weekend {
-            color: #dc3545; /* SPORT LIVE rød */
+            color: #dc3545; 
         }
 
-        /* Styling til de tomme dage i måneder med 28/29/30 dage */
+        /* Styling til hver anden uge (toning) */
+        .even-week {
+            background-color: #f5f7f9; /* Meget svag toning til hver anden uge */
+        }
+        
+        .even-week .date-number {
+            background-color: #ebedf0; /* Gør talkassen tilsvarende en anelse mørkere */
+        }
+
+        /* Styling til de tomme dage i måneder med under 31 dage */
         .empty-day .date-number {
-            background-color: #fdfdfd; 
+            background-color: transparent; 
             border-right: 1px solid transparent;
+        }
+        .empty-day {
+            border-bottom: 1px solid transparent;
         }
     </style>
 </head>
@@ -108,12 +120,11 @@
         const container = document.getElementById('calendar-container');
         const monthNames = ['JANUAR', 'FEBRUAR', 'MARTS', 'APRIL', 'MAJ', 'JUNI', 'JULI', 'AUGUST', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DECEMBER'];
         
-        // Finder dags dato som udgangspunkt
         const currentDate = new Date();
         const currentMonthIndex = currentDate.getMonth();
         const currentYear = currentDate.getFullYear();
 
-        // Funktion til at beregne Påskedag for et givent år (Meeus/Jones/Butcher algoritme)
+        // Algoritme til beregning af påske (til helligdage)
         function getEaster(year) {
             const a = year % 19, b = Math.floor(year / 100), c = year % 100;
             const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
@@ -125,56 +136,43 @@
             return new Date(year, month, day);
         }
 
-        // Funktion der tjekker, om en specifik dato er en dansk helligdag
         function isHoliday(y, m, d) {
             const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
             const easter = getEaster(y);
-            
             const addDays = (date, days) => {
                 const result = new Date(date.getTime());
                 result.setDate(result.getDate() + days);
                 return result.getFullYear() + "-" + String(result.getMonth() + 1).padStart(2, '0') + "-" + String(result.getDate()).padStart(2, '0');
             };
-
             const holidays = [
-                y + "-01-01", // Nytårsdag
-                y + "-06-05", // Grundlovsdag
-                y + "-12-24", // Juleaften
-                y + "-12-25", // 1. Juledag
-                y + "-12-26", // 2. Juledag
-                y + "-12-31", // Nytårsaften
-                addDays(easter, -3), // Skærtorsdag
-                addDays(easter, -2), // Langfredag
-                addDays(easter, 0),  // Påskedag
-                addDays(easter, 1),  // 2. Påskedag
-                addDays(easter, 39), // Kr. Himmelfartsdag
-                addDays(easter, 49), // Pinsedag
-                addDays(easter, 50)  // 2. Pinsedag
+                y + "-01-01", y + "-06-05", y + "-12-24", y + "-12-25", y + "-12-26", y + "-12-31",
+                addDays(easter, -3), addDays(easter, -2), addDays(easter, 0), addDays(easter, 1), addDays(easter, 39), addDays(easter, 49), addDays(easter, 50)
             ];
-
             return holidays.includes(dateStr);
         }
 
-        // Bygger 5 kolonner (måneder)
+        // Funktion der finder ugenummeret (ISO-8601)
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return weekNo;
+        }
+
         for (let i = 0; i < 5; i++) {
-            // Beregner korrekt måned og år (hvis vi rammer over nytår)
             let m = (currentMonthIndex + i) % 12;
             let y = currentYear + Math.floor((currentMonthIndex + i) / 12);
-
-            // Finder antallet af dage i den specifikke måned
             let daysInMonth = new Date(y, m + 1, 0).getDate();
 
-            // Opretter kolonnen
             let col = document.createElement('div');
             col.className = 'month-column';
 
-            // Opretter månedsoverskriften
             let header = document.createElement('div');
             header.className = 'month-header';
             header.textContent = monthNames[m];
             col.appendChild(header);
 
-            // Opretter præcis 31 rækker i hver kolonne for at sikre 100% vandret alignment
             for (let d = 1; d <= 31; d++) {
                 let row = document.createElement('div');
                 row.className = 'day-row';
@@ -185,17 +183,22 @@
                 let contentBox = document.createElement('div');
                 contentBox.className = 'date-content';
 
-                // Tjekker om dagen eksisterer i den aktuelle måned
                 if (d <= daysInMonth) {
                     dateBox.textContent = d;
+                    let dateObj = new Date(y, m, d);
+                    let dayOfWeek = dateObj.getDay();
                     
-                    // Tjekker ugedagen OG om det er en dansk helligdag
-                    let dayOfWeek = new Date(y, m, d).getDay();
+                    // Marker rød farve for weekend/helligdag
                     if (dayOfWeek === 0 || dayOfWeek === 6 || isHoliday(y, m, d)) { 
                         dateBox.classList.add('weekend');
                     }
+
+                    // Tjek ugenummer for zebra-toning
+                    let weekNum = getWeekNumber(dateObj);
+                    if (weekNum % 2 === 0) {
+                        row.classList.add('even-week');
+                    }
                 } else {
-                    // Tomme rækker i bunden af måneder med under 31 dage
                     row.classList.add('empty-day');
                 }
 
@@ -203,8 +206,6 @@
                 row.appendChild(contentBox);
                 col.appendChild(row);
             }
-            
-            // Tilføjer kolonnen til hovedcontaineren
             container.appendChild(col);
         }
     </script>
