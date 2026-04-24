@@ -30,7 +30,7 @@
             flex-direction: column;
             border-right: 2px solid #e0e0e0;
             box-sizing: border-box;
-            min-width: 0; /* Tvinger kolonnerne til at holde sig inden for 20% bredde hver */
+            min-width: 0; 
         }
         
         .month-column:last-child {
@@ -76,26 +76,29 @@
             flex-shrink: 0;
         }
 
-        /* Området til programmerne - nu med mere spacing */
         .date-content {
             flex: 1;
-            padding: 2px 4px 2px 8px; /* Mere luft til venstre (8px) og top/bund (2px) */
+            /* Fjernet top/bund padding og lagt det udelukkende på siderne */
+            padding: 0 4px 0 8px; 
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 2px; /* Mere luft mellem de to programlinjer */
             overflow: hidden;
-            padding-right: 1.5vw; /* Sikrer cut-off før højre side */
+            padding-right: 1.5vw; 
         }
 
-        /* Individuel program-linje - fontstørrelse reduceret */
         .program-line {
-            font-size: 0.72vw; /* Reduceret fra 0.82vw for bedre plads */
+            font-size: 0.65vw; /* Justeret ned for at forhindre overlap */
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: clip; 
-            line-height: 1.2; /* Justeret for at undgå overlap */
+            line-height: 1.1; /* Strammet op for at give plads */
+            margin-bottom: 1px; /* Ekstremt diskret mellemrum */
+        }
+        
+        .program-line:last-child {
+            margin-bottom: 0;
         }
 
         .color-blue { color: #0056b3; }
@@ -117,6 +120,7 @@
             font-size: 0.7vw;
             color: #ccc;
             z-index: 100;
+            transition: opacity 0.3s;
         }
     </style>
 </head>
@@ -219,7 +223,7 @@
 
                             const isSportLive = (p.Kanal === "SPORT LIVE");
                             const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
-                            const isObUnit = obUnits.includes(p.Unit);
+                            const isObUnit = obUnits.includes(String(p.Unit || "").trim());
 
                             return isSportLive || isObUnit;
                         });
@@ -228,16 +232,32 @@
                             const line = document.createElement('div');
                             line.className = 'program-line';
                             
-                            const obUnits = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
-                            const boksUnits = ["Boks 1", "Boks 2", "Boks 3", "Boks 4", "Boks 5", "Boks 6", "Boks 7", "BRT", "SRT"];
+                            // Normaliser inputs for at gøre søgningen 'case-insensitive'
+                            const kanalNavn = String(p.Kanal || "").trim();
+                            const unitLower = String(p.Unit || "").toLowerCase().trim();
 
-                            if (p.Kanal === "SPORT LIVE" && obUnits.includes(p.Unit)) line.classList.add('color-blue');
-                            else if (p.Kanal === "SPORT LIVE" && boksUnits.includes(p.Unit)) line.classList.add('color-green');
-                            else if (p.Kanal === "EFP") line.classList.add('color-black');
-                            else if (p.Kanal !== "SPORT LIVE" && obUnits.includes(p.Unit)) line.classList.add('color-red');
+                            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
+                            const boksUnits = ["boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
 
-                            let tbcTxt = (p.TBC && p.TBC.toUpperCase() === 'X') ? " (TBC)" : "";
-                            line.textContent = `${p.Sportsgren}: ${p.Programtitel}${tbcTxt}`;
+                            // Farve-logik
+                            if (kanalNavn === "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
+                                line.classList.add('color-blue');
+                            } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
+                                line.classList.add('color-green');
+                            } else if (kanalNavn === "EFP" || unitLower === "efp") {
+                                line.classList.add('color-black');
+                            } else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
+                                line.classList.add('color-red');
+                            } else {
+                                // Default, hvis ingen af reglerne rammes
+                                line.classList.add('color-black');
+                            }
+
+                            let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
+                            let displaySport = p.Sportsgren ? String(p.Sportsgren).trim() : "Ukendt";
+                            let displayTitel = p.Programtitel ? String(p.Programtitel).trim() : "Ukendt titel";
+                            
+                            line.textContent = `${displaySport}: ${displayTitel}${tbcTxt}`;
                             contentBox.appendChild(line);
                         });
 
