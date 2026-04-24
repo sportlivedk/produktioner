@@ -21,6 +21,7 @@
             display: flex;
             width: 100vw;
             height: 100vh;
+            box-sizing: border-box;
         }
 
         .month-column {
@@ -29,6 +30,7 @@
             flex-direction: column;
             border-right: 2px solid #e0e0e0;
             box-sizing: border-box;
+            min-width: 0; /* Tvinger kolonnerne til at holde sig inden for 20% bredde hver */
         }
         
         .month-column:last-child {
@@ -47,6 +49,7 @@
             background-color: #fdfdfd; 
             letter-spacing: 2px;
             z-index: 10;
+            flex-shrink: 0;
         }
 
         .day-row {
@@ -73,30 +76,28 @@
             flex-shrink: 0;
         }
 
-        /* Området til programmerne */
+        /* Området til programmerne - nu med mere spacing */
         .date-content {
             flex: 1;
-            padding: 1px 4px;
+            padding: 2px 4px 2px 8px; /* Mere luft til venstre (8px) og top/bund (2px) */
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 1px;
+            gap: 2px; /* Mere luft mellem de to programlinjer */
             overflow: hidden;
-            /* Sikrer cut-off før højre side */
-            padding-right: 1.5vw;
+            padding-right: 1.5vw; /* Sikrer cut-off før højre side */
         }
 
-        /* Individuel program-linje */
+        /* Individuel program-linje - fontstørrelse reduceret */
         .program-line {
-            font-size: 0.82vw;
+            font-size: 0.72vw; /* Reduceret fra 0.82vw for bedre plads */
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: clip; /* Hård cut-off som ønsket */
-            line-height: 1.1;
+            text-overflow: clip; 
+            line-height: 1.2; /* Justeret for at undgå overlap */
         }
 
-        /* Farve-logikker */
         .color-blue { color: #0056b3; }
         .color-green { color: #28a745; }
         .color-black { color: #1a1a1a; }
@@ -115,6 +116,7 @@
             right: 10px;
             font-size: 0.7vw;
             color: #ccc;
+            z-index: 100;
         }
     </style>
 </head>
@@ -130,7 +132,6 @@
         
         let produktioner = [];
 
-        // Hjælpefunktioner til dato og helligdage
         function getEaster(year) {
             const a = year % 19, b = Math.floor(year / 100), c = year % 100;
             const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
@@ -160,9 +161,9 @@
             return Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
         }
 
-        // Henter data fra databasen
         async function fetchProductionData() {
-            document.getElementById('loader').style.opacity = "1";
+            const loader = document.getElementById('loader');
+            if(loader) loader.style.opacity = "1";
             try {
                 const response = await fetch(scriptURL + "?action=getdata");
                 const data = await response.json();
@@ -171,7 +172,7 @@
             } catch (error) {
                 console.error("Fejl ved hentning af data:", error);
             }
-            document.getElementById('loader').style.opacity = "0";
+            if(loader) loader.style.opacity = "0";
         }
 
         function tegnKalender() {
@@ -210,14 +211,12 @@
                         }
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
-                        // Find og filtrer produktioner for denne dag
                         const dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
                             const pDato = new Date(p.Dato);
                             const pDatoStr = pDato.getFullYear() + "-" + String(pDato.getMonth() + 1).padStart(2, '0') + "-" + String(pDato.getDate()).padStart(2, '0');
                             if (pDatoStr !== dateStr) return false;
 
-                            // Inklusions-logik
                             const isSportLive = (p.Kanal === "SPORT LIVE");
                             const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
                             const isObUnit = obUnits.includes(p.Unit);
@@ -225,12 +224,10 @@
                             return isSportLive || isObUnit;
                         });
 
-                        // Vis maks 2 programmer
                         dagensProduktioner.slice(0, 2).forEach(p => {
                             const line = document.createElement('div');
                             line.className = 'program-line';
                             
-                            // Farve-logik
                             const obUnits = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
                             const boksUnits = ["Boks 1", "Boks 2", "Boks 3", "Boks 4", "Boks 5", "Boks 6", "Boks 7", "BRT", "SRT"];
 
@@ -256,9 +253,7 @@
             }
         }
 
-        // Start programmet
         fetchProductionData();
-        // Opdater hvert 5. minut
         setInterval(fetchProductionData, 300000);
     </script>
 </body>
