@@ -38,7 +38,8 @@
         }
 
         .month-header {
-            height: 3.5vh; 
+            /* NYT: Højde reduceret fra 3.5vh til 3.0vh for at vinde plads til bunden */
+            height: 3.0vh; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -53,7 +54,8 @@
         }
 
         .day-row {
-            height: calc(96.5vh / 31); 
+            /* NYT: Rækkerne fylder nu 96.2vh. 3.0 + 96.2 = 99.2vh. De sidste 0.8vh er luft i bunden */
+            height: calc(96.2vh / 31); 
             display: flex;
             border-bottom: 1px solid #c0c0c0; 
             box-sizing: border-box;
@@ -78,6 +80,7 @@
 
         .date-content {
             flex: 1;
+            /* ISTJ-padding: Top-tungt for at give plads til gap og bund-balance */
             padding: 3px 4px 0px 6px; 
             display: flex;
             flex-direction: column;
@@ -282,7 +285,7 @@
                             const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
                             const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
 
-                            // NY FARVE-LOGIK: SPORT LIVE + ingen unit (eller OB-enhed) = Blå
+                            // NY LOGIK: SPORT LIVE + tom unit = Blå
                             if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
                                 line.classList.add('color-blue');
                             } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
