@@ -92,7 +92,7 @@
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: clip; 
+            text-overflow: ellipsis; 
             line-height: 1.05; 
             margin-bottom: 0; 
         }
@@ -132,7 +132,6 @@
         
         let produktioner = [];
 
-        // Vaskemaskine logik til forkortelser og udeladelser
         function vaskTekst(sportsgren, titel) {
             let s = sportsgren ? String(sportsgren).trim() : "";
             let t = titel ? String(titel).trim() : "";
@@ -141,6 +140,7 @@
                 { fra: /Basketball/gi, til: "Basket" },
                 { fra: /Volleyball/gi, til: "Volley" },
                 { fra: /Amerikansk fodbold/gi, til: "Football" },
+                { fra: /European League/gi, til: "EL" },
                 { fra: /Randers Cimbria/gi, til: "Randers" },
                 { fra: /Team FOG Næstved/gi, til: "Næstved" },
                 { fra: /Horsens IC/gi, til: "Horsens" },
@@ -155,16 +155,14 @@
             const udeladelser = [
                 "basket", "futsal", "volley", "tennis", "bordtennis", "elitedivisionen", 
                 "liga portugal", "coppa italia", "supercopa", "supercoppa", "WTT", 
-                "davis cup", "billie jean king cup", "mermaid bowl"
+                "davis cup", "billie jean king cup", "mermaid bowl", "gokart"
             ];
 
-            // Anvend forkortelser på begge
             forkortelser.forEach(f => {
                 s = s.replace(f.fra, f.til);
                 t = t.replace(f.fra, f.til);
             });
 
-            // Tjek om Sportsgren skal skjules
             let visSportsgren = true;
             const tLower = t.toLowerCase();
             udeladelser.forEach(ord => {
@@ -295,10 +293,7 @@
                             }
 
                             let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
-                            
-                            // BRUG VASKEMASKINEN HER
                             line.textContent = vaskTekst(p.Sportsgren, p.Programtitel) + tbcTxt;
-                            
                             contentBox.appendChild(line);
                         });
 
