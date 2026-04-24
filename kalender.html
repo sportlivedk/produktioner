@@ -92,7 +92,8 @@
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis; 
+            /* Ændret tilbage til clip for at fjerne prikker og vinde bogstaver */
+            text-overflow: clip; 
             line-height: 1.05; 
             margin-bottom: 0; 
         }
@@ -293,7 +294,9 @@
                             }
 
                             let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
+                            
                             line.textContent = vaskTekst(p.Sportsgren, p.Programtitel) + tbcTxt;
+                            
                             contentBox.appendChild(line);
                         });
 
