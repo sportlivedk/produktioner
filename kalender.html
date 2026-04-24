@@ -38,7 +38,6 @@
         }
 
         .month-header {
-            /* NYT: Justeret til 3.2vh for at finde den gyldne mellemvej */
             height: 3.2vh; 
             display: flex;
             align-items: center;
@@ -54,12 +53,12 @@
         }
 
         .day-row {
-            /* NYT: Rækkerne fylder præcis 96.8vh, så 3.2 + 96.8 giver 100vh. Ingen hvide bjælker i bunden! */
             height: calc(96.8vh / 31); 
             display: flex;
             border-bottom: 1px solid #c0c0c0; 
             box-sizing: border-box;
             overflow: hidden;
+            position: relative; /* Til paging indikator */
         }
         
         .day-row:last-child {
@@ -80,13 +79,12 @@
 
         .date-content {
             flex: 1;
-            padding: 3px 4px 0px 6px; 
+            padding: 3px 1.5vw 0px 6px; /* 1.5vw padding til højre for at give plads til prikker */
             display: flex;
             flex-direction: column;
             justify-content: flex-start; 
             gap: 2px; 
             overflow: hidden;
-            padding-right: 1.5vw; 
         }
 
         .program-line {
@@ -97,8 +95,34 @@
             text-overflow: clip; 
             line-height: 1.05; 
             margin-bottom: 0; 
-            -webkit-mask-image: linear-gradient(to right, black 92%, transparent 100%);
-            mask-image: linear-gradient(to right, black 92%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+            mask-image: linear-gradient(to right, black 90%, transparent 100%);
+        }
+
+        /* Paging indikator styling */
+        .paging-dots {
+            position: absolute;
+            right: 0.4vw;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 3px;
+            width: 0.6vw;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            background-color: #d0d0d0;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+
+        .dot.active {
+            background-color: #555;
+            transform: scale(1.2);
         }
 
         .color-blue { color: #0056b3; }
@@ -120,7 +144,6 @@
             font-size: 0.7vw;
             color: #ccc;
             z-index: 100;
-            transition: opacity 0.3s;
         }
     </style>
 </head>
@@ -135,6 +158,7 @@
         const monthNames = ['JANUAR', 'FEBRUAR', 'MARTS', 'APRIL', 'MAJ', 'JUNI', 'JULI', 'AUGUST', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DECEMBER'];
         
         let produktioner = [];
+        let globalTick = 0; // Bruges til rotation af sider
 
         function vaskTekst(sportsgren, titel) {
             let s = sportsgren ? String(sportsgren).trim() : "";
@@ -170,16 +194,10 @@
             let visSportsgren = true;
             const tLower = t.toLowerCase();
             udeladelser.forEach(ord => {
-                if (tLower.includes(ord.toLowerCase())) {
-                    visSportsgren = false;
-                }
+                if (tLower.includes(ord.toLowerCase())) visSportsgren = false;
             });
 
-            if (!visSportsgren || s === "") {
-                return t;
-            } else {
-                return `${s}: ${t}`;
-            }
+            return (!visSportsgren || s === "") ? t : `${s}: ${t}`;
         }
 
         function getEaster(year) {
@@ -219,9 +237,7 @@
                 const data = await response.json();
                 produktioner = data.programmer || [];
                 tegnKalender();
-            } catch (error) {
-                console.error("Fejl ved hentning af data:", error);
-            }
+            } catch (error) { console.error(error); }
             if(loader) loader.style.opacity = "0";
         }
 
@@ -256,54 +272,57 @@
                         let dateObj = new Date(y, m, d);
                         const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
                         
-                        if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) {
-                            dateBox.classList.add('weekend');
-                        }
+                        if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) dateBox.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
                         const dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
                             const pDato = new Date(p.Dato);
-                            const pDatoStr = pDato.getFullYear() + "-" + String(pDato.getMonth() + 1).padStart(2, '0') + "-" + String(pDato.getDate()).padStart(2, '0');
-                            if (pDatoStr !== dateStr) return false;
-
-                            const isSportLive = (p.Kanal === "SPORT LIVE");
+                            return (pDato.getFullYear() === y && pDato.getMonth() === m && pDato.getDate() === d);
+                        }).filter(p => {
                             const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
-                            const isObUnit = obUnits.includes(String(p.Unit || "").trim());
-
-                            return isSportLive || isObUnit;
+                            return (p.Kanal === "SPORT LIVE") || obUnits.includes(String(p.Unit || "").trim());
                         });
 
-                        dagensProduktioner.slice(0, 2).forEach(p => {
-                            const line = document.createElement('div');
-                            line.className = 'program-line';
-                            
-                            const kanalNavn = String(p.Kanal || "").trim();
-                            const unitLower = String(p.Unit || "").toLowerCase().trim();
+                        if (dagensProduktioner.length > 0) {
+                            // Beregn sider (2 programmer pr side)
+                            const totalPages = Math.ceil(dagensProduktioner.length / 2);
+                            const currentPage = globalTick % totalPages;
+                            const startIdx = currentPage * 2;
+                            const visningsData = dagensProduktioner.slice(startIdx, startIdx + 2);
 
-                            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
-                            const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
+                            visningsData.forEach(p => {
+                                const line = document.createElement('div');
+                                line.className = 'program-line';
+                                const kanalNavn = String(p.Kanal || "").trim();
+                                const unitLower = String(p.Unit || "").toLowerCase().trim();
+                                const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
+                                const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
 
-                            if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
-                                line.classList.add('color-blue');
-                            } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
-                                line.classList.add('color-green');
-                            } else if (kanalNavn === "EFP" || unitLower === "efp") {
-                                line.classList.add('color-black');
-                            } else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
-                                line.classList.add('color-red');
-                            } else {
-                                line.classList.add('color-black');
+                                if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) line.classList.add('color-blue');
+                                else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) line.classList.add('color-green');
+                                else if (kanalNavn === "EFP" || unitLower === "efp") line.classList.add('color-black');
+                                else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) line.classList.add('color-red');
+                                else line.classList.add('color-black');
+
+                                let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
+                                line.textContent = vaskTekst(p.Sportsgren, p.Programtitel) + tbcTxt;
+                                contentBox.appendChild(line);
+                            });
+
+                            // Tilføj prikker hvis der er mere end én side
+                            if (totalPages > 1) {
+                                const dotsContainer = document.createElement('div');
+                                dotsContainer.className = 'paging-dots';
+                                for (let p = 0; p < totalPages; p++) {
+                                    const dot = document.createElement('div');
+                                    dot.className = 'dot' + (p === currentPage ? ' active' : '');
+                                    dotsContainer.appendChild(dot);
+                                }
+                                row.appendChild(dotsContainer);
                             }
-
-                            let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
-                            line.textContent = vaskTekst(p.Sportsgren, p.Programtitel) + tbcTxt;
-                            contentBox.appendChild(line);
-                        });
-
-                    } else {
-                        row.classList.add('empty-day');
-                    }
+                        }
+                    } else { row.classList.add('empty-day'); }
 
                     row.appendChild(dateBox);
                     row.appendChild(contentBox);
@@ -313,8 +332,15 @@
             }
         }
 
+        // Start loop
         fetchProductionData();
-        setInterval(fetchProductionData, 300000);
+        setInterval(fetchProductionData, 300000); // Hent data hvert 5. min
+
+        // Rotation af sider hvert 7. sekund
+        setInterval(() => {
+            globalTick++;
+            tegnKalender(); // Tegn kalenderen forfra for at opdatere visningen af sider
+        }, 7000);
     </script>
 </body>
 </html>
