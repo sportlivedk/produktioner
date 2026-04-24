@@ -28,7 +28,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            border-right: 2px solid #a0a0a0; /* Lidt tydeligere skillelinje mellem månederne */
+            border-right: 1px solid #d0d0d0; /* NYT: Tyndere og lysere adskillelse mellem måneder */
             box-sizing: border-box;
             min-width: 0; 
         }
@@ -55,7 +55,6 @@
         .day-row {
             height: calc(96.5vh / 31); 
             display: flex;
-            /* NYT: Linjen under hver dag er gjort mørkere og skarpere (#c0c0c0) */
             border-bottom: 1px solid #c0c0c0; 
             box-sizing: border-box;
             overflow: hidden;
@@ -72,7 +71,6 @@
             justify-content: center;
             font-size: 0.9vw; 
             font-weight: 700;
-            /* NYT: Stregen til højre for tallet er også gjort mørkere (#c0c0c0) */
             border-right: 1px solid #c0c0c0; 
             background-color: #f4f4f4; 
             flex-shrink: 0;
@@ -81,29 +79,24 @@
         /* Området til programmerne */
         .date-content {
             flex: 1;
-            /* NYT: Lidt mere luft i toppen (4px), så teksten flugter smukt med tallet */
-            padding: 4px 4px 2px 8px; 
+            /* NYT: Ekstrem stram padding for at forhindre overlap (Top, Højre, Bund, Venstre) */
+            padding: 2px 4px 1px 6px; 
             display: flex;
             flex-direction: column;
-            /* NYT: Tvinger teksten op i toppen i stedet for at centrere den */
             justify-content: flex-start; 
-            gap: 2px; 
+            gap: 1px; /* Minimal afstand mellem to linjer */
             overflow: hidden;
             padding-right: 1.5vw; 
         }
 
         .program-line {
-            font-size: 0.65vw; 
+            font-size: 0.62vw; /* Mikroskopisk justeret for at sikre at 2 linjer altid kan være der */
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: clip; 
-            line-height: 1.1; 
-            margin-bottom: 1px; 
-        }
-        
-        .program-line:last-child {
-            margin-bottom: 0;
+            line-height: 1.05; /* Maksimalt strammet linjehøjde */
+            margin-bottom: 0; 
         }
 
         .color-blue { color: #0056b3; }
