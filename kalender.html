@@ -4,27 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPORT LIVE | Display</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* Sikrer at kalenderen fylder hele skærmen uden scrolling */
         body, html {
             margin: 0;
             padding: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #fdfdfd; /* Kontrastoptimeret off-white baggrund */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; /* Ingen scrollbarer på storskærmen */
-            color: #1a1a1a; /* Kontrastoptimeret mørkegrå/sort tekst */
+            background-color: #fdfdfd;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            color: #1a1a1a;
         }
 
-        /* Hovedcontainer der holder de 5 kolonner */
         #calendar-container {
             display: flex;
             width: 100vw;
             height: 100vh;
         }
 
-        /* Hver månedskolonne */
         .month-column {
             flex: 1;
             display: flex;
@@ -37,7 +35,6 @@
             border-right: none;
         }
 
-        /* Overskrift for måneden */
         .month-header {
             height: 3.5vh; 
             display: flex;
@@ -52,79 +49,88 @@
             z-index: 10;
         }
 
-        /* Række for hver dag */
         .day-row {
             height: calc(96.5vh / 31); 
             display: flex;
             border-bottom: 1px solid #eaeaea;
             box-sizing: border-box;
+            overflow: hidden;
         }
         
         .day-row:last-child {
             border-bottom: none;
         }
 
-        /* Feltet til dato-tallet */
         .date-number {
             width: 1.6vw; 
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.95vw; 
+            font-size: 0.9vw; 
             font-weight: 700;
             border-right: 1px solid #eaeaea;
             background-color: #f4f4f4; 
+            flex-shrink: 0;
         }
 
-        /* Det område hvor data skal vises senere */
+        /* Området til programmerne */
         .date-content {
             flex: 1;
-            padding: 0 0.5vw;
+            padding: 1px 4px;
             display: flex;
-            align-items: center;
-            font-size: 0.9vw;
-            font-weight: 500;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1px;
             overflow: hidden;
+            /* Sikrer cut-off før højre side */
+            padding-right: 1.5vw;
+        }
+
+        /* Individuel program-linje */
+        .program-line {
+            font-size: 0.82vw;
+            font-weight: 600;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: clip; /* Hård cut-off som ønsket */
+            line-height: 1.1;
         }
 
-        /* Weekend og helligdag styling */
-        .weekend {
-            color: #dc3545; 
-        }
+        /* Farve-logikker */
+        .color-blue { color: #0056b3; }
+        .color-green { color: #28a745; }
+        .color-black { color: #1a1a1a; }
+        .color-red { color: #dc3545; }
 
-        /* Styling til hver anden uge (toning) */
-        .even-week {
-            background-color: #f5f7f9; /* Meget svag toning til hver anden uge */
-        }
-        
-        .even-week .date-number {
-            background-color: #ebedf0; /* Gør talkassen tilsvarende en anelse mørkere */
-        }
+        .weekend { color: #dc3545; }
+        .even-week { background-color: #f5f7f9; }
+        .even-week .date-number { background-color: #ebedf0; }
 
-        /* Styling til de tomme dage i måneder med under 31 dage */
-        .empty-day .date-number {
-            background-color: transparent; 
-            border-right: 1px solid transparent;
-        }
-        .empty-day {
-            border-bottom: 1px solid transparent;
+        .empty-day .date-number { background-color: transparent; border-right: 1px solid transparent; }
+        .empty-day { border-bottom: 1px solid transparent; }
+
+        #loader {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7vw;
+            color: #ccc;
         }
     </style>
 </head>
 <body>
 
+    <div id="loader">Opdaterer...</div>
     <div id="calendar-container"></div>
 
     <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbznTiMKZZDJhmuZpArHJLwZcN-Ic745YuXZitWrdDojG-L3KuW-VXy0mtJUPOE3xCR1/exec';
         const container = document.getElementById('calendar-container');
         const monthNames = ['JANUAR', 'FEBRUAR', 'MARTS', 'APRIL', 'MAJ', 'JUNI', 'JULI', 'AUGUST', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DECEMBER'];
         
-        const currentDate = new Date();
-        const currentMonthIndex = currentDate.getMonth();
-        const currentYear = currentDate.getFullYear();
+        let produktioner = [];
 
-        // Algoritme til beregning af påske (til helligdage)
+        // Hjælpefunktioner til dato og helligdage
         function getEaster(year) {
             const a = year % 19, b = Math.floor(year / 100), c = year % 100;
             const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
@@ -140,74 +146,120 @@
             const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
             const easter = getEaster(y);
             const addDays = (date, days) => {
-                const result = new Date(date.getTime());
-                result.setDate(result.getDate() + days);
-                return result.getFullYear() + "-" + String(result.getMonth() + 1).padStart(2, '0') + "-" + String(result.getDate()).padStart(2, '0');
+                const res = new Date(date.getTime());
+                res.setDate(res.getDate() + days);
+                return res.getFullYear() + "-" + String(res.getMonth() + 1).padStart(2, '0') + "-" + String(res.getDate()).padStart(2, '0');
             };
-            const holidays = [
-                y + "-01-01", y + "-06-05", y + "-12-24", y + "-12-25", y + "-12-26", y + "-12-31",
-                addDays(easter, -3), addDays(easter, -2), addDays(easter, 0), addDays(easter, 1), addDays(easter, 39), addDays(easter, 49), addDays(easter, 50)
-            ];
-            return holidays.includes(dateStr);
+            const h = [y+"-01-01", y+"-06-05", y+"-12-24", y+"-12-25", y+"-12-26", y+"-12-31", addDays(easter, -3), addDays(easter, -2), addDays(easter, 0), addDays(easter, 1), addDays(easter, 39), addDays(easter, 49), addDays(easter, 50)];
+            return h.includes(dateStr);
         }
 
-        // Funktion der finder ugenummeret (ISO-8601)
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
             d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-            var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            return weekNo;
+            return Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
         }
 
-        for (let i = 0; i < 5; i++) {
-            let m = (currentMonthIndex + i) % 12;
-            let y = currentYear + Math.floor((currentMonthIndex + i) / 12);
-            let daysInMonth = new Date(y, m + 1, 0).getDate();
-
-            let col = document.createElement('div');
-            col.className = 'month-column';
-
-            let header = document.createElement('div');
-            header.className = 'month-header';
-            header.textContent = monthNames[m];
-            col.appendChild(header);
-
-            for (let d = 1; d <= 31; d++) {
-                let row = document.createElement('div');
-                row.className = 'day-row';
-
-                let dateBox = document.createElement('div');
-                dateBox.className = 'date-number';
-
-                let contentBox = document.createElement('div');
-                contentBox.className = 'date-content';
-
-                if (d <= daysInMonth) {
-                    dateBox.textContent = d;
-                    let dateObj = new Date(y, m, d);
-                    let dayOfWeek = dateObj.getDay();
-                    
-                    // Marker rød farve for weekend/helligdag
-                    if (dayOfWeek === 0 || dayOfWeek === 6 || isHoliday(y, m, d)) { 
-                        dateBox.classList.add('weekend');
-                    }
-
-                    // Tjek ugenummer for zebra-toning
-                    let weekNum = getWeekNumber(dateObj);
-                    if (weekNum % 2 === 0) {
-                        row.classList.add('even-week');
-                    }
-                } else {
-                    row.classList.add('empty-day');
-                }
-
-                row.appendChild(dateBox);
-                row.appendChild(contentBox);
-                col.appendChild(row);
+        // Henter data fra databasen
+        async function fetchProductionData() {
+            document.getElementById('loader').style.opacity = "1";
+            try {
+                const response = await fetch(scriptURL + "?action=getdata");
+                const data = await response.json();
+                produktioner = data.programmer || [];
+                tegnKalender();
+            } catch (error) {
+                console.error("Fejl ved hentning af data:", error);
             }
-            container.appendChild(col);
+            document.getElementById('loader').style.opacity = "0";
         }
+
+        function tegnKalender() {
+            container.innerHTML = '';
+            const currentDate = new Date();
+            const currentMonthIndex = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+
+            for (let i = 0; i < 5; i++) {
+                let m = (currentMonthIndex + i) % 12;
+                let y = currentYear + Math.floor((currentMonthIndex + i) / 12);
+                let daysInMonth = new Date(y, m + 1, 0).getDate();
+
+                let col = document.createElement('div');
+                col.className = 'month-column';
+                let header = document.createElement('div');
+                header.className = 'month-header';
+                header.textContent = monthNames[m];
+                col.appendChild(header);
+
+                for (let d = 1; d <= 31; d++) {
+                    let row = document.createElement('div');
+                    row.className = 'day-row';
+                    let dateBox = document.createElement('div');
+                    dateBox.className = 'date-number';
+                    let contentBox = document.createElement('div');
+                    contentBox.className = 'date-content';
+
+                    if (d <= daysInMonth) {
+                        dateBox.textContent = d;
+                        let dateObj = new Date(y, m, d);
+                        const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
+                        
+                        if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) {
+                            dateBox.classList.add('weekend');
+                        }
+                        if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
+
+                        // Find og filtrer produktioner for denne dag
+                        const dagensProduktioner = produktioner.filter(p => {
+                            if (!p.Dato) return false;
+                            const pDato = new Date(p.Dato);
+                            const pDatoStr = pDato.getFullYear() + "-" + String(pDato.getMonth() + 1).padStart(2, '0') + "-" + String(pDato.getDate()).padStart(2, '0');
+                            if (pDatoStr !== dateStr) return false;
+
+                            // Inklusions-logik
+                            const isSportLive = (p.Kanal === "SPORT LIVE");
+                            const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
+                            const isObUnit = obUnits.includes(p.Unit);
+
+                            return isSportLive || isObUnit;
+                        });
+
+                        // Vis maks 2 programmer
+                        dagensProduktioner.slice(0, 2).forEach(p => {
+                            const line = document.createElement('div');
+                            line.className = 'program-line';
+                            
+                            // Farve-logik
+                            const obUnits = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
+                            const boksUnits = ["Boks 1", "Boks 2", "Boks 3", "Boks 4", "Boks 5", "Boks 6", "Boks 7", "BRT", "SRT"];
+
+                            if (p.Kanal === "SPORT LIVE" && obUnits.includes(p.Unit)) line.classList.add('color-blue');
+                            else if (p.Kanal === "SPORT LIVE" && boksUnits.includes(p.Unit)) line.classList.add('color-green');
+                            else if (p.Kanal === "EFP") line.classList.add('color-black');
+                            else if (p.Kanal !== "SPORT LIVE" && obUnits.includes(p.Unit)) line.classList.add('color-red');
+
+                            let tbcTxt = (p.TBC && p.TBC.toUpperCase() === 'X') ? " (TBC)" : "";
+                            line.textContent = `${p.Sportsgren}: ${p.Programtitel}${tbcTxt}`;
+                            contentBox.appendChild(line);
+                        });
+
+                    } else {
+                        row.classList.add('empty-day');
+                    }
+
+                    row.appendChild(dateBox);
+                    row.appendChild(contentBox);
+                    col.appendChild(row);
+                }
+                container.appendChild(col);
+            }
+        }
+
+        // Start programmet
+        fetchProductionData();
+        // Opdater hvert 5. minut
+        setInterval(fetchProductionData, 300000);
     </script>
 </body>
 </html>
