@@ -58,7 +58,7 @@
             border-bottom: 1px solid #c0c0c0; 
             box-sizing: border-box;
             overflow: hidden;
-            position: relative; /* Til paging indikator */
+            position: relative; 
         }
         
         .day-row:last-child {
@@ -79,12 +79,31 @@
 
         .date-content {
             flex: 1;
-            padding: 3px 1.5vw 0px 6px; /* 1.5vw padding til højre for at give plads til prikker */
+            position: relative; /* Nødvendig for at holde scroll-strimlen på plads */
+            overflow: hidden;
+        }
+
+        /* NYT: Animator-wrapperen fungerer som en lang filmstrimmel */
+        .animator-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Blød "cubic-bezier" giver lufthavns/togstations-fornemmelsen */
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
+
+        /* NYT: Hver "side" fylder præcis 100% af boksens højde */
+        .page {
+            height: 100%;
+            width: 100%;
+            padding: 3px 1.5vw 0px 6px; 
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: flex-start; 
             gap: 2px; 
-            overflow: hidden;
         }
 
         .program-line {
@@ -113,16 +132,16 @@
         }
 
         .dot {
-            width: 4px;
-            height: 4px;
+            width: 3px; /* Mindsket fra 4px */
+            height: 3px; /* Mindsket fra 4px */
             background-color: #d0d0d0;
             border-radius: 50%;
-            transition: background-color 0.3s;
+            transition: background-color 0.4s, transform 0.4s;
         }
 
         .dot.active {
             background-color: #555;
-            transform: scale(1.2);
+            transform: scale(1.4); /* Skalerer lidt mere op, da basen nu er mindre */
         }
 
         .color-blue { color: #0056b3; }
@@ -144,6 +163,7 @@
             font-size: 0.7vw;
             color: #ccc;
             z-index: 100;
+            transition: opacity 0.3s;
         }
     </style>
 </head>
@@ -158,7 +178,7 @@
         const monthNames = ['JANUAR', 'FEBRUAR', 'MARTS', 'APRIL', 'MAJ', 'JUNI', 'JULI', 'AUGUST', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DECEMBER'];
         
         let produktioner = [];
-        let globalTick = 0; // Bruges til rotation af sider
+        let globalTick = 0; 
 
         function vaskTekst(sportsgren, titel) {
             let s = sportsgren ? String(sportsgren).trim() : "";
@@ -285,38 +305,52 @@
                         });
 
                         if (dagensProduktioner.length > 0) {
-                            // Beregn sider (2 programmer pr side)
                             const totalPages = Math.ceil(dagensProduktioner.length / 2);
-                            const currentPage = globalTick % totalPages;
-                            const startIdx = currentPage * 2;
-                            const visningsData = dagensProduktioner.slice(startIdx, startIdx + 2);
+                            
+                            // Bygger filmstrimlen
+                            const animatorWrapper = document.createElement('div');
+                            animatorWrapper.className = 'animator-wrapper';
+                            animatorWrapper.dataset.pages = totalPages;
 
-                            visningsData.forEach(p => {
-                                const line = document.createElement('div');
-                                line.className = 'program-line';
-                                const kanalNavn = String(p.Kanal || "").trim();
-                                const unitLower = String(p.Unit || "").toLowerCase().trim();
-                                const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
-                                const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
+                            for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
+                                const pageDiv = document.createElement('div');
+                                pageDiv.className = 'page';
+                                
+                                const startIdx = pageIdx * 2;
+                                const visningsData = dagensProduktioner.slice(startIdx, startIdx + 2);
 
-                                if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) line.classList.add('color-blue');
-                                else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) line.classList.add('color-green');
-                                else if (kanalNavn === "EFP" || unitLower === "efp") line.classList.add('color-black');
-                                else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) line.classList.add('color-red');
-                                else line.classList.add('color-black');
+                                visningsData.forEach(p => {
+                                    const line = document.createElement('div');
+                                    line.className = 'program-line';
+                                    const kanalNavn = String(p.Kanal || "").trim();
+                                    const unitLower = String(p.Unit || "").toLowerCase().trim();
+                                    const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
+                                    const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
 
-                                let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
-                                line.textContent = vaskTekst(p.Sportsgren, p.Programtitel) + tbcTxt;
-                                contentBox.appendChild(line);
-                            });
+                                    if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) line.classList.add('color-blue');
+                                    else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) line.classList.add('color-green');
+                                    else if (kanalNavn === "EFP" || unitLower === "efp") line.classList.add('color-black');
+                                    else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) line.classList.add('color-red');
+                                    else line.classList.add('color-black');
 
-                            // Tilføj prikker hvis der er mere end én side
+                                    let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
+                                    line.textContent = vaskTekst(p.Sportsgren, p.Programtitel) + tbcTxt;
+                                    pageDiv.appendChild(line);
+                                });
+                                animatorWrapper.appendChild(pageDiv);
+                            }
+                            contentBox.appendChild(animatorWrapper);
+
+                            // Sætter den korrekte start-position og dots
                             if (totalPages > 1) {
+                                const startPage = globalTick % totalPages;
+                                animatorWrapper.style.transform = `translateY(-${startPage * 100}%)`;
+
                                 const dotsContainer = document.createElement('div');
                                 dotsContainer.className = 'paging-dots';
                                 for (let p = 0; p < totalPages; p++) {
                                     const dot = document.createElement('div');
-                                    dot.className = 'dot' + (p === currentPage ? ' active' : '');
+                                    dot.className = 'dot' + (p === startPage ? ' active' : '');
                                     dotsContainer.appendChild(dot);
                                 }
                                 row.appendChild(dotsContainer);
@@ -332,15 +366,39 @@
             }
         }
 
-        // Start loop
-        fetchProductionData();
-        setInterval(fetchProductionData, 300000); // Hent data hvert 5. min
-
-        // Rotation af sider hvert 7. sekund
-        setInterval(() => {
+        // Funktion der kun opdaterer animationen, uden at genindlæse hele skærmen
+        function opdaterAnimationer() {
             globalTick++;
-            tegnKalender(); // Tegn kalenderen forfra for at opdatere visningen af sider
-        }, 7000);
+            const wrappers = document.querySelectorAll('.animator-wrapper');
+            wrappers.forEach(wrapper => {
+                const totalPages = parseInt(wrapper.dataset.pages);
+                if (totalPages > 1) {
+                    const currentPage = globalTick % totalPages;
+                    // Ruller strimlen
+                    wrapper.style.transform = `translateY(-${currentPage * 100}%)`;
+                    
+                    // Opdaterer prikkerne
+                    const row = wrapper.closest('.day-row');
+                    const dots = row.querySelectorAll('.dot');
+                    dots.forEach((dot, index) => {
+                        if (index === currentPage) {
+                            dot.classList.add('active');
+                        } else {
+                            dot.classList.remove('active');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Kør dataindlæsning og tegn kalender første gang
+        fetchProductionData();
+        
+        // Hent nye data helt i baggrunden hvert 5. minut
+        setInterval(fetchProductionData, 300000); 
+
+        // Rul "lufthavns-strimlerne" uafhængigt hvert 7. sekund
+        setInterval(opdaterAnimationer, 7000);
     </script>
 </body>
 </html>
