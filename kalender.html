@@ -89,7 +89,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* NYT: Tiden er ændret fra 0.6s til 1.2s for en roligere og mere tydelig rulning */
             transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1); 
         }
 
@@ -133,7 +132,6 @@
             height: 3px; 
             background-color: #d0d0d0;
             border-radius: 50%;
-            /* NYT: Prikkerne fader også lidt langsommere nu for at matche den nye rulning */
             transition: background-color 0.8s, transform 0.8s;
         }
 
@@ -177,6 +175,36 @@
         
         let produktioner = [];
         let globalTick = 0; 
+
+        // NYT: Funktion der returnerer både CSS-klasse og en numerisk prioritet (1-4)
+        function getProgramColorAndPriority(p) {
+            const kanalNavn = String(p.Kanal || "").trim();
+            const unitLower = String(p.Unit || "").toLowerCase().trim();
+            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
+            const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
+
+            if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
+                return { color: 'color-blue', prio: 1 };
+            } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
+                return { color: 'color-green', prio: 2 };
+            } else if (kanalNavn === "EFP" || unitLower === "efp") {
+                return { color: 'color-black', prio: 3 };
+            } else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
+                return { color: 'color-red', prio: 4 };
+            } else {
+                return { color: 'color-black', prio: 3 }; // Sikkerhedsnet
+            }
+        }
+
+        // NYT: Sikker tids-formatering (laver "9.00" eller "9:00" om til "09:00")
+        function parseTime(t) {
+            if (!t) return "99:99"; // Ukendt tid ryger bagerst
+            let str = String(t).replace('.', ':').trim();
+            if (str.length === 4 && str.includes(':')) {
+                str = "0" + str;
+            }
+            return str;
+        }
 
         function vaskTekst(sportsgren, titel) {
             let s = sportsgren ? String(sportsgren).trim() : "";
@@ -293,7 +321,7 @@
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) dateBox.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
-                        const dagensProduktioner = produktioner.filter(p => {
+                        let dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
                             const pDato = new Date(p.Dato);
                             return (pDato.getFullYear() === y && pDato.getMonth() === m && pDato.getDate() === d);
@@ -303,6 +331,27 @@
                         });
 
                         if (dagensProduktioner.length > 0) {
+                            
+                            // NYT: Sorteringsmotor for dagens produktioner
+                            dagensProduktioner.sort((a, b) => {
+                                const infoA = getProgramColorAndPriority(a);
+                                const infoB = getProgramColorAndPriority(b);
+
+                                // 1. Sorter efter farve-prioritet (Blå -> Grøn -> Sort -> Rød)
+                                if (infoA.prio !== infoB.prio) {
+                                    return infoA.prio - infoB.prio;
+                                }
+
+                                // 2. Hvis prioritet er ens OG det er prio 1 eller 2, sorter efter Tid
+                                if (infoA.prio === 1 || infoA.prio === 2) {
+                                    const tidA = parseTime(a.Tid);
+                                    const tidB = parseTime(b.Tid);
+                                    return tidA.localeCompare(tidB);
+                                }
+
+                                return 0; // For EFP og eksterne bevares original rækkefølge
+                            });
+
                             const totalPages = Math.ceil(dagensProduktioner.length / 2);
                             
                             const animatorWrapper = document.createElement('div');
@@ -319,16 +368,10 @@
                                 visningsData.forEach(p => {
                                     const line = document.createElement('div');
                                     line.className = 'program-line';
-                                    const kanalNavn = String(p.Kanal || "").trim();
-                                    const unitLower = String(p.Unit || "").toLowerCase().trim();
-                                    const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
-                                    const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
-
-                                    if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) line.classList.add('color-blue');
-                                    else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) line.classList.add('color-green');
-                                    else if (kanalNavn === "EFP" || unitLower === "efp") line.classList.add('color-black');
-                                    else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) line.classList.add('color-red');
-                                    else line.classList.add('color-black');
+                                    
+                                    // Henter farven fra vores nye prioriterings-funktion
+                                    const info = getProgramColorAndPriority(p);
+                                    line.classList.add(info.color);
 
                                     let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
                                     line.textContent = vaskTekst(p.Sportsgren, p.Programtitel) + tbcTxt;
