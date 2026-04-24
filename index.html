@@ -614,6 +614,28 @@
         let aktueltNavn = ""; 
         let aktuelPassLen = 8; 
         
+        // NYT: Variabel til at gemme det indledende "snapshot" af formularen
+        let formInitialState = ""; 
+
+        // NYT: Funktion der returnerer formularens præcise tilstand som en streng
+        function hentFormularState() {
+            const data = {};
+            const fieldsToCheck = ['Dato', 'Tid', 'TX', 'Kanal', 'Premieredato', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'P-plan', 'Teknisk_info', 'Noter', 'Producer', 'Kommentator', 'Ekspert', 'Reporter'];
+            
+            for (let id of fieldsToCheck) {
+                const el = document.getElementById(id);
+                if (el) data[id] = el.value.trim();
+            }
+            
+            const checkboxes = Array.from(document.querySelectorAll('#signalDropdown input[type="checkbox"]:checked')).map(cb => cb.value).sort();
+            data['Signal'] = checkboxes.join(',');
+            
+            const tbcBox = document.getElementById('TBC');
+            data['TBC'] = tbcBox && tbcBox.checked;
+            
+            return JSON.stringify(data);
+        }
+
         function truncateText(text, maxLength) {
             if (!text) return '';
             if (text.length > maxLength) {
@@ -1367,21 +1389,9 @@
             }
         }
 
-        function erFormularUdfyldt() {
-            const fieldsToCheck = ['Tid', 'TX', 'Kanal', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'Producer', 'Kommentator', 'Ekspert', 'Reporter', 'P-plan', 'Teknisk_info', 'Noter', 'Premieredato'];
-            for (let id of fieldsToCheck) {
-                const el = document.getElementById(id);
-                if (el && el.value.trim() !== '') return true;
-            }
-            const checkboxes = document.querySelectorAll('#signalDropdown input[type="checkbox"]:checked');
-            if (checkboxes.length > 0) return true;
-            const tbcBox = document.getElementById('TBC');
-            if (tbcBox && tbcBox.checked) return true;
-            return false;
-        }
-
+        // NY LOGIK: Vurderer om formularen er ændret ift. da den blev åbnet
         async function forsogLukModal() {
-            if (erFormularUdfyldt()) {
+            if (hentFormularState() !== formInitialState) {
                 const bekræft = await visCustomDialog("Er du sikker på, at du vil afslutte uden at gemme?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
                 if (bekræft) { closeModal(); }
             } else {
@@ -1415,6 +1425,9 @@
                 const sysDato = new Date();
                 document.getElementById('Dato').value = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
             }
+
+            // Tager et snapshot af formularen inden den åbnes
+            formInitialState = hentFormularState();
             openModal();
         }
 
@@ -1435,7 +1448,6 @@
             
             if (pDato > slutNæsteMaaned) return false;
 
-            // NYT: Hvis programmet er TBC, vises der ingen advarsel
             if (program["TBC"] && String(program["TBC"]).toUpperCase() === 'X') {
                 return false;
             }
@@ -1529,6 +1541,9 @@
 
             document.getElementById('modalTitle').textContent = "Rediger program";
             document.getElementById('submitBtn').textContent = "Opdater program";
+
+            // Tager et snapshot af formularen efter dataene er fyldt ind
+            formInitialState = hentFormularState();
             openModal();
         }
 
@@ -1595,6 +1610,9 @@
 
             document.getElementById('modalTitle').textContent = "Kopier program";
             document.getElementById('submitBtn').textContent = "Gem program";
+
+            // Tager et snapshot af formularen efter dataene er fyldt ind
+            formInitialState = hentFormularState();
             openModal();
         }
 
