@@ -11,10 +11,10 @@
             padding: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #ffffff;
+            background-color: #fdfdfd; /* NYT: Kontrastoptimeret off-white baggrund */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden; /* Ingen scrollbarer på storskærmen */
-            color: #000000;
+            color: #1a1a1a; /* NYT: Kontrastoptimeret mørkegrå/sort tekst */
         }
 
         /* Hovedcontainer der holder de 5 kolonner */
@@ -38,23 +38,23 @@
             border-right: none;
         }
 
-        /* Overskrift for måneden - Gjort lavere og med mindre skrift */
+        /* Overskrift for måneden - Gjort endnu mere kompakt */
         .month-header {
-            height: 3.5vh; /* NYT: Optimeret fra 5vh til 3.5vh for at vinde plads */
+            height: 3.5vh; 
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4vw; /* NYT: Mindre skrift, optimeret fra 1.8vw */
+            font-size: 1.1vw; /* NYT: Mindre skrift, reduceret fra 1.4vw */
             font-weight: 800;
             text-transform: uppercase;
             border-bottom: 2px solid #a0a0a0;
-            background-color: #ffffff;
+            background-color: #fdfdfd; /* NYT: Matcher den nye kontrast-baggrund */
             letter-spacing: 2px;
         }
 
         /* Række for hver dag (31 rækker i alt per måned for at holde nettet lige) */
         .day-row {
-            height: calc(96.5vh / 31); /* NYT: 96.5vh fordeles nu mellem rækkerne (pga overskriften blev lavere) */
+            height: calc(96.5vh / 31); 
             display: flex;
             border-bottom: 1px solid #eaeaea;
             box-sizing: border-box;
@@ -64,16 +64,16 @@
             border-bottom: none;
         }
 
-        /* Feltet til dato-tallet - Gjort lidt smallere */
+        /* Feltet til dato-tallet - Gjort smallere og med lidt mindre skrift */
         .date-number {
-            width: 2.0vw; /* NYT: Reduceret fra 2.5vw for at vinde lidt bredde til tekst */
+            width: 1.6vw; /* NYT: Reduceret fra 2.0vw for at vinde plads til program-data */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1vw;
+            font-size: 0.95vw; /* NYT: Reduceret fra 1.1vw */
             font-weight: 700;
             border-right: 1px solid #eaeaea;
-            background-color: #fafafa;
+            background-color: #f4f4f4; /* En anelse mørkere end fdfdfd for at adskille feltet */
         }
 
         /* Det tomme område til højre for tallet, hvor data skal vises senere */
@@ -95,7 +95,7 @@
 
         /* Styling til de tomme dage i måneder med 28/29/30 dage */
         .empty-day .date-number {
-            background-color: #ffffff;
+            background-color: #fdfdfd; /* NYT: Matcher den nye kontrast-baggrund */
             border-right: 1px solid transparent;
         }
     </style>
