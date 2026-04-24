@@ -78,12 +78,10 @@
 
         .date-content {
             flex: 1;
-            /* NYT: Fjernet bund-padding (0px), øget top-padding (3px) for optisk at kompensere for "underhængende" bogstaver */
             padding: 3px 4px 0px 6px; 
             display: flex;
             flex-direction: column;
             justify-content: flex-start; 
-            /* NYT: Øget luften imellem de to linjer med den vundne plads fra bunden */
             gap: 2px; 
             overflow: hidden;
             padding-right: 1.5vw; 
@@ -97,7 +95,6 @@
             text-overflow: clip; 
             line-height: 1.05; 
             margin-bottom: 0; 
-            /* NYT: Fade-out maske, der elegant toner teksten ud fremfor at skære bogstaver over på midten */
             -webkit-mask-image: linear-gradient(to right, black 92%, transparent 100%);
             mask-image: linear-gradient(to right, black 92%, transparent 100%);
         }
@@ -283,9 +280,10 @@
                             const unitLower = String(p.Unit || "").toLowerCase().trim();
 
                             const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
-                            const boksUnits = ["boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
+                            const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
 
-                            if (kanalNavn === "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
+                            // NY FARVE-LOGIK: SPORT LIVE + ingen unit (eller OB-enhed) = Blå
+                            if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
                                 line.classList.add('color-blue');
                             } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
                                 line.classList.add('color-green');
@@ -298,9 +296,7 @@
                             }
 
                             let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
-                            
                             line.textContent = vaskTekst(p.Sportsgren, p.Programtitel) + tbcTxt;
-                            
                             contentBox.appendChild(line);
                         });
 
