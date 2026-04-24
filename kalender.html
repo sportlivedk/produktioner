@@ -28,7 +28,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            border-right: 2px solid #e0e0e0;
+            border-right: 2px solid #a0a0a0; /* Lidt tydeligere skillelinje mellem månederne */
             box-sizing: border-box;
             min-width: 0; 
         }
@@ -55,7 +55,8 @@
         .day-row {
             height: calc(96.5vh / 31); 
             display: flex;
-            border-bottom: 1px solid #eaeaea;
+            /* NYT: Linjen under hver dag er gjort mørkere og skarpere (#c0c0c0) */
+            border-bottom: 1px solid #c0c0c0; 
             box-sizing: border-box;
             overflow: hidden;
         }
@@ -71,30 +72,34 @@
             justify-content: center;
             font-size: 0.9vw; 
             font-weight: 700;
-            border-right: 1px solid #eaeaea;
+            /* NYT: Stregen til højre for tallet er også gjort mørkere (#c0c0c0) */
+            border-right: 1px solid #c0c0c0; 
             background-color: #f4f4f4; 
             flex-shrink: 0;
         }
 
+        /* Området til programmerne */
         .date-content {
             flex: 1;
-            /* Fjernet top/bund padding og lagt det udelukkende på siderne */
-            padding: 0 4px 0 8px; 
+            /* NYT: Lidt mere luft i toppen (4px), så teksten flugter smukt med tallet */
+            padding: 4px 4px 2px 8px; 
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            /* NYT: Tvinger teksten op i toppen i stedet for at centrere den */
+            justify-content: flex-start; 
+            gap: 2px; 
             overflow: hidden;
             padding-right: 1.5vw; 
         }
 
         .program-line {
-            font-size: 0.65vw; /* Justeret ned for at forhindre overlap */
+            font-size: 0.65vw; 
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: clip; 
-            line-height: 1.1; /* Strammet op for at give plads */
-            margin-bottom: 1px; /* Ekstremt diskret mellemrum */
+            line-height: 1.1; 
+            margin-bottom: 1px; 
         }
         
         .program-line:last-child {
@@ -232,14 +237,12 @@
                             const line = document.createElement('div');
                             line.className = 'program-line';
                             
-                            // Normaliser inputs for at gøre søgningen 'case-insensitive'
                             const kanalNavn = String(p.Kanal || "").trim();
                             const unitLower = String(p.Unit || "").toLowerCase().trim();
 
                             const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
                             const boksUnits = ["boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
 
-                            // Farve-logik
                             if (kanalNavn === "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
                                 line.classList.add('color-blue');
                             } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
@@ -249,7 +252,6 @@
                             } else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
                                 line.classList.add('color-red');
                             } else {
-                                // Default, hvis ingen af reglerne rammes
                                 line.classList.add('color-black');
                             }
 
