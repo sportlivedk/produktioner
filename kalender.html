@@ -11,10 +11,10 @@
             padding: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #fdfdfd; /* NYT: Kontrastoptimeret off-white baggrund */
+            background-color: #fdfdfd; /* Kontrastoptimeret off-white baggrund */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden; /* Ingen scrollbarer på storskærmen */
-            color: #1a1a1a; /* NYT: Kontrastoptimeret mørkegrå/sort tekst */
+            color: #1a1a1a; /* Kontrastoptimeret mørkegrå/sort tekst */
         }
 
         /* Hovedcontainer der holder de 5 kolonner */
@@ -38,17 +38,17 @@
             border-right: none;
         }
 
-        /* Overskrift for måneden - Gjort endnu mere kompakt */
+        /* Overskrift for måneden */
         .month-header {
             height: 3.5vh; 
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1vw; /* NYT: Mindre skrift, reduceret fra 1.4vw */
+            font-size: 1.1vw; 
             font-weight: 800;
             text-transform: uppercase;
             border-bottom: 2px solid #a0a0a0;
-            background-color: #fdfdfd; /* NYT: Matcher den nye kontrast-baggrund */
+            background-color: #fdfdfd; 
             letter-spacing: 2px;
         }
 
@@ -64,16 +64,16 @@
             border-bottom: none;
         }
 
-        /* Feltet til dato-tallet - Gjort smallere og med lidt mindre skrift */
+        /* Feltet til dato-tallet */
         .date-number {
-            width: 1.6vw; /* NYT: Reduceret fra 2.0vw for at vinde plads til program-data */
+            width: 1.6vw; 
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.95vw; /* NYT: Reduceret fra 1.1vw */
+            font-size: 0.95vw; 
             font-weight: 700;
             border-right: 1px solid #eaeaea;
-            background-color: #f4f4f4; /* En anelse mørkere end fdfdfd for at adskille feltet */
+            background-color: #f4f4f4; 
         }
 
         /* Det tomme område til højre for tallet, hvor data skal vises senere */
@@ -88,14 +88,14 @@
             white-space: nowrap;
         }
 
-        /* Weekend styling (Lørdag/Søndag) */
+        /* Weekend og helligdag styling */
         .weekend {
-            color: #dc3545; /* SPORT LIVE rød/advarselsfarve */
+            color: #dc3545; /* SPORT LIVE rød */
         }
 
         /* Styling til de tomme dage i måneder med 28/29/30 dage */
         .empty-day .date-number {
-            background-color: #fdfdfd; /* NYT: Matcher den nye kontrast-baggrund */
+            background-color: #fdfdfd; 
             border-right: 1px solid transparent;
         }
     </style>
@@ -112,6 +112,48 @@
         const currentDate = new Date();
         const currentMonthIndex = currentDate.getMonth();
         const currentYear = currentDate.getFullYear();
+
+        // Funktion til at beregne Påskedag for et givent år (Meeus/Jones/Butcher algoritme)
+        function getEaster(year) {
+            const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+            const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+            const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+            const day = ((h + l - 7 * m + 114) % 31) + 1;
+            return new Date(year, month, day);
+        }
+
+        // Funktion der tjekker, om en specifik dato er en dansk helligdag
+        function isHoliday(y, m, d) {
+            const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
+            const easter = getEaster(y);
+            
+            const addDays = (date, days) => {
+                const result = new Date(date.getTime());
+                result.setDate(result.getDate() + days);
+                return result.getFullYear() + "-" + String(result.getMonth() + 1).padStart(2, '0') + "-" + String(result.getDate()).padStart(2, '0');
+            };
+
+            const holidays = [
+                y + "-01-01", // Nytårsdag
+                y + "-06-05", // Grundlovsdag
+                y + "-12-24", // Juleaften
+                y + "-12-25", // 1. Juledag
+                y + "-12-26", // 2. Juledag
+                y + "-12-31", // Nytårsaften
+                addDays(easter, -3), // Skærtorsdag
+                addDays(easter, -2), // Langfredag
+                addDays(easter, 0),  // Påskedag
+                addDays(easter, 1),  // 2. Påskedag
+                addDays(easter, 39), // Kr. Himmelfartsdag
+                addDays(easter, 49), // Pinsedag
+                addDays(easter, 50)  // 2. Pinsedag
+            ];
+
+            return holidays.includes(dateStr);
+        }
 
         // Bygger 5 kolonner (måneder)
         for (let i = 0; i < 5; i++) {
@@ -143,13 +185,13 @@
                 let contentBox = document.createElement('div');
                 contentBox.className = 'date-content';
 
-                // Tjekker om dagen eksisterer i den aktuelle måned (skjuler tal f.eks. d. 31. april)
+                // Tjekker om dagen eksisterer i den aktuelle måned
                 if (d <= daysInMonth) {
                     dateBox.textContent = d;
                     
-                    // Tjekker ugedagen for at markere weekender
+                    // Tjekker ugedagen OG om det er en dansk helligdag
                     let dayOfWeek = new Date(y, m, d).getDay();
-                    if (dayOfWeek === 0 || dayOfWeek === 6) { // 0 = Søndag, 6 = Lørdag
+                    if (dayOfWeek === 0 || dayOfWeek === 6 || isHoliday(y, m, d)) { 
                         dateBox.classList.add('weekend');
                     }
                 } else {
