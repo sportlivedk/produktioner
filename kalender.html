@@ -77,10 +77,10 @@
             flex-shrink: 0;
         }
 
-        /* NYT: Fremhævning af dags dato. 'inset' sørger for at rammen tegnes indvendigt og IKKE rykker layoutet */
+        /* NYT: Fremhævning af dags dato med en afdæmpet, elegant gul baggrund */
         .today-highlight {
-            box-shadow: inset 0 0 0 1.5px #000000; 
-            color: #000000; /* Gør evt. dags dato helt kulsort for lidt ekstra kontrast */
+            background-color: #ffeeba !important; 
+            color: #000000; 
         }
 
         .date-content {
@@ -298,7 +298,6 @@
             const currentMonthIndex = currentDate.getMonth();
             const currentYear = currentDate.getFullYear();
             
-            // NYT: Gem dagens dato som en streng vi kan sammenligne med i løkken
             const todayStr = currentYear + "-" + String(currentMonthIndex + 1).padStart(2, '0') + "-" + String(currentDate.getDate()).padStart(2, '0');
 
             for (let i = 0; i < 5; i++) {
@@ -329,7 +328,6 @@
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) dateBox.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
-                        // NYT: Giv datoboksen den tynde ramme, hvis datoen er lig med i dag
                         if (dateStr === todayStr) {
                             dateBox.classList.add('today-highlight');
                         }
