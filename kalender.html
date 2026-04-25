@@ -77,6 +77,12 @@
             flex-shrink: 0;
         }
 
+        /* NYT: Fremhævning af dags dato. 'inset' sørger for at rammen tegnes indvendigt og IKKE rykker layoutet */
+        .today-highlight {
+            box-shadow: inset 0 0 0 1.5px #000000; 
+            color: #000000; /* Gør evt. dags dato helt kulsort for lidt ekstra kontrast */
+        }
+
         .date-content {
             flex: 1;
             position: relative; 
@@ -176,7 +182,6 @@
         let produktioner = [];
         let globalTick = 0; 
 
-        // NYT: Funktion der returnerer både CSS-klasse og en numerisk prioritet (1-4)
         function getProgramColorAndPriority(p) {
             const kanalNavn = String(p.Kanal || "").trim();
             const unitLower = String(p.Unit || "").toLowerCase().trim();
@@ -192,13 +197,12 @@
             } else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
                 return { color: 'color-red', prio: 4 };
             } else {
-                return { color: 'color-black', prio: 3 }; // Sikkerhedsnet
+                return { color: 'color-black', prio: 3 }; 
             }
         }
 
-        // NYT: Sikker tids-formatering (laver "9.00" eller "9:00" om til "09:00")
         function parseTime(t) {
-            if (!t) return "99:99"; // Ukendt tid ryger bagerst
+            if (!t) return "99:99"; 
             let str = String(t).replace('.', ':').trim();
             if (str.length === 4 && str.includes(':')) {
                 str = "0" + str;
@@ -293,6 +297,9 @@
             const currentDate = new Date();
             const currentMonthIndex = currentDate.getMonth();
             const currentYear = currentDate.getFullYear();
+            
+            // NYT: Gem dagens dato som en streng vi kan sammenligne med i løkken
+            const todayStr = currentYear + "-" + String(currentMonthIndex + 1).padStart(2, '0') + "-" + String(currentDate.getDate()).padStart(2, '0');
 
             for (let i = 0; i < 5; i++) {
                 let m = (currentMonthIndex + i) % 12;
@@ -322,6 +329,11 @@
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) dateBox.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
+                        // NYT: Giv datoboksen den tynde ramme, hvis datoen er lig med i dag
+                        if (dateStr === todayStr) {
+                            dateBox.classList.add('today-highlight');
+                        }
+
                         let dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
                             const pDato = new Date(p.Dato);
@@ -333,24 +345,21 @@
 
                         if (dagensProduktioner.length > 0) {
                             
-                            // NYT: Sorteringsmotor for dagens produktioner
                             dagensProduktioner.sort((a, b) => {
                                 const infoA = getProgramColorAndPriority(a);
                                 const infoB = getProgramColorAndPriority(b);
 
-                                // 1. Sorter efter farve-prioritet (Blå -> Grøn -> Sort -> Rød)
                                 if (infoA.prio !== infoB.prio) {
                                     return infoA.prio - infoB.prio;
                                 }
 
-                                // 2. Hvis prioritet er ens OG det er prio 1 eller 2, sorter efter Tid
                                 if (infoA.prio === 1 || infoA.prio === 2) {
                                     const tidA = parseTime(a.Tid);
                                     const tidB = parseTime(b.Tid);
                                     return tidA.localeCompare(tidB);
                                 }
 
-                                return 0; // For EFP og eksterne bevares original rækkefølge
+                                return 0; 
                             });
 
                             const totalPages = Math.ceil(dagensProduktioner.length / 2);
@@ -370,7 +379,6 @@
                                     const line = document.createElement('div');
                                     line.className = 'program-line';
                                     
-                                    // Henter farven fra vores nye prioriterings-funktion
                                     const info = getProgramColorAndPriority(p);
                                     line.classList.add(info.color);
 
@@ -429,7 +437,7 @@
         }
 
         fetchProductionData();
-        setInterval(fetchProductionData, 300000); 
+        setInterval(fetchProductionData, 180000); 
         setInterval(opdaterAnimationer, 7000);
     </script>
 </body>
