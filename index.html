@@ -1299,7 +1299,7 @@
                 if (kategoriFilter === 'ekstern' && (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse')) return false;
                 
                 if (kategoriFilter === 'ob') {
-                    const obFilterArr = ["MINITECH", "NOWTEK OB1", "NOWTEK OB2", "OB 7", "OB 9", "SAM OB"];
+                    const obFilterArr = ["MINITECH", "NOWTEK OB1", "NOWTEK OB2", "OB 7", "OB 9", "SAM OB", "OB"];
                     if (!obFilterArr.includes(unitNavn.toUpperCase())) return false;
                 }
 
@@ -1911,6 +1911,7 @@
             const valgtProgramtitel = document.getElementById('Programtitel').value;
             const valgtTid = document.getElementById('Tid').value;
             const valgtTX = document.getElementById('TX').value; 
+            const valgtUnit = document.getElementById('Unit').value; 
             const rowId = document.getElementById('RowId').value;
             const valgtPremieredato = document.getElementById('Premieredato') ? document.getElementById('Premieredato').value : "";
 
@@ -1928,8 +1929,8 @@
                 }
             }
 
-            if (!valgtDato || !valgtKanal || !valgtSportsgren || !valgtProgramtitel) {
-                await visCustomDialog("Du skal som minimum vælge en dato, en kanal og en sportsgren samt indtaste en programtitel.", 'alert');
+            if (!valgtDato || !valgtKanal || !valgtUnit || !valgtSportsgren || !valgtProgramtitel) {
+                await visCustomDialog("Du skal som minimum vælge en dato, kanal, unit og sportsgren samt indtaste en programtitel.\n\nHvis du ikke kender den specifikke OB-enhed eller boks, skal du blot vælge \"OB\" eller \"BOKS\" fra listen.", 'alert');
                 return; 
             }
 
