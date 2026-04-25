@@ -180,7 +180,7 @@
         function getProgramColorAndPriority(p) {
             const kanalNavn = String(p.Kanal || "").trim();
             const unitLower = String(p.Unit || "").toLowerCase().trim();
-            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
+            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "sam ob"];
             const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
 
             if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
@@ -327,7 +327,7 @@
                             const pDato = new Date(p.Dato);
                             return (pDato.getFullYear() === y && pDato.getMonth() === m && pDato.getDate() === d);
                         }).filter(p => {
-                            const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
+                            const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB", "OB 7", "OB 9", "SAM OB"];
                             return (p.Kanal === "SPORT LIVE") || obUnits.includes(String(p.Unit || "").trim());
                         });
 
