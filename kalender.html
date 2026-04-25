@@ -77,12 +77,6 @@
             flex-shrink: 0;
         }
 
-        /* NYT: Meget afdæmpet, creme-gul baggrund til dags dato */
-        .today-highlight {
-            background-color: rgba(255, 238, 186, 0.4) !important; 
-            color: #000000; 
-        }
-
         .date-content {
             flex: 1;
             position: relative; 
@@ -297,8 +291,6 @@
             const currentDate = new Date();
             const currentMonthIndex = currentDate.getMonth();
             const currentYear = currentDate.getFullYear();
-            
-            const todayStr = currentYear + "-" + String(currentMonthIndex + 1).padStart(2, '0') + "-" + String(currentDate.getDate()).padStart(2, '0');
 
             for (let i = 0; i < 5; i++) {
                 let m = (currentMonthIndex + i) % 12;
@@ -323,14 +315,9 @@
                     if (d <= daysInMonth) {
                         dateBox.textContent = d;
                         let dateObj = new Date(y, m, d);
-                        const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
                         
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) dateBox.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
-
-                        if (dateStr === todayStr) {
-                            dateBox.classList.add('today-highlight');
-                        }
 
                         let dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
