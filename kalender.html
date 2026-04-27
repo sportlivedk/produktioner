@@ -77,6 +77,21 @@
             flex-shrink: 0;
         }
 
+        /* NYT: Elegant cirkel-markering af datoer */
+        .date-circle {
+            width: 1.25vw;
+            height: 1.25vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .weekend .date-circle {
+            background-color: #dc3545;
+            color: #ffffff;
+        }
+
         .date-content {
             flex: 1;
             position: relative; 
@@ -145,7 +160,6 @@
         .color-black { color: #1a1a1a; }
         .color-red { color: #dc3545; }
 
-        .weekend { color: #dc3545; }
         .even-week { background-color: #f5f7f9; }
         .even-week .date-number { background-color: #ebedf0; }
 
@@ -179,7 +193,7 @@
         function getProgramColorAndPriority(p) {
             const kanalNavn = String(p.Kanal || "").trim();
             const unitLower = String(p.Unit || "").toLowerCase().trim();
-            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "sam ob"];
+            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
             const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
 
             if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
@@ -221,12 +235,12 @@
                 { fra: /BMS Herlev/gi, til: "Herlev" },
                 { fra: /Bakken Bears/gi, til: "Bakken" },
                 { fra: /BK Vejen/gi, til: "Vejen" },
-                { fra: /Hørsholm Rungsted/gi, til: "HRT" },
                 { fra: /kvalifikation/gi, til: "kval" }
             ];
 
+            // NYT: "elitedivisionen" er nu fjernet fra listen, så den forbliver synlig!
             const udeladelser = [
-                "basket", "futsal", "volley", "tennis", "bordtennis", "elitedivisionen", 
+                "basket", "futsal", "volley", "tennis", "bordtennis", 
                 "liga portugal", "coppa italia", "supercopa", "supercoppa", "WTT", 
                 "davis cup", "billie jean king cup", "mermaid bowl", "gokart"
             ];
@@ -313,8 +327,14 @@
                     contentBox.className = 'date-content';
 
                     if (d <= daysInMonth) {
-                        dateBox.textContent = d;
+                        // NYT: Datoen indsættes nu i en dedikeret cirkel-div for at styre baggrundsfarven
+                        let circle = document.createElement('div');
+                        circle.className = 'date-circle';
+                        circle.textContent = d;
+                        dateBox.appendChild(circle);
+
                         let dateObj = new Date(y, m, d);
+                        const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
                         
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) dateBox.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
@@ -324,12 +344,11 @@
                             const pDato = new Date(p.Dato);
                             return (pDato.getFullYear() === y && pDato.getMonth() === m && pDato.getDate() === d);
                         }).filter(p => {
-                            const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB", "OB 7", "OB 9", "SAM OB"];
+                            const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
                             return (p.Kanal === "SPORT LIVE") || obUnits.includes(String(p.Unit || "").trim());
                         });
 
                         if (dagensProduktioner.length > 0) {
-                            
                             dagensProduktioner.sort((a, b) => {
                                 const infoA = getProgramColorAndPriority(a);
                                 const infoB = getProgramColorAndPriority(b);
