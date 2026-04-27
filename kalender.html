@@ -70,25 +70,27 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9vw; 
+            /* REDUCERET: Fra 0.9vw til 0.75vw for at give luft i cirklerne */
+            font-size: 0.75vw; 
             font-weight: 700;
             border-right: 1px solid #c0c0c0; 
             background-color: #f4f4f4; 
             flex-shrink: 0;
         }
 
-        /* NYT: Elegant cirkel-markering af datoer */
         .date-circle {
-            width: 1.25vw;
-            height: 1.25vw;
+            width: 1.2vw;
+            height: 1.2vw;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
+            transition: all 0.3s ease;
         }
 
+        /* OPDATERET: En anelse blødere rød farve */
         .weekend .date-circle {
-            background-color: #dc3545;
+            background-color: #e33445; 
             color: #ffffff;
         }
 
@@ -193,7 +195,7 @@
         function getProgramColorAndPriority(p) {
             const kanalNavn = String(p.Kanal || "").trim();
             const unitLower = String(p.Unit || "").toLowerCase().trim();
-            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob 7", "ob 9", "sam ob"];
+            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "sam ob"];
             const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
 
             if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
@@ -235,10 +237,11 @@
                 { fra: /BMS Herlev/gi, til: "Herlev" },
                 { fra: /Bakken Bears/gi, til: "Bakken" },
                 { fra: /BK Vejen/gi, til: "Vejen" },
+                /* GENINDSAT: HRT oversættelsen */
+                { fra: /Hørsholm Rungsted/gi, til: "HRT" },
                 { fra: /kvalifikation/gi, til: "kval" }
             ];
 
-            // NYT: "elitedivisionen" er nu fjernet fra listen, så den forbliver synlig!
             const udeladelser = [
                 "basket", "futsal", "volley", "tennis", "bordtennis", 
                 "liga portugal", "coppa italia", "supercopa", "supercoppa", "WTT", 
@@ -327,7 +330,6 @@
                     contentBox.className = 'date-content';
 
                     if (d <= daysInMonth) {
-                        // NYT: Datoen indsættes nu i en dedikeret cirkel-div for at styre baggrundsfarven
                         let circle = document.createElement('div');
                         circle.className = 'date-circle';
                         circle.textContent = d;
@@ -336,7 +338,7 @@
                         let dateObj = new Date(y, m, d);
                         const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
                         
-                        if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) dateBox.classList.add('weekend');
+                        if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
                         let dagensProduktioner = produktioner.filter(p => {
@@ -344,7 +346,7 @@
                             const pDato = new Date(p.Dato);
                             return (pDato.getFullYear() === y && pDato.getMonth() === m && pDato.getDate() === d);
                         }).filter(p => {
-                            const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB"];
+                            const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB", "OB 7", "OB 9", "SAM OB"];
                             return (p.Kanal === "SPORT LIVE") || obUnits.includes(String(p.Unit || "").trim());
                         });
 
@@ -352,22 +354,14 @@
                             dagensProduktioner.sort((a, b) => {
                                 const infoA = getProgramColorAndPriority(a);
                                 const infoB = getProgramColorAndPriority(b);
-
-                                if (infoA.prio !== infoB.prio) {
-                                    return infoA.prio - infoB.prio;
-                                }
-
+                                if (infoA.prio !== infoB.prio) return infoA.prio - infoB.prio;
                                 if (infoA.prio === 1 || infoA.prio === 2) {
-                                    const tidA = parseTime(a.Tid);
-                                    const tidB = parseTime(b.Tid);
-                                    return tidA.localeCompare(tidB);
+                                    return parseTime(a.Tid).localeCompare(parseTime(b.Tid));
                                 }
-
                                 return 0; 
                             });
 
                             const totalPages = Math.ceil(dagensProduktioner.length / 2);
-                            
                             const animatorWrapper = document.createElement('div');
                             animatorWrapper.className = 'animator-wrapper';
                             animatorWrapper.dataset.pages = totalPages;
@@ -375,17 +369,14 @@
                             for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
                                 const pageDiv = document.createElement('div');
                                 pageDiv.className = 'page';
-                                
                                 const startIdx = pageIdx * 2;
                                 const visningsData = dagensProduktioner.slice(startIdx, startIdx + 2);
 
                                 visningsData.forEach(p => {
                                     const line = document.createElement('div');
                                     line.className = 'program-line';
-                                    
                                     const info = getProgramColorAndPriority(p);
                                     line.classList.add(info.color);
-
                                     let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
                                     line.textContent = vaskTekst(p.Sportsgren, p.Programtitel) + tbcTxt;
                                     pageDiv.appendChild(line);
@@ -397,7 +388,6 @@
                             if (totalPages > 1) {
                                 const startPage = globalTick % totalPages;
                                 animatorWrapper.style.transform = `translateY(-${startPage * 100}%)`;
-
                                 const dotsContainer = document.createElement('div');
                                 dotsContainer.className = 'paging-dots';
                                 for (let p = 0; p < totalPages; p++) {
@@ -426,15 +416,11 @@
                 if (totalPages > 1) {
                     const currentPage = globalTick % totalPages;
                     wrapper.style.transform = `translateY(-${currentPage * 100}%)`;
-                    
                     const row = wrapper.closest('.day-row');
                     const dots = row.querySelectorAll('.dot');
                     dots.forEach((dot, index) => {
-                        if (index === currentPage) {
-                            dot.classList.add('active');
-                        } else {
-                            dot.classList.remove('active');
-                        }
+                        if (index === currentPage) dot.classList.add('active');
+                        else dot.classList.remove('active');
                     });
                 }
             });
