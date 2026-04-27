@@ -345,7 +345,7 @@
                             const pDato = new Date(p.Dato);
                             return (pDato.getFullYear() === y && pDato.getMonth() === m && pDato.getDate() === d);
                         }).filter(p => {
-                            const obUnits = ["EFP", "Minitech", "Nowtek OB1", "Nowtek OB2", "OB", "OB 7", "OB 9", "SAM OB"];
+                            const obUnits = ["EFP", "MINITECH", "NOWTEK OB1", "NOWTEK OB2", "OB", "OB 7", "OB 9", "SAM OB"];
                             return (p.Kanal === "SPORT LIVE") || obUnits.includes(String(p.Unit || "").trim());
                         });
 
