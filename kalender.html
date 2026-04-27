@@ -70,7 +70,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* REDUCERET: Fra 0.9vw til 0.75vw for at give luft i cirklerne */
             font-size: 0.75vw; 
             font-weight: 700;
             border-right: 1px solid #c0c0c0; 
@@ -88,9 +87,9 @@
             transition: all 0.3s ease;
         }
 
-        /* OPDATERET: En anelse blødere rød farve */
+        /* OPDATERET: En støvet, afdæmpet 'IndianRed', der bevarer hvid-kontrasten men fjerner dominansen */
         .weekend .date-circle {
-            background-color: #e33445; 
+            background-color: #cd5c5c; 
             color: #ffffff;
         }
 
@@ -237,7 +236,6 @@
                 { fra: /BMS Herlev/gi, til: "Herlev" },
                 { fra: /Bakken Bears/gi, til: "Bakken" },
                 { fra: /BK Vejen/gi, til: "Vejen" },
-                /* GENINDSAT: HRT oversættelsen */
                 { fra: /Hørsholm Rungsted/gi, til: "HRT" },
                 { fra: /kvalifikation/gi, til: "kval" }
             ];
