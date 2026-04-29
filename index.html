@@ -325,7 +325,7 @@
             
             <div class="form-group" style="margin-bottom: 15px;">
                 <label>Brugernavn</label>
-                <input type="text" id="loginUsername" autocomplete="nope" onkeypress="if(event.key === 'Enter') document.getElementById('loginPassword').focus();">
+                <input type="text" id="loginUsername" autocomplete="off" onkeypress="if(event.key === 'Enter') document.getElementById('loginPassword').focus();">
             </div>
             <div class="form-group">
                 <label>Adgangskode</label>
@@ -364,7 +364,7 @@
                     </div>
                     
                     <div class="search-container">
-                        <input type="text" id="searchInput" class="search-input" placeholder="Søg i alt (titel, sted, person...)" onkeyup="handterSogning()" autocomplete="nope">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Søg i alt (titel, sted, person...)" onkeyup="handterSogning()" autocomplete="off">
                         <button id="clearSearchBtn" class="search-clear-btn" onclick="rydSogning()" title="Ryd søgning">✕</button>
                     </div>
                     
@@ -506,42 +506,42 @@
             <form id="programForm" autocomplete="off">
                 <input type="hidden" id="RowId">
                 <div class="form-grid">
-                    <div class="form-group"><label>Dato</label><input type="date" id="Dato" autocomplete="nope"></div>
-                    <div class="form-group"><label>Tid</label><input type="time" id="Tid" autocomplete="nope"></div>
-                    <div class="form-group"><label>TX</label><input type="time" id="TX" autocomplete="nope"></div>
+                    <div class="form-group"><label>Dato</label><input type="date" id="Dato" autocomplete="off"></div>
+                    <div class="form-group"><label>Tid</label><input type="time" id="Tid" autocomplete="off"></div>
+                    <div class="form-group"><label>TX</label><input type="time" id="TX" autocomplete="off"></div>
                     <div class="form-group">
                         <label>Kanal</label>
-                        <input type="text" id="Kanal" list="liste-Kanal" placeholder="V&aelig;lg eller skriv..." autocomplete="nope">
+                        <input type="text" id="Kanal" list="liste-Kanal" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Kanal"></datalist>
                     </div>
                     <div class="form-group" id="group-Premieredato" style="display: none;">
                         <label>Premieredato</label>
-                        <input type="date" id="Premieredato" autocomplete="nope">
+                        <input type="date" id="Premieredato" autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label>Sportsgren</label>
-                        <input type="text" id="Sportsgren" list="liste-Sportsgren" placeholder="V&aelig;lg eller skriv..." autocomplete="nope">
+                        <input type="text" id="Sportsgren" list="liste-Sportsgren" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Sportsgren"></datalist>
                     </div>
-                    <div class="form-group"><label>Programtitel</label><input type="text" id="Programtitel" autocomplete="nope"></div>
+                    <div class="form-group"><label>Programtitel</label><input type="text" id="Programtitel" autocomplete="off"></div>
                     <div class="form-group">
                         <label>Lokation</label>
-                        <input type="text" id="Lokation" list="liste-Lokation" placeholder="V&aelig;lg eller skriv..." autocomplete="nope">
+                        <input type="text" id="Lokation" list="liste-Lokation" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Lokation"></datalist>
                     </div>
                     <div class="form-group">
                         <label>Unit</label>
-                        <input type="text" id="Unit" list="liste-Unit" placeholder="V&aelig;lg eller skriv..." autocomplete="nope">
+                        <input type="text" id="Unit" list="liste-Unit" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Unit"></datalist>
                     </div>
                     <div class="form-group">
                         <label>Format</label>
-                        <input type="text" id="Format" list="liste-Format" placeholder="V&aelig;lg eller skriv..." autocomplete="nope">
+                        <input type="text" id="Format" list="liste-Format" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Format"></datalist>
                     </div>
                     <div class="form-group">
                         <label>RX</label>
-                        <input type="text" id="RX" list="liste-RX" placeholder="V&aelig;lg eller skriv..." autocomplete="nope">
+                        <input type="text" id="RX" list="liste-RX" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-RX"></datalist>
                     </div>
                     <div class="form-group">
@@ -557,35 +557,35 @@
                     </div>
                     <div class="form-group">
                         <label>Producer</label>
-                        <input type="text" id="Producer" list="liste-Producer" placeholder="V&aelig;lg eller skriv..." autocomplete="nope">
+                        <input type="text" id="Producer" list="liste-Producer" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Producer"></datalist>
                     </div>
                     <div class="form-group">
                         <label>Kommentator/vært</label>
-                        <input type="text" id="Kommentator" list="liste-Kommentator" placeholder="V&aelig;lg eller skriv..." autocomplete="nope">
+                        <input type="text" id="Kommentator" list="liste-Kommentator" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Kommentator"></datalist>
                     </div>
                     <div class="form-group">
                         <label>Ekspert/gæst</label>
-                        <input type="text" id="Ekspert" list="liste-Ekspert" placeholder="V&aelig;lg eller skriv..." autocomplete="nope">
+                        <input type="text" id="Ekspert" list="liste-Ekspert" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Ekspert"></datalist>
                     </div>
                     <div class="form-group">
                         <label>Reporter</label>
-                        <input type="text" id="Reporter" list="liste-Reporter" placeholder="V&aelig;lg eller skriv..." autocomplete="nope">
+                        <input type="text" id="Reporter" list="liste-Reporter" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
                         <datalist id="liste-Reporter"></datalist>
                     </div>
                     <div class="form-group full-width">
                         <label>Produktionsplan (inds&aelig;t link)</label>
-                        <input type="text" id="P-plan" autocomplete="nope">
+                        <input type="text" id="P-plan" autocomplete="off">
                     </div>
                     <div class="form-group full-width">
                         <label>Teknisk info (inds&aelig;t link)</label>
-                        <input type="text" id="Teknisk_info" autocomplete="nope">
+                        <input type="text" id="Teknisk_info" autocomplete="off">
                     </div>
                     <div class="form-group full-width">
                         <label>Noter</label>
-                        <input type="text" id="Noter" autocomplete="nope">
+                        <input type="text" id="Noter" autocomplete="off">
                     </div>
                     <div class="form-group full-width checkbox-group">
                         <input type="checkbox" id="TBC">
@@ -614,8 +614,10 @@
         let aktueltNavn = ""; 
         let aktuelPassLen = 8; 
         
+        // NYT: Variabel til at gemme det indledende "snapshot" af formularen
         let formInitialState = ""; 
 
+        // NYT: Funktion der returnerer formularens præcise tilstand som en streng
         function hentFormularState() {
             const data = {};
             const fieldsToCheck = ['Dato', 'Tid', 'TX', 'Kanal', 'Premieredato', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'P-plan', 'Teknisk_info', 'Noter', 'Producer', 'Kommentator', 'Ekspert', 'Reporter'];
@@ -1387,6 +1389,7 @@
             }
         }
 
+        // NY LOGIK: Vurderer om formularen er ændret ift. da den blev åbnet
         async function forsogLukModal() {
             if (hentFormularState() !== formInitialState) {
                 const bekræft = await visCustomDialog("Er du sikker på, at du vil afslutte uden at gemme?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
@@ -1423,6 +1426,7 @@
                 document.getElementById('Dato').value = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
             }
 
+            // Tager et snapshot af formularen inden den åbnes
             formInitialState = hentFormularState();
             openModal();
         }
@@ -1538,6 +1542,7 @@
             document.getElementById('modalTitle').textContent = "Rediger program";
             document.getElementById('submitBtn').textContent = "Opdater program";
 
+            // Tager et snapshot af formularen efter dataene er fyldt ind
             formInitialState = hentFormularState();
             openModal();
         }
@@ -1606,6 +1611,7 @@
             document.getElementById('modalTitle').textContent = "Kopier program";
             document.getElementById('submitBtn').textContent = "Gem program";
 
+            // Tager et snapshot af formularen efter dataene er fyldt ind
             formInitialState = hentFormularState();
             openModal();
         }
@@ -1812,7 +1818,12 @@
                     tbody.appendChild(trSep);
                 }
 
+                // Hent rawUnit og tøm den, hvis den er OB eller BOKS
                 let visUnit = String(program["Unit"] || '');
+                if (visUnit.toUpperCase() === "OB" || visUnit.toUpperCase() === "BOKS") {
+                    visUnit = "";
+                }
+                
                 let hasAdvarsel = skalViseAdvarsel(program);
                 let hasSignal = (signalTekst !== '-' && signalTekst.trim() !== '');
 
@@ -1867,7 +1878,7 @@
                             <div class="detail-card teknik">
                                 <h4>Tekniske specifikationer</h4>
                                 <div class="detail-list">
-                                    <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${program["Unit"] || '-'}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${visUnit || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Format:</span> <span class="detail-value">${program["Format"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">RX:</span> <span class="detail-value">${program["RX"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="${signalStyling}">${signalTekst}</span></div>
@@ -1924,7 +1935,7 @@
             }
 
             if (!valgtDato || !valgtKanal || !valgtUnit || !valgtSportsgren || !valgtProgramtitel) {
-                await visCustomDialog("Du skal som minimum vælge en dato, en kanal, en unit og en sportsgren samt indtaste en programtitel.\n\nHvis du endnu ikke kender den specifikke OB-enhed eller boks, skal du blot vælge \"OB\" eller \"BOKS\" fra listen.", 'alert');
+                await visCustomDialog("Du skal som minimum vælge en dato, kanal, unit og sportsgren samt indtaste en programtitel.\n\nHvis du ikke kender den specifikke OB-enhed eller boks, skal du blot vælge \"OB\" eller \"BOKS\" fra listen.", 'alert');
                 return; 
             }
 
