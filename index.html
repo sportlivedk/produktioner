@@ -1819,11 +1819,12 @@
                 }
 
                 // Hent rawUnit og tøm den, hvis den er OB eller BOKS
-                let visUnit = String(program["Unit"] || '');
-                if (visUnit.toUpperCase() === "OB" || visUnit.toUpperCase() === "BOKS") {
-                    visUnit = "";
+                let visUnitRen = String(program["Unit"] || '');
+                if (visUnitRen.toUpperCase() === "OB" || visUnitRen.toUpperCase() === "BOKS") {
+                    visUnitRen = "";
                 }
                 
+                let visUnitMedIkoner = visUnitRen;
                 let hasAdvarsel = skalViseAdvarsel(program);
                 let hasSignal = (signalTekst !== '-' && signalTekst.trim() !== '');
 
@@ -1835,7 +1836,7 @@
                     if (hasSignal) {
                         ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #fdd932; color: black; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; font-family: 'Times New Roman', Times, serif; font-style: italic; cursor: help; flex-shrink: 0;" title="Signal skal sendes til: ${signalTekst}">i</span>`;
                     }
-                    visUnit = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 2px;">${visUnit}</span><div style="display: flex; gap: 3px; flex-shrink: 0;">${ikoner}</div></div>`;
+                    visUnitMedIkoner = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 2px;">${visUnitRen}</span><div style="display: flex; gap: 3px; flex-shrink: 0;">${ikoner}</div></div>`;
                 }
 
                 const trMain = document.createElement('tr');
@@ -1851,7 +1852,7 @@
                     <td><div class="mobile-sportsgren-wrapper">${program["Sportsgren"] || ''}</div></td>
                     <td><div class="prog-title-wrapper">${visProgramtitel}</div></td>
                     <td>${pKomm}</td>
-                    <td>${visUnit}</td>
+                    <td>${visUnitMedIkoner}</td>
                     <td style="white-space: nowrap;">${handlingsKnapper}</td>
                 `;
                 
@@ -1878,7 +1879,7 @@
                             <div class="detail-card teknik">
                                 <h4>Tekniske specifikationer</h4>
                                 <div class="detail-list">
-                                    <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${visUnit || '-'}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${visUnitRen || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Format:</span> <span class="detail-value">${program["Format"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">RX:</span> <span class="detail-value">${program["RX"] || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="${signalStyling}">${signalTekst}</span></div>
