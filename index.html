@@ -1824,7 +1824,12 @@
                     visUnitRen = "";
                 }
                 
-                let visUnitMedIkoner = visUnitRen;
+                let visUnitKolonne = visUnitRen;
+                if (visUnitKolonne.toUpperCase() === "NOWTEK OB1" || visUnitKolonne.toUpperCase() === "NOWTEK OB2") {
+                    visUnitKolonne = "NOWTEK";
+                }
+                
+                let visUnitMedIkoner = visUnitKolonne;
                 let hasAdvarsel = skalViseAdvarsel(program);
                 let hasSignal = (signalTekst !== '-' && signalTekst.trim() !== '');
 
@@ -1836,7 +1841,7 @@
                     if (hasSignal) {
                         ikoner += `<span style="display: inline-flex; align-items: center; justify-content: center; background-color: #fdd932; color: black; width: 16px; height: 16px; border-radius: 50%; font-size: 12px; font-weight: bold; font-family: 'Times New Roman', Times, serif; font-style: italic; cursor: help; flex-shrink: 0;" title="Signal skal sendes til: ${signalTekst}">i</span>`;
                     }
-                    visUnitMedIkoner = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 2px;">${visUnitRen}</span><div style="display: flex; gap: 3px; flex-shrink: 0;">${ikoner}</div></div>`;
+                    visUnitMedIkoner = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 2px;">${visUnitKolonne}</span><div style="display: flex; gap: 3px; flex-shrink: 0;">${ikoner}</div></div>`;
                 }
 
                 const trMain = document.createElement('tr');
