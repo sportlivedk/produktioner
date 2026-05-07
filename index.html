@@ -2101,7 +2101,26 @@
 
             setInterval(() => {
                 if (brugerRolle !== "") {
-                    loadProgrammer(true);
+                    // Løsning 2: "Forstyr ikke"-tilstand.
+                    // Tjekker om brugeren er i gang med at kigge på en fold-ud-boks eller arbejder i et vindue.
+                    let erForstyrret = false;
+                    
+                    // 1. Tjekker om en fold-ud-boks er åben
+                    document.querySelectorAll('.detail-row').forEach(row => {
+                        if (row.style.display === 'table-row') {
+                            erForstyrret = true;
+                        }
+                    });
+                    
+                    // 2. Tjekker om der arbejdes i 'Tilføj/Rediger'-vinduet, profil-vinduet eller advarselsboksen
+                    if (document.getElementById('programModal').style.display === 'block') erForstyrret = true;
+                    if (document.getElementById('profileModal').style.display === 'flex') erForstyrret = true;
+                    if (document.getElementById('customDialog').style.display === 'flex') erForstyrret = true;
+
+                    // Opdater KUN, hvis der ikke er nogen vinduer eller bokse åbne
+                    if (!erForstyrret) {
+                        loadProgrammer(true);
+                    }
                 }
             }, 180000);
             
