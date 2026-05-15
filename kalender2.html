@@ -377,19 +377,20 @@
                                     line.classList.add(info.color);
                                     let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
                                     
-                                    let formatTid = "--.--";
+                                    // NY LOGIK: Formatér tid som 4 cifre (uden punktum) eller som 4 bindestreger
+                                    let formatTid = "----";
                                     if (p.Tid) {
                                         let rawTid = String(p.Tid).trim();
                                         if (rawTid !== "" && rawTid !== "-") {
                                             if (rawTid.includes('T')) {
                                                 const tObj = new Date(rawTid);
                                                 if (!isNaN(tObj.getTime())) {
-                                                    formatTid = String(tObj.getHours()).padStart(2, '0') + "." + String(tObj.getMinutes()).padStart(2, '0');
+                                                    formatTid = String(tObj.getHours()).padStart(2, '0') + String(tObj.getMinutes()).padStart(2, '0');
                                                 }
                                             } else {
                                                 let parsed = parseTime(rawTid);
                                                 if (parsed !== "99:99") {
-                                                    formatTid = parsed.replace(':', '.');
+                                                    formatTid = parsed.replace(':', '');
                                                 }
                                             }
                                         }
