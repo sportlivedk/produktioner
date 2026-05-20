@@ -14,8 +14,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #f4f6f8; 
             margin: 0; 
-            height: 100vh; /* Fallback til ældre browsere */
-            height: 100dvh; /* Moderne fix så iOS ikke skjuler bunden */
+            height: 100vh; 
+            height: 100dvh; 
             display: flex; 
             flex-direction: column; 
             overflow: hidden; 
@@ -34,7 +34,6 @@
             justify-content: center;
         }
         
-        /* DESKTOP LOGIN BOKS */
         .login-box {
             background-color: white;
             padding: 40px;
@@ -58,7 +57,6 @@
         .login-loader { display: none; margin-top: 15px; font-size: 14px; color: #555; }
 
         .top-section { 
-            /* Apple Safe Area Inset tilføjet for at undgå at indhold skjules bag "hakket" */
             padding: calc(20px + env(safe-area-inset-top)) 20px 0 20px; 
             flex-shrink: 0; 
             background-color: #f4f6f8; 
@@ -69,7 +67,6 @@
             flex-grow: 1; 
             overflow-y: scroll; 
             overflow-x: auto; 
-            /* Safe area i bunden så tabellen ikke fanges bag iPhone-stregen */
             padding: 0 20px calc(20px + env(safe-area-inset-bottom)) 20px; 
             position: relative;
             -webkit-overflow-scrolling: touch; 
@@ -133,7 +130,6 @@
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #000000; }
         
-        /* PROFIL LINKS */
         .profil-link { color: #0056b3; text-decoration: none; font-weight: bold; margin-left: 4px; margin-right: 4px; cursor: pointer; }
         .profil-link:hover { text-decoration: underline; }
         .logout-link { color: #dc3545; text-decoration: none; font-weight: bold; cursor: pointer; }
@@ -210,6 +206,27 @@
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #000000; }
         .form-group input:not([type="checkbox"]), .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000;}
         
+        /* Brugerdefineret Checkbox styling */
+        .custom-cb {
+            -webkit-appearance: none;
+            appearance: none;
+            min-width: 18px;
+            width: 18px;
+            height: 18px;
+            border: 1px solid #999;
+            border-radius: 3px;
+            background-color: white;
+            margin: 0;
+            cursor: pointer;
+            display: inline-flex;
+        }
+        .custom-cb:checked {
+            background-color: white;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16'><path d='M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z' fill='black'/></svg>");
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
         .multi-select-container { position: relative; width: 100%; user-select: none; }
         .multi-select-header { padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: white; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; min-height: 18px; color: #000000;}
         .multi-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; display: none; z-index: 10; border-radius: 4px; margin-top: 2px; }
@@ -239,9 +256,6 @@
         
         #ingenResultater { display: none; text-align: center; padding: 40px; color: #000000; font-size: 16px; }
 
-        /* ========================================= */
-        /* MOBIL OPTIMERING (Media Queries)          */
-        /* ========================================= */
         @media (max-width: 900px) {
             input, select, textarea { font-size: 16px !important; }
 
@@ -462,7 +476,7 @@
                 <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 2px;" id="profilePasswordText">********</div>
                 
                 <div style="margin-top: 25px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
-                    <input type="checkbox" id="profileNotifCheckbox" onchange="udfoerSkiftNotifikation()" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
+                    <input type="checkbox" id="profileNotifCheckbox" class="custom-cb">
                     <label for="profileNotifCheckbox" style="font-size: 14px; font-weight: 500; color: #000000; margin: 0; cursor: pointer; user-select: none;">Hold mig opdateret på e-mail om vigtige opdateringer</label>
                 </div>
                 
@@ -947,6 +961,25 @@
         }
 
         function lukProfil() {
+            const cb = document.getElementById('profileNotifCheckbox');
+            
+            // Tjekker om fluebenets status er ændret, og sender "lydløst" i baggrunden, hvis det er.
+            if (cb && cb.checked !== aktuelNotifikation) {
+                const nyStatus = cb.checked;
+                aktuelNotifikation = nyStatus;
+                sessionStorage.setItem('sportlive_notif', nyStatus ? "true" : "false");
+                
+                fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: "update_notification", 
+                        username: aktuelBruger,
+                        wants_notification: nyStatus
+                    }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                }).catch(e => console.error("Fejl ved baggrundsopdatering:", e));
+            }
+            
             document.getElementById('profileModal').style.display = 'none';
         }
 
@@ -964,40 +997,6 @@
         function visProfilInfo() {
             document.getElementById('profileView').style.display = 'block';
             document.getElementById('changePasswordView').style.display = 'none';
-        }
-
-        async function udfoerSkiftNotifikation() {
-            const cb = document.getElementById('profileNotifCheckbox');
-            const nyStatus = cb.checked;
-            cb.disabled = true; 
-
-            try {
-                const response = await fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify({ 
-                        action: "update_notification", 
-                        username: aktuelBruger,
-                        wants_notification: nyStatus
-                    }),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    aktuelNotifikation = nyStatus;
-                    sessionStorage.setItem('sportlive_notif', nyStatus ? "true" : "false");
-                } else {
-                    cb.checked = !nyStatus;
-                    alert("Der opstod en fejl under opdateringen af dine præferencer.");
-                }
-            } catch (error) {
-                console.error(error);
-                cb.checked = !nyStatus;
-                alert("Netværksfejl. Tjek din forbindelse og prøv igen.");
-            } finally {
-                cb.disabled = false;
-            }
         }
 
         async function udfoerSkiftAdgangskode() {
