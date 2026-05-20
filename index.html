@@ -453,17 +453,17 @@
                 <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Profiloplysninger</h2>
                 
                 <div style="margin-top: 20px; font-size: 14px; color: #666;">Navn</div>
-                <div style="font-size: 14px; font-weight: bold; color: #000000;" id="profileNameText">Dit Navn</div>
+                <div style="font-size: 16px; font-weight: bold; color: #000000;" id="profileNameText">Dit Navn</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Brugernavn</div>
-                <div style="font-size: 14px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
+                <div style="font-size: 16px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Adgangskode</div>
                 <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 2px;" id="profilePasswordText">********</div>
                 
-                <div style="margin-top: 25px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; background-color: #f8f9fa; padding: 12px; border-radius: 6px; border: 1px solid #e9ecef;">
+                <div style="margin-top: 25px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
                     <input type="checkbox" id="profileNotifCheckbox" onchange="udfoerSkiftNotifikation()" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
-                    <label for="profileNotifCheckbox" style="font-size: 14px; font-weight: 500; color: #000000; margin: 0; cursor: pointer; user-select: none;">Hold mig opdateret via e-mail om vigtige ændringer</label>
+                    <label for="profileNotifCheckbox" style="font-size: 14px; font-weight: 500; color: #000000; margin: 0; cursor: pointer; user-select: none;">Hold mig opdateret på e-mail om vigtige opdateringer</label>
                 </div>
                 
                 <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-bottom: 25px; color: #dc3545; font-size: 14px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
@@ -618,7 +618,7 @@
         let aktuelBruger = "";
         let aktueltNavn = ""; 
         let aktuelPassLen = 8; 
-        let aktuelNotifikation = false; // NYT: Holder styr på brugerens notifikationsstatus
+        let aktuelNotifikation = false; 
         
         let formInitialState = ""; 
 
@@ -869,13 +869,13 @@
                     aktuelBruger = user;
                     aktueltNavn = result.navn || user; 
                     aktuelPassLen = result.passLength || 8; 
-                    aktuelNotifikation = (result.notifikation === "X"); // NYT
+                    aktuelNotifikation = (result.notifikation === "X"); 
                     
                     sessionStorage.setItem('sportlive_user', aktuelBruger);
                     sessionStorage.setItem('sportlive_role', brugerRolle);
                     sessionStorage.setItem('sportlive_navn', aktueltNavn);
                     sessionStorage.setItem('sportlive_passlen', aktuelPassLen); 
-                    sessionStorage.setItem('sportlive_notif', aktuelNotifikation ? "true" : "false"); // NYT
+                    sessionStorage.setItem('sportlive_notif', aktuelNotifikation ? "true" : "false"); 
                     
                     afslutLogin();
                 } else {
@@ -907,7 +907,7 @@
             sessionStorage.removeItem('sportlive_role');
             sessionStorage.removeItem('sportlive_navn'); 
             sessionStorage.removeItem('sportlive_passlen'); 
-            sessionStorage.removeItem('sportlive_notif'); // NYT
+            sessionStorage.removeItem('sportlive_notif'); 
             
             brugerRolle = "";
             aktuelBruger = "";
@@ -941,7 +941,6 @@
             let pLen = sessionStorage.getItem('sportlive_passlen') || 8;
             document.getElementById('profilePasswordText').textContent = "*".repeat(pLen);
             
-            // NYT: Sætter fluebenets status
             document.getElementById('profileNotifCheckbox').checked = aktuelNotifikation;
             
             document.getElementById('profileModal').style.display = 'flex';
@@ -967,11 +966,10 @@
             document.getElementById('changePasswordView').style.display = 'none';
         }
 
-        // NYT: Funktion der sender opdateringen af afkrydsningsfeltet til Google Sheets
         async function udfoerSkiftNotifikation() {
             const cb = document.getElementById('profileNotifCheckbox');
             const nyStatus = cb.checked;
-            cb.disabled = true; // Låser boksen kortvarigt for at forhindre dobbeltklik
+            cb.disabled = true; 
 
             try {
                 const response = await fetch(scriptURL, {
@@ -990,7 +988,6 @@
                     aktuelNotifikation = nyStatus;
                     sessionStorage.setItem('sportlive_notif', nyStatus ? "true" : "false");
                 } else {
-                    // Revert UI hvis der skete en fejl
                     cb.checked = !nyStatus;
                     alert("Der opstod en fejl under opdateringen af dine præferencer.");
                 }
@@ -2130,14 +2127,14 @@
             const gemtRolle = sessionStorage.getItem('sportlive_role');
             const gemtNavn = sessionStorage.getItem('sportlive_navn');
             const gemtPassLen = sessionStorage.getItem('sportlive_passlen');
-            const gemtNotif = sessionStorage.getItem('sportlive_notif'); // NYT
+            const gemtNotif = sessionStorage.getItem('sportlive_notif'); 
             
             if (gemtBruger && gemtRolle) {
                 aktuelBruger = gemtBruger;
                 brugerRolle = gemtRolle;
                 aktueltNavn = gemtNavn || gemtBruger;
                 aktuelPassLen = gemtPassLen || 8;
-                aktuelNotifikation = (gemtNotif === "true"); // NYT
+                aktuelNotifikation = (gemtNotif === "true"); 
                 afslutLogin();
             } else {
                 document.getElementById('loginOverlay').style.display = 'flex';
