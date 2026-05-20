@@ -453,15 +453,20 @@
                 <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Profiloplysninger</h2>
                 
                 <div style="margin-top: 20px; font-size: 14px; color: #666;">Navn</div>
-                <div style="font-size: 18px; font-weight: bold; color: #000000;" id="profileNameText">Dit Navn</div>
+                <div style="font-size: 14px; font-weight: bold; color: #000000;" id="profileNameText">Dit Navn</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Brugernavn</div>
-                <div style="font-size: 18px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
+                <div style="font-size: 14px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Adgangskode</div>
                 <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 2px;" id="profilePasswordText">********</div>
                 
-                <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-top: 25px; margin-bottom: 25px; color: #dc3545; font-size: 15px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
+                <div style="margin-top: 25px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; background-color: #f8f9fa; padding: 12px; border-radius: 6px; border: 1px solid #e9ecef;">
+                    <input type="checkbox" id="profileNotifCheckbox" onchange="udfoerSkiftNotifikation()" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
+                    <label for="profileNotifCheckbox" style="font-size: 14px; font-weight: 500; color: #000000; margin: 0; cursor: pointer; user-select: none;">Hold mig opdateret via e-mail om vigtige ændringer</label>
+                </div>
+                
+                <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-bottom: 25px; color: #dc3545; font-size: 14px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
                 
                 <div style="display: flex;">
                     <button class="btn btn-dialog primary" style="width: 100%; background-color: #0056b3;" onclick="lukProfil()">Luk</button>
@@ -613,11 +618,10 @@
         let aktuelBruger = "";
         let aktueltNavn = ""; 
         let aktuelPassLen = 8; 
+        let aktuelNotifikation = false; // NYT: Holder styr på brugerens notifikationsstatus
         
-        // NYT: Variabel til at gemme det indledende "snapshot" af formularen
         let formInitialState = ""; 
 
-        // NYT: Funktion der returnerer formularens præcise tilstand som en streng
         function hentFormularState() {
             const data = {};
             const fieldsToCheck = ['Dato', 'Tid', 'TX', 'Kanal', 'Premieredato', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'P-plan', 'Teknisk_info', 'Noter', 'Producer', 'Kommentator', 'Ekspert', 'Reporter'];
@@ -865,11 +869,13 @@
                     aktuelBruger = user;
                     aktueltNavn = result.navn || user; 
                     aktuelPassLen = result.passLength || 8; 
+                    aktuelNotifikation = (result.notifikation === "X"); // NYT
                     
                     sessionStorage.setItem('sportlive_user', aktuelBruger);
                     sessionStorage.setItem('sportlive_role', brugerRolle);
                     sessionStorage.setItem('sportlive_navn', aktueltNavn);
                     sessionStorage.setItem('sportlive_passlen', aktuelPassLen); 
+                    sessionStorage.setItem('sportlive_notif', aktuelNotifikation ? "true" : "false"); // NYT
                     
                     afslutLogin();
                 } else {
@@ -901,10 +907,13 @@
             sessionStorage.removeItem('sportlive_role');
             sessionStorage.removeItem('sportlive_navn'); 
             sessionStorage.removeItem('sportlive_passlen'); 
+            sessionStorage.removeItem('sportlive_notif'); // NYT
+            
             brugerRolle = "";
             aktuelBruger = "";
             aktueltNavn = "";
             aktuelPassLen = 8;
+            aktuelNotifikation = false;
             
             alleProgrammerGlobal = [];
             aktuelleProgrammerVist = [];
@@ -932,6 +941,9 @@
             let pLen = sessionStorage.getItem('sportlive_passlen') || 8;
             document.getElementById('profilePasswordText').textContent = "*".repeat(pLen);
             
+            // NYT: Sætter fluebenets status
+            document.getElementById('profileNotifCheckbox').checked = aktuelNotifikation;
+            
             document.getElementById('profileModal').style.display = 'flex';
         }
 
@@ -953,6 +965,42 @@
         function visProfilInfo() {
             document.getElementById('profileView').style.display = 'block';
             document.getElementById('changePasswordView').style.display = 'none';
+        }
+
+        // NYT: Funktion der sender opdateringen af afkrydsningsfeltet til Google Sheets
+        async function udfoerSkiftNotifikation() {
+            const cb = document.getElementById('profileNotifCheckbox');
+            const nyStatus = cb.checked;
+            cb.disabled = true; // Låser boksen kortvarigt for at forhindre dobbeltklik
+
+            try {
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: "update_notification", 
+                        username: aktuelBruger,
+                        wants_notification: nyStatus
+                    }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    aktuelNotifikation = nyStatus;
+                    sessionStorage.setItem('sportlive_notif', nyStatus ? "true" : "false");
+                } else {
+                    // Revert UI hvis der skete en fejl
+                    cb.checked = !nyStatus;
+                    alert("Der opstod en fejl under opdateringen af dine præferencer.");
+                }
+            } catch (error) {
+                console.error(error);
+                cb.checked = !nyStatus;
+                alert("Netværksfejl. Tjek din forbindelse og prøv igen.");
+            } finally {
+                cb.disabled = false;
+            }
         }
 
         async function udfoerSkiftAdgangskode() {
@@ -1389,7 +1437,6 @@
             }
         }
 
-        // NY LOGIK: Vurderer om formularen er ændret ift. da den blev åbnet
         async function forsogLukModal() {
             if (hentFormularState() !== formInitialState) {
                 const bekræft = await visCustomDialog("Er du sikker på, at du vil afslutte uden at gemme?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
@@ -1426,7 +1473,6 @@
                 document.getElementById('Dato').value = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
             }
 
-            // Tager et snapshot af formularen inden den åbnes
             formInitialState = hentFormularState();
             openModal();
         }
@@ -1542,7 +1588,6 @@
             document.getElementById('modalTitle').textContent = "Rediger program";
             document.getElementById('submitBtn').textContent = "Opdater program";
 
-            // Tager et snapshot af formularen efter dataene er fyldt ind
             formInitialState = hentFormularState();
             openModal();
         }
@@ -1611,7 +1656,6 @@
             document.getElementById('modalTitle').textContent = "Kopier program";
             document.getElementById('submitBtn').textContent = "Gem program";
 
-            // Tager et snapshot af formularen efter dataene er fyldt ind
             formInitialState = hentFormularState();
             openModal();
         }
@@ -1818,7 +1862,6 @@
                     tbody.appendChild(trSep);
                 }
 
-                // Hent rawUnit og tøm den, hvis den er OB eller BOKS
                 let visUnitRen = String(program["Unit"] || '');
                 if (visUnitRen.toUpperCase() === "OB" || visUnitRen.toUpperCase() === "BOKS") {
                     visUnitRen = "";
@@ -2087,12 +2130,14 @@
             const gemtRolle = sessionStorage.getItem('sportlive_role');
             const gemtNavn = sessionStorage.getItem('sportlive_navn');
             const gemtPassLen = sessionStorage.getItem('sportlive_passlen');
+            const gemtNotif = sessionStorage.getItem('sportlive_notif'); // NYT
             
             if (gemtBruger && gemtRolle) {
                 aktuelBruger = gemtBruger;
                 brugerRolle = gemtRolle;
                 aktueltNavn = gemtNavn || gemtBruger;
                 aktuelPassLen = gemtPassLen || 8;
+                aktuelNotifikation = (gemtNotif === "true"); // NYT
                 afslutLogin();
             } else {
                 document.getElementById('loginOverlay').style.display = 'flex';
@@ -2101,23 +2146,16 @@
 
             setInterval(() => {
                 if (brugerRolle !== "") {
-                    // Løsning 2: "Forstyr ikke"-tilstand.
-                    // Tjekker om brugeren er i gang med at kigge på en fold-ud-boks eller arbejder i et vindue.
                     let erForstyrret = false;
                     
-                    // 1. Tjekker om en fold-ud-boks er åben
                     document.querySelectorAll('.detail-row').forEach(row => {
-                        if (row.style.display === 'table-row') {
-                            erForstyrret = true;
-                        }
+                        if (row.style.display === 'table-row') erForstyrret = true;
                     });
                     
-                    // 2. Tjekker om der arbejdes i 'Tilføj/Rediger'-vinduet, profil-vinduet eller advarselsboksen
                     if (document.getElementById('programModal').style.display === 'block') erForstyrret = true;
                     if (document.getElementById('profileModal').style.display === 'flex') erForstyrret = true;
                     if (document.getElementById('customDialog').style.display === 'flex') erForstyrret = true;
 
-                    // Opdater KUN, hvis der ikke er nogen vinduer eller bokse åbne
                     if (!erForstyrret) {
                         loadProgrammer(true);
                     }
