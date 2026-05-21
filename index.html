@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="da">
 <head>
     <meta charset="UTF-8">
@@ -207,24 +207,25 @@
         .form-group input:not([type="checkbox"]), .form-group select { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000;}
         
         /* Brugerdefineret Checkbox styling */
-        .custom-cb {
-            -webkit-appearance: none;
-            appearance: none;
-            min-width: 18px;
-            width: 18px;
-            height: 18px;
-            border: 1px solid #999;
-            border-radius: 3px;
-            background-color: white;
-            margin: 0;
-            cursor: pointer;
-            display: inline-flex;
+        .custom-cb { 
+            -webkit-appearance: none; 
+            appearance: none; 
+            width: 18px; 
+            height: 18px; 
+            border: 1px solid #000; 
+            border-radius: 3px; 
+            background-color: white; 
+            margin: 0; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
         }
-        .custom-cb:checked {
-            background-color: white;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16'><path d='M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z' fill='black'/></svg>");
-            background-repeat: no-repeat;
-            background-position: center;
+        .custom-cb:checked { 
+            background-color: white; 
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16'><path d='M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z' fill='black'/></svg>"); 
+            background-repeat: no-repeat; 
+            background-position: center; 
         }
 
         .multi-select-container { position: relative; width: 100%; user-select: none; }
@@ -459,32 +460,30 @@
         </div>
     </div>
 
-    <div id="profileModal" class="modal" style="align-items: center; justify-content: center;">
+    <div id="profileModal" class="modal" style="display: none; align-items: center; justify-content: center;">
         <div class="modal-content" style="max-width: 400px; margin: auto;">
-            <span class="close" onclick="lukProfil()">&times;</span>
+            <span class="close" onclick="forsogLukProfil()">&times;</span>
             
             <div id="profileView" style="text-align: left;">
                 <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Profiloplysninger</h2>
                 
                 <div style="margin-top: 20px; font-size: 14px; color: #666;">Navn</div>
-                <div style="font-size: 16px; font-weight: bold; color: #000000;" id="profileNameText">Dit Navn</div>
+                <div style="font-size: 16px; font-weight: bold; color: #000000; margin-bottom: 5px;" id="profileNameText"></div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Brugernavn</div>
-                <div style="font-size: 16px; font-weight: bold; color: #000000;" id="profileUsernameText">email@email.dk</div>
+                <div style="font-size: 16px; font-weight: bold; color: #000000; margin-bottom: 5px;" id="profileUsernameText"></div>
                 
                 <div style="margin-top: 15px; font-size: 14px; color: #666;">Adgangskode</div>
-                <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 2px;" id="profilePasswordText">********</div>
+                <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 2px; margin-bottom: 5px;" id="profilePasswordText">********</div>
                 
-                <div style="margin-top: 25px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-bottom: 15px; color: #dc3545; font-size: 14px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
+
+                <div style="margin: 15px 0 25px 0; display: flex; align-items: center; gap: 10px;">
                     <input type="checkbox" id="profileNotifCheckbox" class="custom-cb">
-                    <label for="profileNotifCheckbox" style="font-size: 14px; font-weight: 500; color: #000000; margin: 0; cursor: pointer; user-select: none;">Hold mig opdateret på e-mail om vigtige opdateringer</label>
+                    <label for="profileNotifCheckbox" style="font-size: 14px; font-weight: 500; color: #000000; cursor: pointer; user-select: none;">Send mig e-mails om vigtige opdateringer</label>
                 </div>
                 
-                <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-bottom: 25px; color: #dc3545; font-size: 14px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
-                
-                <div style="display: flex;">
-                    <button class="btn btn-dialog primary" style="width: 100%; background-color: #0056b3;" onclick="lukProfil()">Luk</button>
-                </div>
+                <button class="btn" style="width: 100%; background-color: #0056b3;" onclick="gemProfil()">Gem</button>
             </div>
 
             <div id="changePasswordView" style="display: none; text-align: left;">
@@ -960,10 +959,9 @@
             document.getElementById('profileModal').style.display = 'flex';
         }
 
-        function lukProfil() {
+        function gemProfil() {
             const cb = document.getElementById('profileNotifCheckbox');
             
-            // Tjekker om fluebenets status er ændret, og sender "lydløst" i baggrunden, hvis det er.
             if (cb && cb.checked !== aktuelNotifikation) {
                 const nyStatus = cb.checked;
                 aktuelNotifikation = nyStatus;
@@ -981,6 +979,19 @@
             }
             
             document.getElementById('profileModal').style.display = 'none';
+        }
+        
+        async function forsogLukProfil() {
+            const cb = document.getElementById('profileNotifCheckbox');
+            if (cb && cb.checked !== aktuelNotifikation) {
+                const bekræft = await visCustomDialog("Er du sikker på, at du vil afslutte uden at gemme?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
+                if (bekræft) {
+                    cb.checked = aktuelNotifikation;
+                    document.getElementById('profileModal').style.display = 'none';
+                }
+            } else {
+                document.getElementById('profileModal').style.display = 'none';
+            }
         }
 
         function visSkiftAdgangskode(e) {
@@ -1042,7 +1053,7 @@
                     
                     setTimeout(() => {
                         logUd();
-                        lukProfil();
+                        document.getElementById('profileModal').style.display = 'none';
                     }, 7000);
                 } else {
                     errorMsg.textContent = result.message || "Der opstod en fejl.";
