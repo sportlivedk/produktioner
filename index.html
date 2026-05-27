@@ -884,11 +884,11 @@
                     aktuelPassLen = result.passLength || 8; 
                     aktuelNotifikation = (result.notifikation === "X"); 
                     
-                    sessionStorage.setItem('sportlive_user', aktuelBruger);
-                    sessionStorage.setItem('sportlive_role', brugerRolle);
-                    sessionStorage.setItem('sportlive_navn', aktueltNavn);
-                    sessionStorage.setItem('sportlive_passlen', aktuelPassLen); 
-                    sessionStorage.setItem('sportlive_notif', aktuelNotifikation ? "true" : "false"); 
+                    localStorage.setItem('sportlive_user', aktuelBruger);
+                    localStorage.setItem('sportlive_role', brugerRolle);
+                    localStorage.setItem('sportlive_navn', aktueltNavn);
+                    localStorage.setItem('sportlive_passlen', aktuelPassLen); 
+                    localStorage.setItem('sportlive_notif', aktuelNotifikation ? "true" : "false"); 
                     
                     afslutLogin();
                 } else {
@@ -916,11 +916,11 @@
         function logUd(event) {
             if(event) event.preventDefault();
             
-            sessionStorage.removeItem('sportlive_user');
-            sessionStorage.removeItem('sportlive_role');
-            sessionStorage.removeItem('sportlive_navn'); 
-            sessionStorage.removeItem('sportlive_passlen'); 
-            sessionStorage.removeItem('sportlive_notif'); 
+            localStorage.removeItem('sportlive_user');
+            localStorage.removeItem('sportlive_role');
+            localStorage.removeItem('sportlive_navn'); 
+            localStorage.removeItem('sportlive_passlen'); 
+            localStorage.removeItem('sportlive_notif'); 
             
             brugerRolle = "";
             aktuelBruger = "";
@@ -951,7 +951,7 @@
             document.getElementById('profileNameText').textContent = aktueltNavn;
             document.getElementById('profileUsernameText').textContent = aktuelBruger;
             
-            let pLen = sessionStorage.getItem('sportlive_passlen') || 8;
+            let pLen = localStorage.getItem('sportlive_passlen') || 8;
             document.getElementById('profilePasswordText').textContent = "*".repeat(pLen);
             
             document.getElementById('profileNotifCheckbox').checked = aktuelNotifikation;
@@ -965,7 +965,7 @@
             if (cb && cb.checked !== aktuelNotifikation) {
                 const nyStatus = cb.checked;
                 aktuelNotifikation = nyStatus;
-                sessionStorage.setItem('sportlive_notif', nyStatus ? "true" : "false");
+                localStorage.setItem('sportlive_notif', nyStatus ? "true" : "false");
                 
                 fetch(scriptURL, {
                     method: 'POST',
@@ -2133,11 +2133,11 @@
                 yearContainer.innerHTML += `<span class="year-option" id="year-${a}" onclick="filtrerAar(${a})">${a}</span>`;
             }
 
-            const gemtBruger = sessionStorage.getItem('sportlive_user');
-            const gemtRolle = sessionStorage.getItem('sportlive_role');
-            const gemtNavn = sessionStorage.getItem('sportlive_navn');
-            const gemtPassLen = sessionStorage.getItem('sportlive_passlen');
-            const gemtNotif = sessionStorage.getItem('sportlive_notif'); 
+            const gemtBruger = localStorage.getItem('sportlive_user');
+            const gemtRolle = localStorage.getItem('sportlive_role');
+            const gemtNavn = localStorage.getItem('sportlive_navn');
+            const gemtPassLen = localStorage.getItem('sportlive_passlen');
+            const gemtNotif = localStorage.getItem('sportlive_notif'); 
             
             if (gemtBruger && gemtRolle) {
                 aktuelBruger = gemtBruger;
