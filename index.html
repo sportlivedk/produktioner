@@ -1354,7 +1354,7 @@
                 if (kategoriFilter === 'ekstern' && (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse')) return false;
                 
                 if (kategoriFilter === 'ob') {
-                    const obFilterArr = ["MINITECH", "NOWTEK OB1", "NOWTEK OB2", "OB 7", "OB 9", "SAM OB", "OB"];
+                    const obFilterArr = ["MINITECH", "NOWTEK OB1", "NOWTEK OB2", "OB 7", "OB 9", "OB 7+9", "SAM OB", "OB"];
                     if (!obFilterArr.includes(unitNavn.toUpperCase())) return false;
                 }
 
@@ -1512,7 +1512,7 @@
             const manglerProducer = (!program["Producer"] || String(program["Producer"]).trim() === "");
             const manglerEkspert = (!program["Ekspert"] || String(program["Ekspert"]).trim() === "");
 
-            const obUnitsArr = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "SAM OB", "OB"];
+            const obUnitsArr = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "OB 7+9", "SAM OB", "OB"];
             const erOB = obUnitsArr.includes(unit);
             const unitLower = unit.toLowerCase();
 
