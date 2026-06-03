@@ -326,6 +326,14 @@
             .mobile-only-title { display: block; font-size: 12px !important; font-weight: bold; color: #0056b3; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; white-space: normal; }
             .detail-row td { padding: 12px !important; background-color: #fafbfc; border-bottom: none !important; }
             .detail-list-item, .detail-label, .detail-value { font-size: 12px !important; }
+            
+            /* Vis ugedag ved swipe på mobil */
+            body.show-mobile-weekday th:nth-child(2),
+            body.show-mobile-weekday .main-row td:nth-child(2) {
+                display: table-cell !important;
+                padding-left: 4px !important;
+                padding-right: 8px !important;
+            }
         }
     </style>
 </head>
@@ -2184,6 +2192,39 @@
         
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
+        
+        // --- SWIPE LOGIK TIL MOBILVISNING (UGEDAG) ---
+        let touchstartX = 0;
+        let touchendX = 0;
+
+        const tableContainerEl = document.querySelector('.table-container');
+        
+        if (tableContainerEl) {
+            // Registrerer hvor fingeren lander
+            tableContainerEl.addEventListener('touchstart', e => {
+                touchstartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            // Registrerer hvor fingeren slippes
+            tableContainerEl.addEventListener('touchend', e => {
+                touchendX = e.changedTouches[0].screenX;
+                handterMobileSwipe();
+            }, {passive: true});
+        }
+
+        function handterMobileSwipe() {
+            // Tjekker om vi faktisk er på en mobilskærm
+            if (window.innerWidth <= 900) {
+                // Et swipe på mere end 60 pixels mod HØJRE (trækker menuen frem)
+                if (touchendX > touchstartX + 60) {
+                    document.body.classList.add('show-mobile-weekday');
+                } 
+                // Et swipe på mere end 60 pixels mod VENSTRE (skubber menuen væk igen)
+                else if (touchendX < touchstartX - 60) {
+                    document.body.classList.remove('show-mobile-weekday');
+                }
+            }
+        }
         
     </script>
 </body>
