@@ -195,7 +195,7 @@
         function getProgramColorAndPriority(p) {
             const kanalNavn = String(p.Kanal || "").trim();
             const unitLower = String(p.Unit || "").toLowerCase().trim();
-            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "sam ob"];
+            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "ob 7+9", "sam ob"];
             const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
 
             if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
