@@ -1687,21 +1687,28 @@
             if (bekræft) udfoerSletning(rowId);
         }
 
-        async function udfoerSletning(rowId) {
+async function udfoerSletning(rowId) {
             try {
-                document.getElementById('loader').style.display = 'block';
-                document.getElementById('programTable').style.display = 'none';
+                // Visuel finesse: Gør rækken bleg med det samme, så brugeren føler, handlingen er øjeblikkelig
+                const rowBtn = document.querySelector(`button[onclick="redigerProgram(${rowId})"]`);
+                if (rowBtn) {
+                    const trMain = rowBtn.closest('.main-row');
+                    if (trMain) {
+                        trMain.style.opacity = '0.3';
+                        if (trMain.nextElementSibling) trMain.nextElementSibling.style.opacity = '0.3';
+                    }
+                }
 
                 await fetch(scriptURL, {
                     method: 'POST',
                     body: JSON.stringify({ action: "delete", RowId: rowId }),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
-                await loadProgrammer(); 
+                
+                // Hent de nye data lydløst i baggrunden uden at fjerne tabellen
+                await loadProgrammer(true); 
             } catch (error) {
                 console.error('Fejl ved sletning:', error);
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('programTable').style.display = 'table';
                 await visCustomDialog("Der skete en fejl under sletning. Prøv igen.", 'alert');
             }
         }
@@ -1968,7 +1975,7 @@
             });
         }
 
-        async function gemProgram() {
+async function gemProgram() {
             if (brugerRolle !== "Admin") {
                 await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
                 return;
@@ -2060,10 +2067,6 @@
 
             const scrollContainer = document.querySelector('.table-container');
             const savedScrollPosition = scrollContainer ? scrollContainer.scrollTop : 0;
-
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('programTable').style.display = 'none';
-            document.getElementById('ingenResultater').style.display = 'none';
             
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.textContent;
@@ -2115,7 +2118,9 @@
                 
                 closeModal();
                 document.getElementById('programForm').reset();
-                await loadProgrammer(); 
+                
+                // Hent data lydløst i baggrunden uden at fjerne tabellen
+                await loadProgrammer(true); 
                 
                 if (scrollContainer) {
                     scrollContainer.scrollTop = savedScrollPosition;
@@ -2123,8 +2128,6 @@
                 
             } catch (error) {
                 console.error('Fejl ved gemning:', error);
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('programTable').style.display = 'table';
                 await visCustomDialog("Der skete en fejl. Prøv igen.", 'alert');
             } finally {
                 submitBtn.textContent = originalText;
