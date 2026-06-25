@@ -533,8 +533,7 @@
                 <input type="hidden" id="RowId">
                 <div class="form-grid">
                     <div class="form-group"><label>Dato</label><input type="date" id="Dato" autocomplete="off"></div>
-                    <div class="form-group"><label>Tid (Danmark)</label><input type="time" id="Tid" autocomplete="off"></div>
-<div class="form-group"><label>Tid (GMT/UTC)</label><input type="time" id="Tid_UTC" autocomplete="off"></div>
+                    <div class="form-group"><label>Tid</label><input type="time" id="Tid" autocomplete="off"></div>
                     <div class="form-group"><label>TX</label><input type="time" id="TX" autocomplete="off"></div>
                     <div class="form-group">
                         <label>Kanal</label>
@@ -1560,7 +1559,6 @@
                     document.getElementById('Tid').value = String(t.getHours()).padStart(2, '0') + ":" + String(t.getMinutes()).padStart(2, '0');
                 } else { document.getElementById('Tid').value = program["Tid"]; }
             } else { document.getElementById('Tid').value = ""; }
-kalkulerTid('dk');
 
             if (program["TX"]) {
                 const txDate = new Date(program["TX"]);
@@ -1629,7 +1627,6 @@ kalkulerTid('dk');
                     document.getElementById('Tid').value = String(t.getHours()).padStart(2, '0') + ":" + String(t.getMinutes()).padStart(2, '0');
                 } else { document.getElementById('Tid').value = program["Tid"]; }
             } else { document.getElementById('Tid').value = ""; }
-kalkulerTid('dk');
 
             if (program["TX"]) {
                 const txDate = new Date(program["TX"]);
@@ -2199,45 +2196,6 @@ async function gemProgram() {
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
         
-// --- TIDSZONE BEREGNING ---
-        function getDanishOffset(datoStr) {
-            const d = datoStr ? new Date(datoStr) : new Date();
-            const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Copenhagen', timeZoneName: 'short' });
-            const parts = formatter.formatToParts(d);
-            const tzPart = parts.find(p => p.type === 'timeZoneName');
-            const tzValue = tzPart ? tzPart.value : "";
-            // Tjekker både for GMT+2 og CEST afhængigt af browserens fortolkning
-            return (tzValue.includes('+2') || tzValue.includes('CEST')) ? 2 : 1;
-        }
-
-        function kalkulerTid(kilde) {
-            const feltDK = document.getElementById('Tid');
-            const feltUTC = document.getElementById('Tid_UTC');
-            const datoStr = document.getElementById('Dato').value;
-            
-            const offset = getDanishOffset(datoStr);
-            
-            if (kilde === 'dk') {
-                if (!feltDK.value) { feltUTC.value = ""; return; }
-                let [t, m] = feltDK.value.split(':').map(Number);
-                t = t - offset;
-                if (t < 0) t += 24;
-                feltUTC.value = String(t).padStart(2, '0') + ":" + String(m).padStart(2, '0');
-            } else if (kilde === 'utc') {
-                if (!feltUTC.value) { feltDK.value = ""; return; }
-                let [t, m] = feltUTC.value.split(':').map(Number);
-                t = t + offset;
-                if (t >= 24) t -= 24;
-                feltDK.value = String(t).padStart(2, '0') + ":" + String(m).padStart(2, '0');
-            }
-        }
-
-        document.getElementById('Tid').addEventListener('input', () => kalkulerTid('dk'));
-        document.getElementById('Tid_UTC').addEventListener('input', () => kalkulerTid('utc'));
-        document.getElementById('Dato').addEventListener('input', () => {
-            if (document.getElementById('Tid').value) kalkulerTid('dk');
-        });
-
         // --- SWIPE LOGIK TIL MOBILVISNING (UGEDAG) ---
         let touchstartX = 0;
         let touchendX = 0;
