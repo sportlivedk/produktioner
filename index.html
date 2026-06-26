@@ -1908,6 +1908,32 @@ async function udfoerSletning(rowId) {
                     }
                     visUnitMedIkoner = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 2px;">${visUnitKolonne}</span><div style="display: flex; gap: 3px; flex-shrink: 0;">${ikoner}</div></div>`;
                 }
+// --- BEREGNING AF UTC OG SAMMENSLÅNING AF FORMAT/RX ---
+                let pFormat = program["Format"] ? String(program["Format"]).trim() : '';
+                let pRX = program["RX"] ? String(program["RX"]).trim() : '';
+                let formatOgRx = [pFormat, pRX].filter(Boolean).join(', ') || '-';
+
+                let utcDisplay = '-';
+                if (pTid !== '-' && pTid.includes(':') && normDato !== '') {
+                    const [timerStr, minutterStr] = pTid.split(':');
+                    let timer = parseInt(timerStr, 10);
+                    let minutter = parseInt(minutterStr, 10);
+                    
+                    if (!isNaN(timer) && !isNaN(minutter)) {
+                        // Tjekker offset (CET = 1 time, CEST = 2 timer) for den pågældende program-dato
+                        const tzTestDate = new Date(`${normDato}T12:00:00Z`);
+                        const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Copenhagen', timeZoneName: 'short' });
+                        const tzPart = formatter.formatToParts(tzTestDate).find(p => p.type === 'timeZoneName');
+                        const isSummertime = tzPart && (tzPart.value.includes('+2') || tzPart.value.includes('CEST') || tzPart.value.includes('GMT+2'));
+                        const offset = isSummertime ? 2 : 1;
+                        
+                        timer -= offset;
+                        if (timer < 0) timer += 24;
+                        
+                        utcDisplay = String(timer).padStart(2, '0') + ':' + String(minutter).padStart(2, '0');
+                    }
+                }
+                // --------------------------------------------------------
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
@@ -1950,8 +1976,8 @@ async function udfoerSletning(rowId) {
                                 <h4>Tekniske specifikationer</h4>
                                 <div class="detail-list">
                                     <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${visUnitRen || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Format:</span> <span class="detail-value">${program["Format"] || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">RX:</span> <span class="detail-value">${program["RX"] || '-'}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Format & RX:</span> <span class="detail-value">${formatOgRx}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Starttid i UTC/GMT:</span> <span class="detail-value">${utcDisplay}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="${signalStyling}">${signalTekst}</span></div>
                                 </div>
                             </div>
