@@ -335,7 +335,13 @@
                 padding-right: 8px !important;
             }
         }
-    </style>
+    
+/* Styling til inputfelter med Kopier-knap */
+        .input-with-copy { display: flex; width: 100%; }
+        .input-with-copy input { flex-grow: 1; border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; border-right: none !important; }
+        .copy-btn-tech { background-color: #e9ecef; border: 1px solid #ccc; border-top-right-radius: 4px; border-bottom-right-radius: 4px; cursor: pointer; padding: 0 10px; display: flex; align-items: center; justify-content: center; color: #555; transition: background-color 0.2s; }
+        .copy-btn-tech:hover { background-color: #d4d8db; color: #000; }
+</style>
 </head>
 <body>
 
@@ -641,57 +647,107 @@
                     </div>
                     <div style="grid-column: span 6;"></div> <div class="form-group" style="grid-column: span 4;">
                         <label>MAIN SRT Caller IP</label>
-                        <input type="text" id="TechMainIP">
+                        <div class="input-with-copy">
+                            <input type="text" id="TechMainIP">
+                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainIP', this)" title="Kopier IP">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
                     </div>
-                    <div class="form-group" style="grid-column: span 2;">
+                    <div class="form-group" style="grid-column: span 3;">
                         <label>Port</label>
-                        <input type="text" id="TechMainPort">
+                        <div class="input-with-copy">
+                            <input type="text" id="TechMainPort">
+                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainPort', this)" title="Kopier Port">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
                     </div>
-                    <div class="form-group" style="grid-column: span 6;">
+                    <div class="form-group" style="grid-column: span 5;">
                         <label>Passphrase</label>
-                        <input type="text" id="TechMainPass">
+                        <div class="input-with-copy">
+                            <input type="text" id="TechMainPass">
+                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainPass', this)" title="Kopier Passphrase">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="form-group" style="grid-column: span 4;">
                         <label>BACKUP SRT Caller IP</label>
-                        <input type="text" id="TechBackupIP">
+                        <div class="input-with-copy">
+                            <input type="text" id="TechBackupIP">
+                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupIP', this)" title="Kopier IP">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
                     </div>
-                    <div class="form-group" style="grid-column: span 2;">
+                    <div class="form-group" style="grid-column: span 3;">
                         <label>Port</label>
-                        <input type="text" id="TechBackupPort">
+                        <div class="input-with-copy">
+                            <input type="text" id="TechBackupPort">
+                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPort', this)" title="Kopier Port">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
                     </div>
-                    <div class="form-group" style="grid-column: span 6;">
+                    <div class="form-group" style="grid-column: span 5;">
                         <label>Passphrase</label>
-                        <input type="text" id="TechBackupPass">
+                        <div class="input-with-copy">
+                            <input type="text" id="TechBackupPass">
+                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPass', this)" title="Kopier Passphrase">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="form-group checkbox-group" style="grid-column: span 6; display: flex; align-items: center; margin-top: 15px;">
+                    <div class="form-group checkbox-group" style="grid-column: span 12; display: flex; align-items: center; margin-top: 15px;">
                         <input type="checkbox" id="TechSrtListener" onchange="toggleTechListeners()">
                         <label for="TechSrtListener" style="font-weight: bold;">SRT Listener</label>
                     </div>
-                    <div class="form-group checkbox-group" style="grid-column: span 6; display: flex; align-items: center; margin-top: 15px;">
+                    <div id="TechSrtListenerGroup" style="display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: -5px;">
+                        <div class="form-group" style="grid-column: span 4;">
+                            <label>SRT Listener IP</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechSrtListenerIP">
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerIP', this)" title="Kopier IP">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>Port</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechSrtListenerPort">
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerPort', this)" title="Kopier Port">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group" style="grid-column: span 12; display: flex; align-items: center; margin-top: 5px;">
                         <input type="checkbox" id="TechBrtListener" onchange="toggleTechListeners()">
                         <label for="TechBrtListener" style="font-weight: bold;">BRT Listener (UDP)</label>
                     </div>
-
-                    <div id="TechSrtListenerGroup" style="display: none; grid-column: 1 / 7; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: -5px;">
-                        <div class="form-group" style="grid-column: span 4;">
-                            <label>SRT Listener IP</label>
-                            <input type="text" id="TechSrtListenerIP">
-                        </div>
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label>Port</label>
-                            <input type="text" id="TechSrtListenerPort">
-                        </div>
-                    </div>
-                    <div id="TechBrtListenerGroup" style="display: none; grid-column: 7 / 13; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: -5px;">
+                    <div id="TechBrtListenerGroup" style="display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: -5px;">
                         <div class="form-group" style="grid-column: span 4;">
                             <label>BRT Listener IP</label>
-                            <input type="text" id="TechBrtListenerIP">
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBrtListenerIP">
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerIP', this)" title="Kopier IP">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
                         </div>
-                        <div class="form-group" style="grid-column: span 2;">
+                        <div class="form-group" style="grid-column: span 3;">
                             <label>Port</label>
-                            <input type="text" id="TechBrtListenerPort">
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBrtListenerPort">
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerPort', this)" title="Kopier Port">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -699,10 +755,10 @@
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">AUDIO LAYOUT</h4>
                     </div>
                     <div class="form-group" style="grid-column: span 4;"><label>A1</label><input type="text" id="TechA1"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A2</label><input type="text" id="TechA2"></div>
                     <div class="form-group" style="grid-column: span 4;"><label>A3</label><input type="text" id="TechA3"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A4</label><input type="text" id="TechA4"></div>
                     <div class="form-group" style="grid-column: span 4;"><label>A5</label><input type="text" id="TechA5"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>A2</label><input type="text" id="TechA2"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>A4</label><input type="text" id="TechA4"></div>
                     <div class="form-group" style="grid-column: span 4;"><label>A6</label><input type="text" id="TechA6"></div>
 
                     <div class="form-group full-width" style="grid-column: span 12;">
@@ -726,18 +782,21 @@
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">KONTAKTER</h4>
                     </div>
-                    <div class="form-group" style="grid-column: span 6;"><label>MCR (telefon)</label><input type="text" id="TechMcrTlf"></div>
-                    <div class="form-group" style="grid-column: span 6;"><label>MCR (e-mail)</label><input type="text" id="TechMcrEmail"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>MCR (titel)</label><input type="text" id="TechMcrTitel"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>MCR (telefon)</label><input type="text" id="TechMcrTlf"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>MCR (e-mail)</label><input type="text" id="TechMcrEmail"></div>
                     
-                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 1 (telefon)</label><input type="text" id="TechKontakt1Tlf"></div>
-                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 1 (e-mail)</label><input type="text" id="TechKontakt1Email"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 1 (titel)</label><input type="text" id="TechKontakt1Titel"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 1 (telefon)</label><input type="text" id="TechKontakt1Tlf"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 1 (e-mail)</label><input type="text" id="TechKontakt1Email"></div>
                     
-                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 2 (telefon)</label><input type="text" id="TechKontakt2Tlf"></div>
-                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 2 (e-mail)</label><input type="text" id="TechKontakt2Email"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 2 (titel)</label><input type="text" id="TechKontakt2Titel"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 2 (telefon)</label><input type="text" id="TechKontakt2Tlf"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 2 (e-mail)</label><input type="text" id="TechKontakt2Email"></div>
 
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">YDERLIGERE INFORMATION</h4>
-                        <textarea id="TechYderligere" rows="3" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical; margin-top: 5px;"></textarea>
+                        <textarea id="TechYderligere" rows="3" style="font-family: inherit; width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical; margin-top: 5px;"></textarea>
                     </div>
                     
                 </div>
@@ -1586,8 +1645,19 @@
             }
         }
 
-       // --- NYE MODAL FUNKTIONER TIL TEKNISK INFO ---
+ // --- NYE MODAL FUNKTIONER TIL TEKNISK INFO ---
         
+        // Kopierer teksten i input-feltet og giver grønt flueben-feedback i knappen
+        function kopierTekst(elementId, btnElement) {
+            const el = document.getElementById(elementId);
+            if (!el || !el.value) return;
+            navigator.clipboard.writeText(el.value).then(() => {
+                const originalHtml = btnElement.innerHTML;
+                btnElement.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#28a745" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                setTimeout(() => { btnElement.innerHTML = originalHtml; }, 1500);
+            }).catch(err => console.error("Kopiering fejlede:", err));
+        }
+
         // Viser/skjuler felter afhængigt af om checkboksen er markeret
         function toggleTechListeners() {
             const srtBox = document.getElementById('TechSrtListener');
@@ -1599,7 +1669,6 @@
             brtGroup.style.display = brtBox.checked ? 'grid' : 'none';
         }
 
-        // Udregner CET/CEST automatisk baseret på programmets dato
         // Udregner CET/CEST automatisk baseret på programmets dato
         function calcE2ETime() {
             const rowId = document.getElementById('TechRowId').value;
@@ -1617,7 +1686,6 @@
                 const utcVal = document.getElementById(`TechUtc${type}`).value;
                 const cetDiv = document.getElementById(`TechCet${type}`);
                 
-                // Ny logik: Hvis feltet er tomt, visles der intet overhovedet
                 if (!utcVal) {
                     cetDiv.textContent = "";
                     return;
@@ -1641,7 +1709,7 @@
             document.getElementById('TechRowId').value = rowId;
             const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
             
-            // 1. SPEJLING AF FORMAT OG RX (Henter live-data fra det valgte program)
+            // 1. SPEJLING AF FORMAT OG RX
             document.getElementById('TechFormat').value = program ? (program["Format"] || '') : '';
             document.getElementById('TechRX').value = program ? (program["RX"] || '') : '';
             
@@ -1660,23 +1728,25 @@
             document.getElementById('TechBrtListener').checked = false;
             document.getElementById('TechBrtListenerIP').value = "";
             document.getElementById('TechBrtListenerPort').value = "";
-            toggleTechListeners(); // Sørger for at skubbe/skjule felterne
+            toggleTechListeners(); 
             
             for(let i=1; i<=6; i++) document.getElementById('TechA'+i).value = "";
             
             document.getElementById('TechUtcStart').value = "";
             document.getElementById('TechUtcSlut').value = "";
-            calcE2ETime(); // Opdaterer den lille CET/CEST tekst til --:-- baseret på datoen
+            calcE2ETime(); 
             
+            document.getElementById('TechMcrTitel').value = "";
             document.getElementById('TechMcrTlf').value = "";
             document.getElementById('TechMcrEmail').value = "";
+            document.getElementById('TechKontakt1Titel').value = "";
             document.getElementById('TechKontakt1Tlf').value = "";
             document.getElementById('TechKontakt1Email').value = "";
+            document.getElementById('TechKontakt2Titel').value = "";
             document.getElementById('TechKontakt2Tlf').value = "";
             document.getElementById('TechKontakt2Email').value = "";
             document.getElementById('TechYderligere').value = "";
             
-            // For nuværende antager vi, det er en "ny" opsætning, da vi ikke har et databasefelt endnu.
             const submitBtn = document.getElementById('btnTechSubmit');
             submitBtn.textContent = "Gem teknisk info";
             
@@ -1684,12 +1754,10 @@
         }
 
         async function forsogLukTechModal() {
-            // (Simpel lukke-metode for nuværende i test-fasen)
             document.getElementById('techModal').style.display = "none";
         }
 
         async function gemTechInfo() {
-            // Placeholder: Trin 1-løsning før vi bygger Google Sheets logikken
             await visCustomDialog("Test-data gemt!\n\n(Dette er kun en visuel test-version. Intet er sendt til Google Sheets endnu).", "alert");
             document.getElementById('techModal').style.display = "none";
         }
