@@ -761,42 +761,42 @@
                     <div class="form-group" style="grid-column: span 4;"><label>A4</label><input type="text" id="TechA4"></div>
                     <div class="form-group" style="grid-column: span 4;"><label>A6</label><input type="text" id="TechA6"></div>
 
-                    <div class="form-group full-width" style="grid-column: span 12;">
+                   <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">END-2-END TEST</h4>
                     </div>
                     <div class="form-group" style="grid-column: span 3;">
-                        <label>UTC start</label>
+                        <label>UTC/GMT start</label>
                         <input type="time" id="TechUtcStart" oninput="calcE2ETime()">
                     </div>
-                    <div class="form-group" style="grid-column: span 3; display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column;">
+                    <div class="form-group" style="grid-column: span 2; display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column;">
                         <div id="TechCetStart" style="font-size: 13px; color: #000; font-weight: bold; margin-bottom: 9px;"></div>
                     </div>
                     <div class="form-group" style="grid-column: span 3;">
-                        <label>UTC slut</label>
+                        <label>UTC/GMT slut</label>
                         <input type="time" id="TechUtcSlut" oninput="calcE2ETime()">
                     </div>
-                    <div class="form-group" style="grid-column: span 3; display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column;">
+                    <div class="form-group" style="grid-column: span 4; display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column;">
                         <div id="TechCetSlut" style="font-size: 13px; color: #000; font-weight: bold; margin-bottom: 9px;"></div>
                     </div>
 
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">KONTAKTER</h4>
                     </div>
-                    <div class="form-group" style="grid-column: span 4;"><label>MCR (titel)</label><input type="text" id="TechMcrTitel"></div>
                     <div class="form-group" style="grid-column: span 4;"><label>MCR (telefon)</label><input type="text" id="TechMcrTlf"></div>
                     <div class="form-group" style="grid-column: span 4;"><label>MCR (e-mail)</label><input type="text" id="TechMcrEmail"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>MCR (titel)</label><input type="text" id="TechMcrTitel"></div>
                     
-                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 1 (titel)</label><input type="text" id="TechKontakt1Titel"></div>
                     <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 1 (telefon)</label><input type="text" id="TechKontakt1Tlf"></div>
                     <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 1 (e-mail)</label><input type="text" id="TechKontakt1Email"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 1 (titel)</label><input type="text" id="TechKontakt1Titel"></div>
                     
-                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 2 (titel)</label><input type="text" id="TechKontakt2Titel"></div>
                     <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 2 (telefon)</label><input type="text" id="TechKontakt2Tlf"></div>
                     <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 2 (e-mail)</label><input type="text" id="TechKontakt2Email"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 2 (titel)</label><input type="text" id="TechKontakt2Titel"></div>
 
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">YDERLIGERE INFORMATION</h4>
-                        <textarea id="TechYderligere" rows="3" style="font-family: inherit; width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical; margin-top: 5px;"></textarea>
+                        <textarea id="TechYderligere" rows="3" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical; margin-top: 5px;"></textarea>
                     </div>
                     
                 </div>
@@ -1758,7 +1758,18 @@
         }
 
         async function gemTechInfo() {
-            await visCustomDialog("Test-data gemt!\n\n(Dette er kun en visuel test-version. Intet er sendt til Google Sheets endnu).", "alert");
+            const rowId = document.getElementById('TechRowId').value;
+            const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
+            
+            // Simulerer to-vejs dataopdatering i frontenden:
+            if (program) {
+                program["Format"] = document.getElementById('TechFormat').value;
+                program["RX"] = document.getElementById('TechRX').value;
+                opdaterVisning(); // Genoptegner tabellen med de nye data med det samme
+            }
+
+            await visCustomDialog("Test-data gemt og hovedtabellen er opdateret!\n\n(Husk: Dette er stadig en lokal testfunktion, indtil vi bygger backend-koden, der gemmer dataene permanent i Google Sheets).", "alert");
+            
             document.getElementById('techModal').style.display = "none";
         }
         // ---------------------------------------------
