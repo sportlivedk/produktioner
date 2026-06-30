@@ -622,17 +622,122 @@
     </div>
 
     <!-- Nyt Teknisk Info Modal -->
-    <div id="techModal" class="modal">
+   <div id="techModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="forsogLukTechModal()">&times;</span>
             <h2 id="techModalTitle">Teknisk information</h2>
             <form id="techForm" autocomplete="off">
                 <input type="hidden" id="TechRowId">
                 <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label>Test-felt (Her kommer de tekniske felter senere)</label>
-                        <textarea id="TechTestFelt" rows="25" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical;"></textarea>
+                    
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Format</label>
+                        <input type="text" id="TechFormat" list="liste-Format" placeholder="Vælg eller skriv..." autocomplete="off">
                     </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>RX</label>
+                        <input type="text" id="TechRX" list="liste-RX" placeholder="Vælg eller skriv..." autocomplete="off">
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 3;">
+                        <label>MAIN SRT Caller IP</label>
+                        <input type="text" id="TechMainIP" placeholder="F.eks. 192.168.1.1" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                    </div>
+                    <div class="form-group" style="grid-column: span 1;">
+                        <label>Port</label>
+                        <input type="text" id="TechMainPort" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>MAIN Passphrase</label>
+                        <input type="text" id="TechMainPass">
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 3;">
+                        <label>BACKUP SRT Caller IP</label>
+                        <input type="text" id="TechBackupIP" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                    </div>
+                    <div class="form-group" style="grid-column: span 1;">
+                        <label>Port</label>
+                        <input type="text" id="TechBackupPort" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>BACKUP Passphrase</label>
+                        <input type="text" id="TechBackupPass">
+                    </div>
+
+                    <div class="form-group full-width checkbox-group" style="margin-top: 15px;">
+                        <input type="checkbox" id="TechSrtListener" onchange="toggleTechListeners()">
+                        <label for="TechSrtListener" style="font-weight: bold;">SRT Listener</label>
+                    </div>
+                    <div id="TechSrtListenerGroup" style="display: none; grid-column: span 4; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>SRT Listener IP</label>
+                            <input type="text" id="TechSrtListenerIP" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                        </div>
+                        <div class="form-group" style="grid-column: span 1;">
+                            <label>Port</label>
+                            <input type="text" id="TechSrtListenerPort" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width checkbox-group" style="margin-top: 5px;">
+                        <input type="checkbox" id="TechBrtListener" onchange="toggleTechListeners()">
+                        <label for="TechBrtListener" style="font-weight: bold;">BRT Listener (UDP)</label>
+                    </div>
+                    <div id="TechBrtListenerGroup" style="display: none; grid-column: span 4; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>BRT Listener IP</label>
+                            <input type="text" id="TechBrtListenerIP" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                        </div>
+                        <div class="form-group" style="grid-column: span 1;">
+                            <label>Port</label>
+                            <input type="text" id="TechBrtListenerPort" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <h4 style="margin: 20px 0 5px 0; border-bottom: 2px solid #ccc; padding-bottom: 5px;">AUDIO LAYOUT</h4>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;"><label>A1</label><input type="text" id="TechA1"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>A2</label><input type="text" id="TechA2"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>A3</label><input type="text" id="TechA3"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>A4</label><input type="text" id="TechA4"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>A5</label><input type="text" id="TechA5"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>A6</label><input type="text" id="TechA6"></div>
+
+                    <div class="form-group full-width">
+                        <h4 style="margin: 20px 0 5px 0; border-bottom: 2px solid #ccc; padding-bottom: 5px;">End-2-End test</h4>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>UTC start</label>
+                        <input type="time" id="TechUtcStart" oninput="calcE2ETime()">
+                        <div id="TechCetStart" style="font-size: 11px; color: #666; margin-top: 4px;">CET/CEST start: --:--</div>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>UTC slut</label>
+                        <input type="time" id="TechUtcSlut" oninput="calcE2ETime()">
+                        <div id="TechCetSlut" style="font-size: 11px; color: #666; margin-top: 4px;">CET/CEST slut: --:--</div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <h4 style="margin: 20px 0 5px 0; border-bottom: 2px solid #ccc; padding-bottom: 5px;">Kontakter</h4>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;"><label>MCR (Telefon)</label><input type="text" id="TechMcrTlf" oninput="this.value = this.value.replace(/[^0-9+ ]/g, '');"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>MCR (E-mail)</label><input type="email" id="TechMcrEmail"></div>
+                    
+                    <div class="form-group" style="grid-column: span 2;"><label>Anden kontakt 1 (Telefon)</label><input type="text" id="TechKontakt1Tlf" oninput="this.value = this.value.replace(/[^0-9+ ]/g, '');"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>Anden kontakt 1 (E-mail)</label><input type="email" id="TechKontakt1Email"></div>
+                    
+                    <div class="form-group" style="grid-column: span 2;"><label>Anden kontakt 2 (Telefon)</label><input type="text" id="TechKontakt2Tlf" oninput="this.value = this.value.replace(/[^0-9+ ]/g, '');"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>Anden kontakt 2 (E-mail)</label><input type="email" id="TechKontakt2Email"></div>
+
+                    <div class="form-group full-width">
+                        <h4 style="margin: 20px 0 5px 0; border-bottom: 2px solid #ccc; padding-bottom: 5px;">Yderligere information</h4>
+                        <textarea id="TechYderligere" rows="5" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical; margin-top: 5px;"></textarea>
+                    </div>
+                    
                 </div>
                 <div class="form-actions">
                     <button type="button" id="btnTechSubmit" class="btn" onclick="gemTechInfo()">Gem teknisk info</button>
@@ -1479,8 +1584,51 @@
             }
         }
 
-        // --- NYE MODAL FUNKTIONER TIL TEKNISK INFO ---
-       async function aabenTechModal(event, rowId) {
+       // --- NYE MODAL FUNKTIONER TIL TEKNISK INFO ---
+        
+        // Viser/skjuler felter afhængigt af om checkboksen er markeret
+        function toggleTechListeners() {
+            const srtBox = document.getElementById('TechSrtListener');
+            const srtGroup = document.getElementById('TechSrtListenerGroup');
+            srtGroup.style.display = srtBox.checked ? 'grid' : 'none';
+
+            const brtBox = document.getElementById('TechBrtListener');
+            const brtGroup = document.getElementById('TechBrtListenerGroup');
+            brtGroup.style.display = brtBox.checked ? 'grid' : 'none';
+        }
+
+        // Udregner CET/CEST automatisk baseret på programmets dato
+        function calcE2ETime() {
+            const rowId = document.getElementById('TechRowId').value;
+            const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
+            const datoStr = (program && program.NormDato) ? program.NormDato : new Date().toISOString().split('T')[0];
+
+            // Samme logik som du allerede bruger i storskærmsvisningen til at finde dansk tidszone-offset
+            const tzTestDate = new Date(`${datoStr}T12:00:00Z`);
+            const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Copenhagen', timeZoneName: 'short' });
+            const tzPart = formatter.formatToParts(tzTestDate).find(p => p.type === 'timeZoneName');
+            const isSummertime = tzPart && (tzPart.value.includes('+2') || tzPart.value.includes('CEST') || tzPart.value.includes('GMT+2'));
+            const offset = isSummertime ? 2 : 1;
+            const tzNavn = isSummertime ? "CEST" : "CET";
+
+            ['Start', 'Slut'].forEach(type => {
+                const utcVal = document.getElementById(`TechUtc${type}`).value;
+                const cetDiv = document.getElementById(`TechCet${type}`);
+                
+                if (!utcVal) {
+                    cetDiv.textContent = `${tzNavn} ${type.toLowerCase()}: --:--`;
+                    return;
+                }
+                
+                let [t, m] = utcVal.split(':').map(Number);
+                t = t + offset;
+                if (t >= 24) t -= 24;
+                
+                cetDiv.textContent = `${tzNavn} ${type.toLowerCase()}: ${String(t).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            });
+        }
+
+        async function aabenTechModal(event, rowId) {
             event.preventDefault();
             if (brugerRolle !== "Admin") {
                 await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
@@ -1488,41 +1636,58 @@
             }
             
             document.getElementById('TechRowId').value = rowId;
+            const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
             
-            // --- HER VIL VI SENERE HENTE DATA FRA GOOGLE SHEETS ---
-            // Lige nu lader vi systemet hente en tom streng som test
-            let hentetData = ""; 
+            // 1. SPEJLING AF FORMAT OG RX (Henter live-data fra det valgte program)
+            document.getElementById('TechFormat').value = program ? (program["Format"] || '') : '';
+            document.getElementById('TechRX').value = program ? (program["RX"] || '') : '';
             
-            const testFelt = document.getElementById('TechTestFelt');
-            testFelt.value = hentetData; 
+            // 2. NULSTILLING AF RESTEN (Test-layout)
+            document.getElementById('TechMainIP').value = "";
+            document.getElementById('TechMainPort').value = "";
+            document.getElementById('TechMainPass').value = "";
+            document.getElementById('TechBackupIP').value = "";
+            document.getElementById('TechBackupPort').value = "";
+            document.getElementById('TechBackupPass').value = "";
             
-            // Vi gemmer feltets start-tilstand, så vi kan tjekke, om brugeren har ændret noget
-            techFormInitialState = testFelt.value.trim();
+            document.getElementById('TechSrtListener').checked = false;
+            document.getElementById('TechSrtListenerIP').value = "";
+            document.getElementById('TechSrtListenerPort').value = "";
             
-            // Skift teksten på knappen dynamisk
+            document.getElementById('TechBrtListener').checked = false;
+            document.getElementById('TechBrtListenerIP').value = "";
+            document.getElementById('TechBrtListenerPort').value = "";
+            toggleTechListeners(); // Sørger for at skubbe/skjule felterne
+            
+            for(let i=1; i<=6; i++) document.getElementById('TechA'+i).value = "";
+            
+            document.getElementById('TechUtcStart').value = "";
+            document.getElementById('TechUtcSlut').value = "";
+            calcE2ETime(); // Opdaterer den lille CET/CEST tekst til --:-- baseret på datoen
+            
+            document.getElementById('TechMcrTlf').value = "";
+            document.getElementById('TechMcrEmail').value = "";
+            document.getElementById('TechKontakt1Tlf').value = "";
+            document.getElementById('TechKontakt1Email').value = "";
+            document.getElementById('TechKontakt2Tlf').value = "";
+            document.getElementById('TechKontakt2Email').value = "";
+            document.getElementById('TechYderligere').value = "";
+            
+            // For nuværende antager vi, det er en "ny" opsætning, da vi ikke har et databasefelt endnu.
             const submitBtn = document.getElementById('btnTechSubmit');
-            if (techFormInitialState === "") {
-                submitBtn.textContent = "Gem teknisk info";
-            } else {
-                submitBtn.textContent = "Opdater teknisk info";
-            }
+            submitBtn.textContent = "Gem teknisk info";
             
             document.getElementById('techModal').style.display = "block";
         }
 
         async function forsogLukTechModal() {
-            const currentVal = document.getElementById('TechTestFelt').value.trim();
-            if (currentVal !== techFormInitialState) {
-                const bekræft = await visCustomDialog("Er du sikker på, at du vil afslutte uden at gemme?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
-                if (bekræft) { document.getElementById('techModal').style.display = "none"; }
-            } else {
-                document.getElementById('techModal').style.display = "none";
-            }
+            // (Simpel lukke-metode for nuværende i test-fasen)
+            document.getElementById('techModal').style.display = "none";
         }
 
         async function gemTechInfo() {
             // Placeholder: Trin 1-løsning før vi bygger Google Sheets logikken
-            await visCustomDialog("Test-data gemt!\n\n(Dette er kun en midlertidig placeholder-funktion i Trin 1. Intet er sendt til Google Sheets endnu).", "alert");
+            await visCustomDialog("Test-data gemt!\n\n(Dette er kun en visuel test-version. Intet er sendt til Google Sheets endnu).", "alert");
             document.getElementById('techModal').style.display = "none";
         }
         // ---------------------------------------------
