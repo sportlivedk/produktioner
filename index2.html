@@ -641,11 +641,11 @@
                     </div>
                     <div style="grid-column: span 6;"></div> <div class="form-group" style="grid-column: span 4;">
                         <label>MAIN SRT Caller IP</label>
-                        <input type="text" id="TechMainIP" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                        <input type="text" id="TechMainIP">
                     </div>
                     <div class="form-group" style="grid-column: span 2;">
                         <label>Port</label>
-                        <input type="text" id="TechMainPort" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        <input type="text" id="TechMainPort">
                     </div>
                     <div class="form-group" style="grid-column: span 6;">
                         <label>Passphrase</label>
@@ -654,44 +654,44 @@
 
                     <div class="form-group" style="grid-column: span 4;">
                         <label>BACKUP SRT Caller IP</label>
-                        <input type="text" id="TechBackupIP" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                        <input type="text" id="TechBackupIP">
                     </div>
                     <div class="form-group" style="grid-column: span 2;">
                         <label>Port</label>
-                        <input type="text" id="TechBackupPort" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        <input type="text" id="TechBackupPort">
                     </div>
                     <div class="form-group" style="grid-column: span 6;">
                         <label>Passphrase</label>
                         <input type="text" id="TechBackupPass">
                     </div>
 
-                    <div class="form-group checkbox-group" style="grid-column: span 12; display: flex; align-items: center; margin-top: 15px;">
+                    <div class="form-group checkbox-group" style="grid-column: span 6; display: flex; align-items: center; margin-top: 15px;">
                         <input type="checkbox" id="TechSrtListener" onchange="toggleTechListeners()">
                         <label for="TechSrtListener" style="font-weight: bold;">SRT Listener</label>
                     </div>
-                    <div id="TechSrtListenerGroup" style="display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: -5px;">
-                        <div class="form-group" style="grid-column: span 4;">
-                            <label>SRT Listener IP</label>
-                            <input type="text" id="TechSrtListenerIP" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
-                        </div>
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label>Port</label>
-                            <input type="text" id="TechSrtListenerPort" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-                        </div>
-                    </div>
-
-                    <div class="form-group checkbox-group" style="grid-column: span 12; display: flex; align-items: center; margin-top: 5px;">
+                    <div class="form-group checkbox-group" style="grid-column: span 6; display: flex; align-items: center; margin-top: 15px;">
                         <input type="checkbox" id="TechBrtListener" onchange="toggleTechListeners()">
                         <label for="TechBrtListener" style="font-weight: bold;">BRT Listener (UDP)</label>
                     </div>
-                    <div id="TechBrtListenerGroup" style="display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: -5px;">
+
+                    <div id="TechSrtListenerGroup" style="display: none; grid-column: 1 / 7; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: -5px;">
                         <div class="form-group" style="grid-column: span 4;">
-                            <label>BRT Listener IP</label>
-                            <input type="text" id="TechBrtListenerIP" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                            <label>SRT Listener IP</label>
+                            <input type="text" id="TechSrtListenerIP">
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
                             <label>Port</label>
-                            <input type="text" id="TechBrtListenerPort" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                            <input type="text" id="TechSrtListenerPort">
+                        </div>
+                    </div>
+                    <div id="TechBrtListenerGroup" style="display: none; grid-column: 7 / 13; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: -5px;">
+                        <div class="form-group" style="grid-column: span 4;">
+                            <label>BRT Listener IP</label>
+                            <input type="text" id="TechBrtListenerIP">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Port</label>
+                            <input type="text" id="TechBrtListenerPort">
                         </div>
                     </div>
 
@@ -726,14 +726,14 @@
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">KONTAKTER</h4>
                     </div>
-                    <div class="form-group" style="grid-column: span 6;"><label>MCR (Telefon)</label><input type="text" id="TechMcrTlf" oninput="this.value = this.value.replace(/[^0-9+ ]/g, '');"></div>
-                    <div class="form-group" style="grid-column: span 6;"><label>MCR (E-mail)</label><input type="email" id="TechMcrEmail"></div>
+                    <div class="form-group" style="grid-column: span 6;"><label>MCR (telefon)</label><input type="text" id="TechMcrTlf"></div>
+                    <div class="form-group" style="grid-column: span 6;"><label>MCR (e-mail)</label><input type="text" id="TechMcrEmail"></div>
                     
-                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 1 (Telefon)</label><input type="text" id="TechKontakt1Tlf" oninput="this.value = this.value.replace(/[^0-9+ ]/g, '');"></div>
-                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 1 (E-mail)</label><input type="email" id="TechKontakt1Email"></div>
+                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 1 (telefon)</label><input type="text" id="TechKontakt1Tlf"></div>
+                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 1 (e-mail)</label><input type="text" id="TechKontakt1Email"></div>
                     
-                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 2 (Telefon)</label><input type="text" id="TechKontakt2Tlf" oninput="this.value = this.value.replace(/[^0-9+ ]/g, '');"></div>
-                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 2 (E-mail)</label><input type="email" id="TechKontakt2Email"></div>
+                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 2 (telefon)</label><input type="text" id="TechKontakt2Tlf"></div>
+                    <div class="form-group" style="grid-column: span 6;"><label>Anden kontakt 2 (e-mail)</label><input type="text" id="TechKontakt2Email"></div>
 
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">YDERLIGERE INFORMATION</h4>
