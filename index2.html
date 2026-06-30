@@ -1646,6 +1646,27 @@
         }
 
  // --- NYE MODAL FUNKTIONER TIL TEKNISK INFO ---
+
+        // Fanger status på alle felter i Tech-vinduet for at tjekke for ændringer
+        function hentTechFormularState() {
+            const data = {};
+            const textFields = [
+                'TechFormat', 'TechRX', 'TechMainIP', 'TechMainPort', 'TechMainPass',
+                'TechBackupIP', 'TechBackupPort', 'TechBackupPass', 
+                'TechSrtListenerIP', 'TechSrtListenerPort', 'TechBrtListenerIP', 'TechBrtListenerPort',
+                'TechA1', 'TechA2', 'TechA3', 'TechA4', 'TechA5', 'TechA6',
+                'TechUtcStart', 'TechUtcSlut', 'TechMcrTitel', 'TechMcrTlf', 'TechMcrEmail',
+                'TechKontakt1Titel', 'TechKontakt1Tlf', 'TechKontakt1Email',
+                'TechKontakt2Titel', 'TechKontakt2Tlf', 'TechKontakt2Email', 'TechYderligere'
+            ];
+            for (let id of textFields) {
+                const el = document.getElementById(id);
+                if (el) data[id] = el.value;
+            }
+            data['TechSrtListener'] = document.getElementById('TechSrtListener').checked;
+            data['TechBrtListener'] = document.getElementById('TechBrtListener').checked;
+            return JSON.stringify(data);
+        }
         
         // Kopierer teksten i input-feltet og giver grønt flueben-feedback i knappen
         function kopierTekst(elementId, btnElement) {
@@ -1754,19 +1775,38 @@
             
             document.getElementById('TechYderligere').value = program["Yderligere info"] || '';
             
+            // Fanger start-tilstanden, så vi kan tjekke, om der bliver lavet ændringer
+            techFormInitialState = hentTechFormularState();
+
             // Tjekker om der ligger data (for at ændre knapteksten)
             const hasData = (program["MAIN SRT IP"] || program["Format"] || program["UTC start"] || program["MCR telefon"]);
             const submitBtn = document.getElementById('btnTechSubmit');
             submitBtn.textContent = hasData ? "Opdater teknisk info" : "Gem teknisk info";
             
             document.getElementById('techModal').style.display = "block";
+            
+            // Tvinger vinduet til at scrolle helt til toppen, hver gang det åbnes
+            document.getElementById('techModal').scrollTop = 0;
         }
 
         async function forsogLukTechModal() {
-            document.getElementById('techModal').style.display = "none";
+            // Hvis der er lavet ændringer, kaster vi en advarsel
+            if (hentTechFormularState() !== techFormInitialState) {
+                const bekræft = await visCustomDialog("Er du sikker på, at du vil afslutte uden at gemme?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
+                if (bekræft) { document.getElementById('techModal').style.display = "none"; }
+            } else {
+                // Ingen ændringer? Så lukker vi bare.
+                document.getElementById('techModal').style.display = "none";
+            }
         }
 
         async function gemTechInfo() {
+            // Hvis brugeren trykker Gem/Opdater uden at have ændret noget, lukker vi bare for at spare tid
+            if (hentTechFormularState() === techFormInitialState) {
+                document.getElementById('techModal').style.display = "none";
+                return;
+            }
+
             const rowId = document.getElementById('TechRowId').value;
             if (!rowId) return;
 
@@ -1775,7 +1815,6 @@
             submitBtn.textContent = "Gemmer...";
             submitBtn.disabled = true;
 
-            // Samler alle indtastede værdier til et præcist payload
             const techPayload = {
                 action: "update",
                 RowId: rowId,
@@ -1814,14 +1853,12 @@
             };
 
             try {
-                // Sender data til Google Sheets
                 await fetch(scriptURL, {
                     method: 'POST',
                     body: JSON.stringify(techPayload),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 
-                // Opdaterer den lokale tabel øjeblikkeligt 
                 const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
                 if (program) {
                     for (let key in techPayload) {
