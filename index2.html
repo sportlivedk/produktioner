@@ -1709,46 +1709,55 @@
             document.getElementById('TechRowId').value = rowId;
             const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
             
-            // 1. SPEJLING AF FORMAT OG RX
-            document.getElementById('TechFormat').value = program ? (program["Format"] || '') : '';
-            document.getElementById('TechRX').value = program ? (program["RX"] || '') : '';
+            if (!program) return;
+
+            // UDFYLDER ALLE FELTER MED DATA FRA DATABASEN (Spejling)
+            document.getElementById('TechFormat').value = program["Format"] || '';
+            document.getElementById('TechRX').value = program["RX"] || '';
             
-            // 2. NULSTILLING AF RESTEN (Test-layout)
-            document.getElementById('TechMainIP').value = "";
-            document.getElementById('TechMainPort').value = "";
-            document.getElementById('TechMainPass').value = "";
-            document.getElementById('TechBackupIP').value = "";
-            document.getElementById('TechBackupPort').value = "";
-            document.getElementById('TechBackupPass').value = "";
+            document.getElementById('TechMainIP').value = program["MAIN SRT IP"] || '';
+            document.getElementById('TechMainPort').value = program["MAIN SRT Port"] || '';
+            document.getElementById('TechMainPass').value = program["MAIN Passphrase"] || '';
             
-            document.getElementById('TechSrtListener').checked = false;
-            document.getElementById('TechSrtListenerIP').value = "";
-            document.getElementById('TechSrtListenerPort').value = "";
+            document.getElementById('TechBackupIP').value = program["BACKUP SRT IP"] || '';
+            document.getElementById('TechBackupPort').value = program["BACKUP SRT Port"] || '';
+            document.getElementById('TechBackupPass').value = program["BACKUP Passphrase"] || '';
             
-            document.getElementById('TechBrtListener').checked = false;
-            document.getElementById('TechBrtListenerIP').value = "";
-            document.getElementById('TechBrtListenerPort').value = "";
+            document.getElementById('TechSrtListener').checked = (program["SRT Listener"] === "X");
+            document.getElementById('TechSrtListenerIP').value = program["SRT Listener IP"] || '';
+            document.getElementById('TechSrtListenerPort').value = program["SRT Listener Port"] || '';
+            
+            document.getElementById('TechBrtListener').checked = (program["BRT Listener"] === "X");
+            document.getElementById('TechBrtListenerIP').value = program["BRT Listener IP"] || '';
+            document.getElementById('TechBrtListenerPort').value = program["BRT Listener Port"] || '';
             toggleTechListeners(); 
             
-            for(let i=1; i<=6; i++) document.getElementById('TechA'+i).value = "";
+            for(let i=1; i<=6; i++) {
+                document.getElementById('TechA'+i).value = program["A"+i] || '';
+            }
             
-            document.getElementById('TechUtcStart').value = "";
-            document.getElementById('TechUtcSlut').value = "";
+            document.getElementById('TechUtcStart').value = program["UTC start"] || '';
+            document.getElementById('TechUtcSlut').value = program["UTC slut"] || '';
             calcE2ETime(); 
             
-            document.getElementById('TechMcrTitel').value = "";
-            document.getElementById('TechMcrTlf').value = "";
-            document.getElementById('TechMcrEmail').value = "";
-            document.getElementById('TechKontakt1Titel').value = "";
-            document.getElementById('TechKontakt1Tlf').value = "";
-            document.getElementById('TechKontakt1Email').value = "";
-            document.getElementById('TechKontakt2Titel').value = "";
-            document.getElementById('TechKontakt2Tlf').value = "";
-            document.getElementById('TechKontakt2Email').value = "";
-            document.getElementById('TechYderligere').value = "";
+            document.getElementById('TechMcrTitel').value = program["MCR titel"] || '';
+            document.getElementById('TechMcrTlf').value = program["MCR telefon"] || '';
+            document.getElementById('TechMcrEmail').value = program["MCR e-mail"] || '';
             
+            document.getElementById('TechKontakt1Titel').value = program["Kontakt 1 titel"] || '';
+            document.getElementById('TechKontakt1Tlf').value = program["Kontakt 1 telefon"] || '';
+            document.getElementById('TechKontakt1Email').value = program["Kontakt 1 e-mail"] || '';
+            
+            document.getElementById('TechKontakt2Titel').value = program["Kontakt 2 titel"] || '';
+            document.getElementById('TechKontakt2Tlf').value = program["Kontakt 2 telefon"] || '';
+            document.getElementById('TechKontakt2Email').value = program["Kontakt 2 e-mail"] || '';
+            
+            document.getElementById('TechYderligere').value = program["Yderligere info"] || '';
+            
+            // Tjekker om der ligger data (for at ændre knapteksten)
+            const hasData = (program["MAIN SRT IP"] || program["Format"] || program["UTC start"] || program["MCR telefon"]);
             const submitBtn = document.getElementById('btnTechSubmit');
-            submitBtn.textContent = "Gem teknisk info";
+            submitBtn.textContent = hasData ? "Opdater teknisk info" : "Gem teknisk info";
             
             document.getElementById('techModal').style.display = "block";
         }
@@ -1759,18 +1768,79 @@
 
         async function gemTechInfo() {
             const rowId = document.getElementById('TechRowId').value;
-            const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
-            
-            // Simulerer to-vejs dataopdatering i frontenden:
-            if (program) {
-                program["Format"] = document.getElementById('TechFormat').value;
-                program["RX"] = document.getElementById('TechRX').value;
-                opdaterVisning(); // Genoptegner tabellen med de nye data med det samme
-            }
+            if (!rowId) return;
 
-            await visCustomDialog("Test-data gemt og hovedtabellen er opdateret!\n\n(Husk: Dette er stadig en lokal testfunktion, indtil vi bygger backend-koden, der gemmer dataene permanent i Google Sheets).", "alert");
-            
-            document.getElementById('techModal').style.display = "none";
+            const submitBtn = document.getElementById('btnTechSubmit');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = "Gemmer...";
+            submitBtn.disabled = true;
+
+            // Samler alle indtastede værdier til et præcist payload
+            const techPayload = {
+                action: "update",
+                RowId: rowId,
+                "Format": document.getElementById('TechFormat').value,
+                "RX": document.getElementById('TechRX').value,
+                "MAIN SRT IP": document.getElementById('TechMainIP').value,
+                "MAIN SRT Port": document.getElementById('TechMainPort').value,
+                "MAIN Passphrase": document.getElementById('TechMainPass').value,
+                "BACKUP SRT IP": document.getElementById('TechBackupIP').value,
+                "BACKUP SRT Port": document.getElementById('TechBackupPort').value,
+                "BACKUP Passphrase": document.getElementById('TechBackupPass').value,
+                "SRT Listener": document.getElementById('TechSrtListener').checked ? "X" : "",
+                "SRT Listener IP": document.getElementById('TechSrtListenerIP').value,
+                "SRT Listener Port": document.getElementById('TechSrtListenerPort').value,
+                "BRT Listener": document.getElementById('TechBrtListener').checked ? "X" : "",
+                "BRT Listener IP": document.getElementById('TechBrtListenerIP').value,
+                "BRT Listener Port": document.getElementById('TechBrtListenerPort').value,
+                "A1": document.getElementById('TechA1').value,
+                "A2": document.getElementById('TechA2').value,
+                "A3": document.getElementById('TechA3').value,
+                "A4": document.getElementById('TechA4').value,
+                "A5": document.getElementById('TechA5').value,
+                "A6": document.getElementById('TechA6').value,
+                "UTC start": document.getElementById('TechUtcStart').value,
+                "UTC slut": document.getElementById('TechUtcSlut').value,
+                "MCR titel": document.getElementById('TechMcrTitel').value,
+                "MCR telefon": document.getElementById('TechMcrTlf').value,
+                "MCR e-mail": document.getElementById('TechMcrEmail').value,
+                "Kontakt 1 titel": document.getElementById('TechKontakt1Titel').value,
+                "Kontakt 1 telefon": document.getElementById('TechKontakt1Tlf').value,
+                "Kontakt 1 e-mail": document.getElementById('TechKontakt1Email').value,
+                "Kontakt 2 titel": document.getElementById('TechKontakt2Titel').value,
+                "Kontakt 2 telefon": document.getElementById('TechKontakt2Tlf').value,
+                "Kontakt 2 e-mail": document.getElementById('TechKontakt2Email').value,
+                "Yderligere info": document.getElementById('TechYderligere').value
+            };
+
+            try {
+                // Sender data til Google Sheets
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify(techPayload),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                
+                // Opdaterer den lokale tabel øjeblikkeligt 
+                const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
+                if (program) {
+                    for (let key in techPayload) {
+                        if (key !== "action" && key !== "RowId") {
+                            program[key] = techPayload[key];
+                        }
+                    }
+                    opdaterVisning(); 
+                }
+
+                document.getElementById('techModal').style.display = "none";
+                
+            } catch (error) {
+                console.error('Fejl ved gemning af tech info:', error);
+                await visCustomDialog("Der skete en fejl under gemning. Prøv igen.", 'alert');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
         }
         // ---------------------------------------------
 
