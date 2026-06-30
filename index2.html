@@ -621,18 +621,21 @@
         </div>
     </div>
 
+    <!-- Nyt Teknisk Info Modal -->
     <div id="techModal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content">
             <span class="close" onclick="forsogLukTechModal()">&times;</span>
             <h2 id="techModalTitle">Teknisk information</h2>
             <form id="techForm" autocomplete="off">
                 <input type="hidden" id="TechRowId">
-                <div class="form-group full-width">
-                    <label>Test-felt (Her kommer de tekniske felter senere)</label>
-                    <textarea id="TechTestFelt" rows="6" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical;"></textarea>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Test-felt (Her kommer de tekniske felter senere)</label>
+                        <textarea id="TechTestFelt" rows="25" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical;"></textarea>
+                    </div>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn" onclick="gemTechInfo()">Gem teknisk info</button>
+                    <button type="button" id="btnTechSubmit" class="btn" onclick="gemTechInfo()">Gem teknisk info</button>
                 </div>
             </form>
         </div>
@@ -1477,7 +1480,7 @@
         }
 
         // --- NYE MODAL FUNKTIONER TIL TEKNISK INFO ---
-        async function aabenTechModal(event, rowId) {
+       async function aabenTechModal(event, rowId) {
             event.preventDefault();
             if (brugerRolle !== "Admin") {
                 await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
@@ -1485,9 +1488,25 @@
             }
             
             document.getElementById('TechRowId').value = rowId;
-            document.getElementById('TechTestFelt').value = ""; // Testfelt ryddes til trin 1
             
-            techFormInitialState = document.getElementById('TechTestFelt').value.trim();
+            // --- HER VIL VI SENERE HENTE DATA FRA GOOGLE SHEETS ---
+            // Lige nu lader vi systemet hente en tom streng som test
+            let hentetData = ""; 
+            
+            const testFelt = document.getElementById('TechTestFelt');
+            testFelt.value = hentetData; 
+            
+            // Vi gemmer feltets start-tilstand, så vi kan tjekke, om brugeren har ændret noget
+            techFormInitialState = testFelt.value.trim();
+            
+            // Skift teksten på knappen dynamisk
+            const submitBtn = document.getElementById('btnTechSubmit');
+            if (techFormInitialState === "") {
+                submitBtn.textContent = "Gem teknisk info";
+            } else {
+                submitBtn.textContent = "Opdater teknisk info";
+            }
+            
             document.getElementById('techModal').style.display = "block";
         }
 
