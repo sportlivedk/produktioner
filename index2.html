@@ -197,7 +197,7 @@
         .slet-btn { background-color: #dc3545; color: white; font-weight: bold; margin-right: 0; }
         .slet-btn:hover { background-color: #c82333; }
         
-        /* NY STYLING TIL TEKNISK INFO KNAP (ANTENNE) */
+        /* NY STYLING TIL TEKNISK INFO KNAP (PARABOL) */
         .tech-btn { background-color: #17a2b8; color: white; margin-right: 5px; padding: 0 8px;}
         .tech-btn:hover { background-color: #138496; }
 
@@ -649,8 +649,8 @@
                     </div>
                     <div style="grid-column: span 6;"></div> 
                     
-                    <div style="grid-column: span 12; background-color: #e8f5e9; padding: 15px; border-radius: 6px; border: 1px solid #c3e6cb; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px;">
-                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #155724;">MAIN SRT</h4>
+                    <div style="grid-column: span 12; background-color: #f9fdfa; padding: 15px; border-radius: 6px; border: 1px solid #e8f5e9; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #000000;">MAIN SRT</h4>
                         
                         <div class="form-group" style="grid-column: span 4;">
                             <label>Caller IP</label>
@@ -684,8 +684,8 @@
                         </div>
                     </div>
 
-                    <div style="grid-column: span 12; background-color: #fff3cd; padding: 15px; border-radius: 6px; border: 1px solid #ffeeba; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
-                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #856404;">BACKUP SRT</h4>
+                    <div style="grid-column: span 12; background-color: #fffdf2; padding: 15px; border-radius: 6px; border: 1px solid #fff3cd; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #000000;">BACKUP SRT</h4>
                         
                         <div class="form-group" style="grid-column: span 4;">
                             <label>Caller IP</label>
@@ -773,8 +773,8 @@
                         </div>
                     </div>
 
-                    <div style="grid-column: span 12; background-color: #f0f8ff; padding: 15px; border-radius: 6px; border: 1px solid #cce5ff; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
-                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #004085;">AUDIO LAYOUT</h4>
+                    <div style="grid-column: span 12; background-color: #f6fafe; padding: 15px; border-radius: 6px; border: 1px solid #e6f0ff; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #000000;">AUDIO LAYOUT</h4>
                         <div class="form-group" style="grid-column: span 4;"><label>A1</label><input type="text" id="TechA1" list="liste-TechA1"><datalist id="liste-TechA1"></datalist></div>
                         <div class="form-group" style="grid-column: span 4;"><label>A3</label><input type="text" id="TechA3" list="liste-TechA3"><datalist id="liste-TechA3"></datalist></div>
                         <div class="form-group" style="grid-column: span 4;"><label>A5</label><input type="text" id="TechA5" list="liste-TechA5"><datalist id="liste-TechA5"></datalist></div>
@@ -2316,8 +2316,8 @@
 
                 let handlingsKnapper = `
                     <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
-                    <button class="action-btn tech-btn" onclick="aabenTechModal(event, ${program.RowId})" title="Teknisk info"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="M4.9 19.1C3.1 17.3 2 14.8 2 12c0-2.8 1.1-5.3 2.9-7.1"></path><path d="M8.4 15.6C7.5 14.7 7 13.4 7 12c0-1.4.5-2.7 1.4-3.6"></path><circle cx="12" cy="12" r="2"></circle><path d="M15.6 15.6c.9-.9 1.4-2.2 1.4-3.6 0-1.4-.5-2.7-1.4-3.6"></path><path d="M19.1 19.1c1.8-1.8 2.9-4.3 2.9-7.1 0-2.8-1.1-5.3-2.9-7.1"></path></svg></button>
-                    <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
+                    <button class="action-btn tech-btn" onclick="aabenTechModal(event, ${program.RowId})" title="Teknisk info"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="M2.5 12a9.5 9.5 0 0 0 19 0"></path><path d="M12 12v-5"></path><circle cx="12" cy="6" r="1"></circle><path d="M12 22v-6"></path><path d="M9 22h6"></path></svg></button>
+                    <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})" title="Rediger program">Rediger</button>
                     <button class="action-btn kopier-btn" onclick="kopierProgram(${program.RowId})" title="Kopier program">Kopier</button>
                     <button class="action-btn slet-btn" onclick="bekraeftSlet(${program.RowId})" title="Slet program">✖</button>
                 `;
@@ -2376,7 +2376,7 @@
                         timer -= offset;
                         if (timer < 0) timer += 24;
                         
-                        utcDisplay = String(timer).padStart(2, '0') + ':' + String(minutter).padStart(2, '0');
+                        utcDisplay = "Kl. " + String(timer).padStart(2, '0') + ':' + String(minutter).padStart(2, '0');
                     }
                 }
 
@@ -2433,7 +2433,7 @@
                                     <div class="detail-list-item"><span class="detail-label">Lokation:</span> <span class="detail-value">${pSted}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Starttid UTC/GMT:</span> <span class="detail-value">${utcDisplay}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Noter:</span> <span class="detail-value" style="color: #0056b3; text-align: right; max-width: 75%; word-break: break-word;">${formateretNoter}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Noter:</span> <span class="detail-value" style="color: #000000; text-align: right; max-width: 75%; word-break: break-word;">${formateretNoter}</span></div>
                                 </div>
                             </div>
                         </div>
