@@ -197,7 +197,7 @@
         .slet-btn { background-color: #dc3545; color: white; font-weight: bold; margin-right: 0; }
         .slet-btn:hover { background-color: #c82333; }
         
-        /* NY STYLING TIL TEKNISK INFO KNAP (TANDHJUL) */
+        /* NY STYLING TIL TEKNISK INFO KNAP (ANTENNE) */
         .tech-btn { background-color: #17a2b8; color: white; margin-right: 5px; padding: 0 8px;}
         .tech-btn:hover { background-color: #138496; }
 
@@ -630,7 +630,7 @@
         </div>
     </div>
 
-    <div id="techModal" class="modal">
+   <div id="techModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="forsogLukTechModal()">&times;</span>
             <h2 id="techModalTitle">Teknisk info</h2>
@@ -649,8 +649,8 @@
                     </div>
                     <div style="grid-column: span 6;"></div> 
                     
-                    <div style="grid-column: span 12; background-color: #f0f8ff; padding: 15px; border-radius: 6px; border: 1px solid #cce5ff; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px;">
-                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #004085;">MAIN SRT</h4>
+                    <div style="grid-column: span 12; background-color: #e8f5e9; padding: 15px; border-radius: 6px; border: 1px solid #c3e6cb; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #155724;">MAIN SRT</h4>
                         
                         <div class="form-group" style="grid-column: span 4;">
                             <label>Caller IP</label>
@@ -684,8 +684,8 @@
                         </div>
                     </div>
 
-                    <div style="grid-column: span 12; background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #dae0e5; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
-                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #383d41;">BACKUP SRT</h4>
+                    <div style="grid-column: span 12; background-color: #fff3cd; padding: 15px; border-radius: 6px; border: 1px solid #ffeeba; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #856404;">BACKUP SRT</h4>
                         
                         <div class="form-group" style="grid-column: span 4;">
                             <label>Caller IP</label>
@@ -773,32 +773,14 @@
                         </div>
                     </div>
 
-                    <div class="form-group full-width" style="grid-column: span 12;">
-                        <h4 style="margin: 15px 0 0 0; font-size: 13px;">AUDIO LAYOUT</h4>
-                    </div>
-                    
-                    <div style="grid-column: span 4; background-color: #f8f9fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 12px; box-sizing: border-box;">
-                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Par 1 (A1 / A2)</div>
-                        <div style="display: flex; gap: 10px;">
-                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Venstre (L)</label><input type="text" id="TechA1" list="liste-TechA1" style="width: 100%;"></div>
-                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Højre (R)</label><input type="text" id="TechA2" list="liste-TechA2" style="width: 100%;"></div>
-                        </div>
-                    </div>
-                    
-                    <div style="grid-column: span 4; background-color: #f8f9fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 12px; box-sizing: border-box;">
-                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Par 2 (A3 / A4)</div>
-                        <div style="display: flex; gap: 10px;">
-                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Venstre (L)</label><input type="text" id="TechA3" list="liste-TechA3" style="width: 100%;"></div>
-                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Højre (R)</label><input type="text" id="TechA4" list="liste-TechA4" style="width: 100%;"></div>
-                        </div>
-                    </div>
-                    
-                    <div style="grid-column: span 4; background-color: #f8f9fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 12px; box-sizing: border-box;">
-                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Par 3 (A5 / A6)</div>
-                        <div style="display: flex; gap: 10px;">
-                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Venstre (L)</label><input type="text" id="TechA5" list="liste-TechA5" style="width: 100%;"></div>
-                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Højre (R)</label><input type="text" id="TechA6" list="liste-TechA6" style="width: 100%;"></div>
-                        </div>
+                    <div style="grid-column: span 12; background-color: #f0f8ff; padding: 15px; border-radius: 6px; border: 1px solid #cce5ff; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #004085;">AUDIO LAYOUT</h4>
+                        <div class="form-group" style="grid-column: span 4;"><label>A1</label><input type="text" id="TechA1" list="liste-TechA1"><datalist id="liste-TechA1"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>A3</label><input type="text" id="TechA3" list="liste-TechA3"><datalist id="liste-TechA3"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>A5</label><input type="text" id="TechA5" list="liste-TechA5"><datalist id="liste-TechA5"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>A2</label><input type="text" id="TechA2" list="liste-TechA2"><datalist id="liste-TechA2"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>A4</label><input type="text" id="TechA4" list="liste-TechA4"><datalist id="liste-TechA4"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>A6</label><input type="text" id="TechA6" list="liste-TechA6"><datalist id="liste-TechA6"></datalist></div>
                     </div>
 
                    <div class="form-group full-width" style="grid-column: span 12;">
@@ -863,11 +845,10 @@
         let aktuelNotifikation = false; 
         
         let formInitialState = ""; 
-        let techFormInitialState = ""; // Til at tjekke ændringer i tech-vinduet
+        let techFormInitialState = ""; 
 
         function hentFormularState() {
             const data = {};
-            // Teknisk_info er fjernet fra fieldsToCheck
             const fieldsToCheck = ['Dato', 'Tid', 'TX', 'Kanal', 'Premieredato', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'P-plan', 'Noter', 'Producer', 'Kommentator', 'Ekspert', 'Reporter'];
             
             for (let id of fieldsToCheck) {
@@ -2335,9 +2316,9 @@
 
                 let handlingsKnapper = `
                     <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
+                    <button class="action-btn tech-btn" onclick="aabenTechModal(event, ${program.RowId})" title="Teknisk info"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="M4.9 19.1C3.1 17.3 2 14.8 2 12c0-2.8 1.1-5.3 2.9-7.1"></path><path d="M8.4 15.6C7.5 14.7 7 13.4 7 12c0-1.4.5-2.7 1.4-3.6"></path><circle cx="12" cy="12" r="2"></circle><path d="M15.6 15.6c.9-.9 1.4-2.2 1.4-3.6 0-1.4-.5-2.7-1.4-3.6"></path><path d="M19.1 19.1c1.8-1.8 2.9-4.3 2.9-7.1 0-2.8-1.1-5.3-2.9-7.1"></path></svg></button>
                     <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
                     <button class="action-btn kopier-btn" onclick="kopierProgram(${program.RowId})" title="Kopier program">Kopier</button>
-                    <button class="action-btn tech-btn" onclick="aabenTechModal(event, ${program.RowId})" title="Teknisk info"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
                     <button class="action-btn slet-btn" onclick="bekraeftSlet(${program.RowId})" title="Slet program">✖</button>
                 `;
 
@@ -2376,10 +2357,8 @@
                     visUnitMedIkoner = `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="padding-right: 2px;">${visUnitKolonne}</span><div style="display: flex; gap: 3px; flex-shrink: 0;">${ikoner}</div></div>`;
                 }
 
-                // --- BEREGNING AF UTC OG SAMMENSLÅNING AF FORMAT/RX ---
                 let pFormat = program["Format"] ? String(program["Format"]).trim() : '';
                 let pRX = program["RX"] ? String(program["RX"]).trim() : '';
-                let formatOgRx = [pFormat, pRX].filter(Boolean).join(', ') || '-';
 
                 let utcDisplay = '-';
                 if (pTid !== '-' && pTid.includes(':') && normDato !== '') {
@@ -2400,7 +2379,6 @@
                         utcDisplay = String(timer).padStart(2, '0') + ':' + String(minutter).padStart(2, '0');
                     }
                 }
-                // --------------------------------------------------------
 
                 const trMain = document.createElement('tr');
                 trMain.className = 'main-row';
@@ -2443,7 +2421,8 @@
                                 <h4>Tekniske specifikationer</h4>
                                 <div class="detail-list">
                                     <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${visUnitRen || '-'}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Format & RX:</span> <span class="detail-value">${formatOgRx}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Format:</span> <span class="detail-value">${pFormat || '-'}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">RX:</span> <span class="detail-value">${pRX || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="${signalStyling}">${signalTekst}</span></div>
                                 </div>
                             </div>
@@ -2595,7 +2574,7 @@
                 "Kommentator": document.getElementById('Kommentator').value,
                 "Ekspert": document.getElementById('Ekspert').value,
                 "Reporter": document.getElementById('Reporter').value,
-                "Teknisk info": "", // Sender tom streng for at undgå fejl med det gamle felt
+                "Teknisk info": "", 
                 "Link / Noter": document.getElementById('Noter').value,
                 "TBC": tbcStatus,
                 "TX": valgtTX 
@@ -2611,7 +2590,6 @@
                 closeModal();
                 document.getElementById('programForm').reset();
                 
-                // Hent data lydløst i baggrunden uden at fjerne tabellen
                 await loadProgrammer(true); 
                 
                 if (scrollContainer) {
@@ -2666,7 +2644,6 @@
                     if (document.getElementById('profileModal').style.display === 'flex') erForstyrret = true;
                     if (document.getElementById('customDialog').style.display === 'flex') erForstyrret = true;
                     
-                    // Tilføjet tjek for det nye techModal
                     const techM = document.getElementById('techModal');
                     if (techM && techM.style.display === 'block') erForstyrret = true;
 
@@ -2692,19 +2669,16 @@
         function openModal() { modal.style.display = "block"; }
         function closeModal() { modal.style.display = "none"; }
         
-        // --- SWIPE LOGIK TIL MOBILVISNING (UGEDAG) ---
         let touchstartX = 0;
         let touchendX = 0;
 
         const tableContainerEl = document.querySelector('.table-container');
         
         if (tableContainerEl) {
-            // Registrerer hvor fingeren lander
             tableContainerEl.addEventListener('touchstart', e => {
                 touchstartX = e.changedTouches[0].screenX;
             }, {passive: true});
 
-            // Registrerer hvor fingeren slippes
             tableContainerEl.addEventListener('touchend', e => {
                 touchendX = e.changedTouches[0].screenX;
                 handterMobileSwipe();
@@ -2712,13 +2686,10 @@
         }
 
         function handterMobileSwipe() {
-            // Tjekker om vi faktisk er på en mobilskærm
             if (window.innerWidth <= 900) {
-                // Et swipe på mere end 60 pixels mod HØJRE (trækker menuen frem)
                 if (touchendX > touchstartX + 60) {
                     document.body.classList.add('show-mobile-weekday');
                 } 
-                // Et swipe på mere end 60 pixels mod VENSTRE (skubber menuen væk igen)
                 else if (touchendX < touchstartX - 60) {
                     document.body.classList.remove('show-mobile-weekday');
                 }
