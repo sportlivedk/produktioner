@@ -652,7 +652,7 @@
                     <div style="grid-column: span 12; background-color: #f9fdfa; padding: 15px; border-radius: 6px; border: 1px solid #e8f5e9; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px;">
                         <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #000000;">MAIN SRT</h4>
                         
-                        <div class="form-group" style="grid-column: span 4;">
+                        <div class="form-group" style="grid-column: span 8;">
                             <label>Caller IP</label>
                             <div class="input-with-copy">
                                 <input type="text" id="TechMainIP" list="liste-TechMainIP">
@@ -662,7 +662,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="form-group" style="grid-column: span 3;">
+                        <div class="form-group" style="grid-column: span 4;">
                             <label>Port</label>
                             <div class="input-with-copy">
                                 <input type="text" id="TechMainPort" list="liste-TechMainPort">
@@ -672,7 +672,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="form-group" style="grid-column: span 5;">
+                        <div class="form-group" style="grid-column: span 6;">
                             <label>Passphrase</label>
                             <div class="input-with-copy">
                                 <input type="text" id="TechMainPass" list="liste-TechMainPass">
@@ -682,12 +682,22 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Stream ID</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechMainStreamID" list="liste-TechMainStreamID">
+                                <datalist id="liste-TechMainStreamID"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainStreamID', this)" title="Kopier Stream ID">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div style="grid-column: span 12; background-color: #fffdf2; padding: 15px; border-radius: 6px; border: 1px solid #fff3cd; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
                         <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #000000;">BACKUP SRT</h4>
                         
-                        <div class="form-group" style="grid-column: span 4;">
+                        <div class="form-group" style="grid-column: span 8;">
                             <label>Caller IP</label>
                             <div class="input-with-copy">
                                 <input type="text" id="TechBackupIP" list="liste-TechBackupIP">
@@ -697,7 +707,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="form-group" style="grid-column: span 3;">
+                        <div class="form-group" style="grid-column: span 4;">
                             <label>Port</label>
                             <div class="input-with-copy">
                                 <input type="text" id="TechBackupPort" list="liste-TechBackupPort">
@@ -707,12 +717,22 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="form-group" style="grid-column: span 5;">
+                        <div class="form-group" style="grid-column: span 6;">
                             <label>Passphrase</label>
                             <div class="input-with-copy">
                                 <input type="text" id="TechBackupPass" list="liste-TechBackupPass">
                                 <datalist id="liste-TechBackupPass"></datalist>
                                 <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPass', this)" title="Kopier Passphrase">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Stream ID</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBackupStreamID" list="liste-TechBackupStreamID">
+                                <datalist id="liste-TechBackupStreamID"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupStreamID', this)" title="Kopier Stream ID">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 </button>
                             </div>
@@ -724,7 +744,7 @@
                         <label for="TechSrtListener" style="font-weight: bold;">SRT Listener</label>
                     </div>
                     <div id="TechSrtListenerGroup" style="display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: -5px;">
-                        <div class="form-group" style="grid-column: span 4;">
+                        <div class="form-group" style="grid-column: span 8;">
                             <label>SRT Listener IP</label>
                             <div class="input-with-copy">
                                 <input type="text" id="TechSrtListenerIP" list="liste-TechSrtListenerIP">
@@ -734,12 +754,32 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="form-group" style="grid-column: span 3;">
+                        <div class="form-group" style="grid-column: span 4;">
                             <label>Port</label>
                             <div class="input-with-copy">
                                 <input type="text" id="TechSrtListenerPort" list="liste-TechSrtListenerPort">
                                 <datalist id="liste-TechSrtListenerPort"></datalist>
                                 <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerPort', this)" title="Kopier Port">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Passphrase</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechSrtListenerPass" list="liste-TechSrtListenerPass">
+                                <datalist id="liste-TechSrtListenerPass"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerPass', this)" title="Kopier Passphrase">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Stream ID</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechSrtListenerStreamID" list="liste-TechSrtListenerStreamID">
+                                <datalist id="liste-TechSrtListenerStreamID"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerStreamID', this)" title="Kopier Stream ID">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 </button>
                             </div>
@@ -751,7 +791,7 @@
                         <label for="TechBrtListener" style="font-weight: bold;">BRT Listener (UDP)</label>
                     </div>
                     <div id="TechBrtListenerGroup" style="display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: -5px;">
-                        <div class="form-group" style="grid-column: span 4;">
+                        <div class="form-group" style="grid-column: span 8;">
                             <label>BRT Listener IP</label>
                             <div class="input-with-copy">
                                 <input type="text" id="TechBrtListenerIP" list="liste-TechBrtListenerIP">
@@ -761,12 +801,32 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="form-group" style="grid-column: span 3;">
+                        <div class="form-group" style="grid-column: span 4;">
                             <label>Port</label>
                             <div class="input-with-copy">
                                 <input type="text" id="TechBrtListenerPort" list="liste-TechBrtListenerPort">
                                 <datalist id="liste-TechBrtListenerPort"></datalist>
                                 <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerPort', this)" title="Kopier Port">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Passphrase</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBrtListenerPass" list="liste-TechBrtListenerPass">
+                                <datalist id="liste-TechBrtListenerPass"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerPass', this)" title="Kopier Passphrase">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Stream ID</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBrtListenerStreamID" list="liste-TechBrtListenerStreamID">
+                                <datalist id="liste-TechBrtListenerStreamID"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerStreamID', this)" title="Kopier Stream ID">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 </button>
                             </div>
@@ -1400,10 +1460,10 @@
 
         function opdaterTechDatalists() {
             const fieldsMap = {
-                'TechMainIP': 'MAIN SRT IP', 'TechMainPort': 'MAIN SRT Port', 'TechMainPass': 'MAIN Passphrase',
-                'TechBackupIP': 'BACKUP SRT IP', 'TechBackupPort': 'BACKUP SRT Port', 'TechBackupPass': 'BACKUP Passphrase',
-                'TechSrtListenerIP': 'SRT Listener IP', 'TechSrtListenerPort': 'SRT Listener Port',
-                'TechBrtListenerIP': 'BRT Listener IP', 'TechBrtListenerPort': 'BRT Listener Port',
+                'TechMainIP': 'MAIN SRT IP', 'TechMainPort': 'MAIN SRT Port', 'TechMainPass': 'MAIN Passphrase', 'TechMainStreamID': 'MAIN Stream ID',
+                'TechBackupIP': 'BACKUP SRT IP', 'TechBackupPort': 'BACKUP SRT Port', 'TechBackupPass': 'BACKUP Passphrase', 'TechBackupStreamID': 'BACKUP Stream ID',
+                'TechSrtListenerIP': 'SRT Listener IP', 'TechSrtListenerPort': 'SRT Listener Port', 'TechSrtListenerPass': 'SRT Listener Passphrase', 'TechSrtListenerStreamID': 'SRT Listener Stream ID',
+                'TechBrtListenerIP': 'BRT Listener IP', 'TechBrtListenerPort': 'BRT Listener Port', 'TechBrtListenerPass': 'BRT Listener Passphrase', 'TechBrtListenerStreamID': 'BRT Listener Stream ID',
                 'TechA1': 'A1', 'TechA2': 'A2', 'TechA3': 'A3', 'TechA4': 'A4', 'TechA5': 'A5', 'TechA6': 'A6',
                 'TechMcrTlf': 'MCR telefon', 'TechMcrEmail': 'MCR e-mail', 'TechMcrTitel': 'MCR titel',
                 'TechKontakt1Tlf': 'Kontakt 1 telefon', 'TechKontakt1Email': 'Kontakt 1 e-mail', 'TechKontakt1Titel': 'Kontakt 1 titel',
@@ -1699,9 +1759,10 @@
         function hentTechFormularState() {
             const data = {};
             const textFields = [
-                'TechFormat', 'TechRX', 'TechMainIP', 'TechMainPort', 'TechMainPass',
-                'TechBackupIP', 'TechBackupPort', 'TechBackupPass', 
-                'TechSrtListenerIP', 'TechSrtListenerPort', 'TechBrtListenerIP', 'TechBrtListenerPort',
+                'TechFormat', 'TechRX', 'TechMainIP', 'TechMainPort', 'TechMainPass', 'TechMainStreamID',
+                'TechBackupIP', 'TechBackupPort', 'TechBackupPass', 'TechBackupStreamID',
+                'TechSrtListenerIP', 'TechSrtListenerPort', 'TechSrtListenerPass', 'TechSrtListenerStreamID', 
+                'TechBrtListenerIP', 'TechBrtListenerPort', 'TechBrtListenerPass', 'TechBrtListenerStreamID',
                 'TechA1', 'TechA2', 'TechA3', 'TechA4', 'TechA5', 'TechA6',
                 'TechUtcStart', 'TechUtcSlut', 'TechMcrTitel', 'TechMcrTlf', 'TechMcrEmail',
                 'TechKontakt1Titel', 'TechKontakt1Tlf', 'TechKontakt1Email',
@@ -1791,18 +1852,24 @@
             document.getElementById('TechMainIP').value = program["MAIN SRT IP"] || '';
             document.getElementById('TechMainPort').value = program["MAIN SRT Port"] || '';
             document.getElementById('TechMainPass').value = program["MAIN Passphrase"] || '';
+            document.getElementById('TechMainStreamID').value = program["MAIN Stream ID"] || '';
             
             document.getElementById('TechBackupIP').value = program["BACKUP SRT IP"] || '';
             document.getElementById('TechBackupPort').value = program["BACKUP SRT Port"] || '';
             document.getElementById('TechBackupPass').value = program["BACKUP Passphrase"] || '';
+            document.getElementById('TechBackupStreamID').value = program["BACKUP Stream ID"] || '';
             
             document.getElementById('TechSrtListener').checked = (program["SRT Listener"] === "X");
             document.getElementById('TechSrtListenerIP').value = program["SRT Listener IP"] || '';
             document.getElementById('TechSrtListenerPort').value = program["SRT Listener Port"] || '';
+            document.getElementById('TechSrtListenerPass').value = program["SRT Listener Passphrase"] || '';
+            document.getElementById('TechSrtListenerStreamID').value = program["SRT Listener Stream ID"] || '';
             
             document.getElementById('TechBrtListener').checked = (program["BRT Listener"] === "X");
             document.getElementById('TechBrtListenerIP').value = program["BRT Listener IP"] || '';
             document.getElementById('TechBrtListenerPort').value = program["BRT Listener Port"] || '';
+            document.getElementById('TechBrtListenerPass').value = program["BRT Listener Passphrase"] || '';
+            document.getElementById('TechBrtListenerStreamID').value = program["BRT Listener Stream ID"] || '';
             
             for(let i=1; i<=6; i++) {
                 document.getElementById('TechA'+i).value = program["A"+i] || '';
@@ -1872,15 +1939,21 @@
                 "MAIN SRT IP": document.getElementById('TechMainIP').value,
                 "MAIN SRT Port": document.getElementById('TechMainPort').value,
                 "MAIN Passphrase": document.getElementById('TechMainPass').value,
+                "MAIN Stream ID": document.getElementById('TechMainStreamID').value,
                 "BACKUP SRT IP": document.getElementById('TechBackupIP').value,
                 "BACKUP SRT Port": document.getElementById('TechBackupPort').value,
                 "BACKUP Passphrase": document.getElementById('TechBackupPass').value,
+                "BACKUP Stream ID": document.getElementById('TechBackupStreamID').value,
                 "SRT Listener": document.getElementById('TechSrtListener').checked ? "X" : "",
                 "SRT Listener IP": document.getElementById('TechSrtListenerIP').value,
                 "SRT Listener Port": document.getElementById('TechSrtListenerPort').value,
+                "SRT Listener Passphrase": document.getElementById('TechSrtListenerPass').value,
+                "SRT Listener Stream ID": document.getElementById('TechSrtListenerStreamID').value,
                 "BRT Listener": document.getElementById('TechBrtListener').checked ? "X" : "",
                 "BRT Listener IP": document.getElementById('TechBrtListenerIP').value,
                 "BRT Listener Port": document.getElementById('TechBrtListenerPort').value,
+                "BRT Listener Passphrase": document.getElementById('TechBrtListenerPass').value,
+                "BRT Listener Stream ID": document.getElementById('TechBrtListenerStreamID').value,
                 "A1": document.getElementById('TechA1').value,
                 "A2": document.getElementById('TechA2').value,
                 "A3": document.getElementById('TechA3').value,
