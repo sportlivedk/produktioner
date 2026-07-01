@@ -197,6 +197,10 @@
         .slet-btn { background-color: #dc3545; color: white; font-weight: bold; margin-right: 0; }
         .slet-btn:hover { background-color: #c82333; }
         
+        /* NY STYLING TIL TEKNISK INFO KNAP (TANDHJUL) */
+        .tech-btn { background-color: #17a2b8; color: white; margin-right: 5px; padding: 0 8px;}
+        .tech-btn:hover { background-color: #138496; }
+
         .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
         .modal-content { background-color: white; margin: 3% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 1100px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
@@ -206,7 +210,6 @@
         .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #000000; }
         .form-group input:not([type="checkbox"]), .form-group select, .form-group textarea { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; font-family: inherit; }
         
-        /* Brugerdefineret Checkbox styling */
         .custom-cb { 
             -webkit-appearance: none; 
             appearance: none; 
@@ -459,9 +462,9 @@
                     <th style="width: 140px;">Kanal</th>
                     <th style="width: 90px;">Sportsgren</th>
                     <th style="width: 360px;">Programtitel</th>
-                    <th style="width: 200px;">Kommentator/vært</th>
+                    <th style="width: 190px;">Kommentator/vært</th>
                     <th style="width: 90px;">Unit</th>
-                    <th style="width: 210px;">Handling</th>
+                    <th style="width: 220px;">Handling</th>
                 </tr>
             </thead>
         </table>
@@ -644,65 +647,75 @@
                         <label>RX</label>
                         <input type="text" id="TechRX" list="liste-RX" placeholder="Vælg eller skriv..." autocomplete="off">
                     </div>
-                    <div style="grid-column: span 6;"></div> <div class="form-group" style="grid-column: span 4;">
-                        <label>MAIN SRT Caller IP</label>
-                        <div class="input-with-copy">
-                            <input type="text" id="TechMainIP" list="liste-TechMainIP">
-                            <datalist id="liste-TechMainIP"></datalist>
-                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainIP', this)" title="Kopier IP">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
+                    <div style="grid-column: span 6;"></div> 
+                    
+                    <div style="grid-column: span 12; background-color: #f0f8ff; padding: 15px; border-radius: 6px; border: 1px solid #cce5ff; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #004085;">MAIN SRT</h4>
+                        
+                        <div class="form-group" style="grid-column: span 4;">
+                            <label>Caller IP</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechMainIP" list="liste-TechMainIP">
+                                <datalist id="liste-TechMainIP"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainIP', this)" title="Kopier IP">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group" style="grid-column: span 3;">
-                        <label>Port</label>
-                        <div class="input-with-copy">
-                            <input type="text" id="TechMainPort" list="liste-TechMainPort">
-                            <datalist id="liste-TechMainPort"></datalist>
-                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainPort', this)" title="Kopier Port">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>Port</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechMainPort" list="liste-TechMainPort">
+                                <datalist id="liste-TechMainPort"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainPort', this)" title="Kopier Port">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group" style="grid-column: span 5;">
-                        <label>Passphrase</label>
-                        <div class="input-with-copy">
-                            <input type="text" id="TechMainPass" list="liste-TechMainPass">
-                            <datalist id="liste-TechMainPass"></datalist>
-                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainPass', this)" title="Kopier Passphrase">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
+                        <div class="form-group" style="grid-column: span 5;">
+                            <label>Passphrase</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechMainPass" list="liste-TechMainPass">
+                                <datalist id="liste-TechMainPass"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainPass', this)" title="Kopier Passphrase">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-group" style="grid-column: span 4;">
-                        <label>BACKUP SRT Caller IP</label>
-                        <div class="input-with-copy">
-                            <input type="text" id="TechBackupIP" list="liste-TechBackupIP">
-                            <datalist id="liste-TechBackupIP"></datalist>
-                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupIP', this)" title="Kopier IP">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
+                    <div style="grid-column: span 12; background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #dae0e5; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #383d41;">BACKUP SRT</h4>
+                        
+                        <div class="form-group" style="grid-column: span 4;">
+                            <label>Caller IP</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBackupIP" list="liste-TechBackupIP">
+                                <datalist id="liste-TechBackupIP"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupIP', this)" title="Kopier IP">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group" style="grid-column: span 3;">
-                        <label>Port</label>
-                        <div class="input-with-copy">
-                            <input type="text" id="TechBackupPort" list="liste-TechBackupPort">
-                            <datalist id="liste-TechBackupPort"></datalist>
-                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPort', this)" title="Kopier Port">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>Port</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBackupPort" list="liste-TechBackupPort">
+                                <datalist id="liste-TechBackupPort"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPort', this)" title="Kopier Port">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group" style="grid-column: span 5;">
-                        <label>Passphrase</label>
-                        <div class="input-with-copy">
-                            <input type="text" id="TechBackupPass" list="liste-TechBackupPass">
-                            <datalist id="liste-TechBackupPass"></datalist>
-                            <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPass', this)" title="Kopier Passphrase">
-                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
+                        <div class="form-group" style="grid-column: span 5;">
+                            <label>Passphrase</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBackupPass" list="liste-TechBackupPass">
+                                <datalist id="liste-TechBackupPass"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPass', this)" title="Kopier Passphrase">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -763,12 +776,30 @@
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">AUDIO LAYOUT</h4>
                     </div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A1</label><input type="text" id="TechA1" list="liste-TechA1"><datalist id="liste-TechA1"></datalist></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A3</label><input type="text" id="TechA3" list="liste-TechA3"><datalist id="liste-TechA3"></datalist></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A5</label><input type="text" id="TechA5" list="liste-TechA5"><datalist id="liste-TechA5"></datalist></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A2</label><input type="text" id="TechA2" list="liste-TechA2"><datalist id="liste-TechA2"></datalist></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A4</label><input type="text" id="TechA4" list="liste-TechA4"><datalist id="liste-TechA4"></datalist></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A6</label><input type="text" id="TechA6" list="liste-TechA6"><datalist id="liste-TechA6"></datalist></div>
+                    
+                    <div style="grid-column: span 4; background-color: #f8f9fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 12px; box-sizing: border-box;">
+                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Par 1 (A1 / A2)</div>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Venstre (L)</label><input type="text" id="TechA1" list="liste-TechA1" style="width: 100%;"></div>
+                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Højre (R)</label><input type="text" id="TechA2" list="liste-TechA2" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="grid-column: span 4; background-color: #f8f9fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 12px; box-sizing: border-box;">
+                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Par 2 (A3 / A4)</div>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Venstre (L)</label><input type="text" id="TechA3" list="liste-TechA3" style="width: 100%;"></div>
+                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Højre (R)</label><input type="text" id="TechA4" list="liste-TechA4" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="grid-column: span 4; background-color: #f8f9fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 12px; box-sizing: border-box;">
+                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Par 3 (A5 / A6)</div>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Venstre (L)</label><input type="text" id="TechA5" list="liste-TechA5" style="width: 100%;"></div>
+                            <div style="flex: 1;"><label style="font-size: 10px; color: #666; font-weight: bold; display: block; margin-bottom: 3px;">Højre (R)</label><input type="text" id="TechA6" list="liste-TechA6" style="width: 100%;"></div>
+                        </div>
+                    </div>
 
                    <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">END-2-END TEST</h4>
@@ -1383,7 +1414,6 @@
             document.querySelector('.table-container').scrollTop = 0;
         }
 
-        // --- NY FUNKTION TIL AUTOCOMPLETE DATALISTS ---
         function opdaterTechDatalists() {
             const fieldsMap = {
                 'TechMainIP': 'MAIN SRT IP', 'TechMainPort': 'MAIN SRT Port', 'TechMainPass': 'MAIN Passphrase',
@@ -1485,7 +1515,7 @@
 
                 opdaterFiltreUI();
                 opdaterVisning();
-                opdaterTechDatalists(); // Opdaterer lister til Tech-vinduet
+                opdaterTechDatalists();
 
                 if (!silent) {
                     document.getElementById('loader').style.display = 'none';
@@ -1682,9 +1712,6 @@
             }
         }
 
- // --- NYE MODAL FUNKTIONER TIL TEKNISK INFO ---
-
-        // Fanger status på alle felter i Tech-vinduet for at tjekke for ændringer
         function hentTechFormularState() {
             const data = {};
             const textFields = [
@@ -1705,7 +1732,6 @@
             return JSON.stringify(data);
         }
         
-        // Kopierer teksten i input-feltet og giver grønt flueben-feedback i knappen
         function kopierTekst(elementId, btnElement) {
             const el = document.getElementById(elementId);
             if (!el || !el.value) return;
@@ -1716,7 +1742,6 @@
             }).catch(err => console.error("Kopiering fejlede:", err));
         }
 
-        // Viser/skjuler felter afhængigt af om checkboksen er markeret
         function toggleTechListeners() {
             const srtBox = document.getElementById('TechSrtListener');
             const srtGroup = document.getElementById('TechSrtListenerGroup');
@@ -1727,7 +1752,6 @@
             brtGroup.style.display = brtBox.checked ? 'grid' : 'none';
         }
 
-        // Udregner CET/CEST automatisk baseret på programmets dato
         function calcE2ETime() {
             const rowId = document.getElementById('TechRowId').value;
             const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
@@ -1769,11 +1793,9 @@
             
             if (!program) return;
 
-            // Opdater dynamisk titel
             const programTitleForModal = program["Programtitel"] ? program["Programtitel"] : "Ukendt program";
-            document.getElementById('techModalTitle').textContent = `Tekniske data | ${programTitleForModal}`;
+            document.getElementById('techModalTitle').textContent = `Teknisk info | ${programTitleForModal}`;
 
-            // UDFYLDER ALLE FELTER MED DATA FRA DATABASEN (Spejling)
             document.getElementById('TechFormat').value = program["Format"] || '';
             document.getElementById('TechRX').value = program["RX"] || '';
             
@@ -1816,33 +1838,27 @@
             
             document.getElementById('TechYderligere').value = program["Yderligere info"] || '';
             
-            // Fanger start-tilstanden, så vi kan tjekke, om der bliver lavet ændringer
             techFormInitialState = hentTechFormularState();
 
-            // Tjekker om der ligger data (for at ændre knapteksten)
             const hasData = (program["MAIN SRT IP"] || program["Format"] || program["UTC start"] || program["MCR telefon"]);
             const submitBtn = document.getElementById('btnTechSubmit');
             submitBtn.textContent = hasData ? "Opdater teknisk info" : "Gem teknisk info";
             
             document.getElementById('techModal').style.display = "block";
             
-            // Tvinger vinduet til at scrolle helt til toppen, hver gang det åbnes
             document.getElementById('techModal').scrollTop = 0;
         }
 
         async function forsogLukTechModal() {
-            // Hvis der er lavet ændringer, kaster vi en advarsel
             if (hentTechFormularState() !== techFormInitialState) {
                 const bekræft = await visCustomDialog("Er du sikker på, at du vil afslutte uden at gemme?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
                 if (bekræft) { document.getElementById('techModal').style.display = "none"; }
             } else {
-                // Ingen ændringer? Så lukker vi bare.
                 document.getElementById('techModal').style.display = "none";
             }
         }
 
         async function gemTechInfo() {
-            // Hvis brugeren trykker Gem/Opdater uden at have ændret noget, lukker vi bare for at spare tid
             if (hentTechFormularState() === techFormInitialState) {
                 document.getElementById('techModal').style.display = "none";
                 return;
@@ -1920,7 +1936,6 @@
                 submitBtn.disabled = false;
             }
         }
-        // ---------------------------------------------
 
         async function opretNytProgram() {
             if (brugerRolle !== "Admin") {
@@ -2057,8 +2072,6 @@
             document.getElementById('Kommentator').value = program["Kommentator"] || '';
             document.getElementById('Ekspert').value = program["Ekspert"] || '';
             document.getElementById('Reporter').value = program["Reporter"] || '';
-            
-            // Teknisk info er fjernet fra formularen her
 
             document.getElementById('Noter').value = program["Link / Noter"] || '';
             document.getElementById('TBC').checked = (program["TBC"] && String(program["TBC"]).toUpperCase() === 'X');
@@ -2127,8 +2140,6 @@
             document.getElementById('Kommentator').value = program["Kommentator"] || '';
             document.getElementById('Ekspert').value = program["Ekspert"] || '';
             document.getElementById('Reporter').value = program["Reporter"] || '';
-            
-            // Teknisk info er fjernet fra formularen her
 
             document.getElementById('Noter').value = program["Link / Noter"] || '';
             document.getElementById('TBC').checked = (program["TBC"] && String(program["TBC"]).toUpperCase() === 'X');
@@ -2312,9 +2323,6 @@
                     pPlanDisplay = `<a href="${linkUrl}" target="_blank" style="color: #0056b3; font-weight: 500; text-decoration: none;">Klik her for at åbne</a>`;
                 }
 
-                // NY TEKNISK INFO LOGIK: Altid et klikbart link, der åbner tech modal
-                let tInfoDisplay = `<a href="#" onclick="aabenTechModal(event, ${program.RowId})" style="color: #0056b3; font-weight: 500; text-decoration: none;">Klik her for at åbne</a>`;
-
                 let datoCelleStyle = '';
                 let ugedagCelleStyle = '';
                 if (erIdag) {
@@ -2329,6 +2337,7 @@
                     <button class="toggle-btn" onclick="toggleDetails(this)">▼</button>
                     <button class="action-btn rediger-btn" onclick="redigerProgram(${program.RowId})">Rediger</button>
                     <button class="action-btn kopier-btn" onclick="kopierProgram(${program.RowId})" title="Kopier program">Kopier</button>
+                    <button class="action-btn tech-btn" onclick="aabenTechModal(event, ${program.RowId})" title="Teknisk info"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
                     <button class="action-btn slet-btn" onclick="bekraeftSlet(${program.RowId})" title="Slet program">✖</button>
                 `;
 
@@ -2379,7 +2388,6 @@
                     let minutter = parseInt(minutterStr, 10);
                     
                     if (!isNaN(timer) && !isNaN(minutter)) {
-                        // Tjekker offset (CET = 1 time, CEST = 2 timer) for den pågældende program-dato
                         const tzTestDate = new Date(`${normDato}T12:00:00Z`);
                         const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Copenhagen', timeZoneName: 'short' });
                         const tzPart = formatter.formatToParts(tzTestDate).find(p => p.type === 'timeZoneName');
@@ -2436,7 +2444,6 @@
                                 <div class="detail-list">
                                     <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${visUnitRen || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Format & RX:</span> <span class="detail-value">${formatOgRx}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Tekniske data:</span> <span class="detail-value">${tInfoDisplay}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="${signalStyling}">${signalTekst}</span></div>
                                 </div>
                             </div>
