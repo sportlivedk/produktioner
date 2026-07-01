@@ -783,26 +783,29 @@
                         <div class="form-group" style="grid-column: span 4;"><label>A6</label><input type="text" id="TechA6" list="liste-TechA6"><datalist id="liste-TechA6"></datalist></div>
                     </div>
 
-                   <div class="form-group full-width" style="grid-column: span 12;">
-                        <h4 style="margin: 15px 0 0 0; font-size: 13px;">END-2-END TEST</h4>
+                    <div class="form-group checkbox-group" style="grid-column: span 12; display: flex; align-items: center; margin-top: 15px;">
+                        <input type="checkbox" id="TechE2ETest" onchange="toggleTechListeners()">
+                        <label for="TechE2ETest" style="font-weight: bold; text-transform: uppercase; font-size: 13px;">End-2-End Test</label>
                     </div>
-                    <div class="form-group" style="grid-column: span 3;">
-                        <label>UTC/GMT start</label>
-                        <input type="time" id="TechUtcStart" oninput="calcE2ETime()">
-                    </div>
-                    <div class="form-group" style="grid-column: span 2; display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column;">
-                        <div id="TechCetStart" style="font-size: 13px; color: #000; font-weight: bold; margin-bottom: 9px;"></div>
-                    </div>
-                    <div class="form-group" style="grid-column: span 3;">
-                        <label>UTC/GMT slut</label>
-                        <input type="time" id="TechUtcSlut" oninput="calcE2ETime()">
-                    </div>
-                    <div class="form-group" style="grid-column: span 4; display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column;">
-                        <div id="TechCetSlut" style="font-size: 13px; color: #000; font-weight: bold; margin-bottom: 9px;"></div>
+                    <div id="TechE2ETestGroup" style="display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: -5px;">
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>UTC/GMT start</label>
+                            <input type="time" id="TechUtcStart" oninput="calcE2ETime()">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2; display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column;">
+                            <div id="TechCetStart" style="font-size: 13px; color: #000; font-weight: bold; margin-bottom: 9px;"></div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>UTC/GMT slut</label>
+                            <input type="time" id="TechUtcSlut" oninput="calcE2ETime()">
+                        </div>
+                        <div class="form-group" style="grid-column: span 4; display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column;">
+                            <div id="TechCetSlut" style="font-size: 13px; color: #000; font-weight: bold; margin-bottom: 9px;"></div>
+                        </div>
                     </div>
 
-                    <div class="form-group full-width" style="grid-column: span 12;">
-                        <h4 style="margin: 15px 0 0 0; font-size: 13px;">KONTAKTER</h4>
+                    <div class="form-group full-width" style="grid-column: span 12; margin-top: 10px;">
+                        <h4 style="margin: 0; font-size: 13px;">KONTAKTER</h4>
                     </div>
                     <div class="form-group" style="grid-column: span 4;"><label>MCR</label><input type="text" id="TechMcrTlf" list="liste-TechMcrTlf" placeholder="Telefonnummer"><datalist id="liste-TechMcrTlf"></datalist></div>
                     <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechMcrEmail" list="liste-TechMcrEmail" placeholder="E-mailadresse"><datalist id="liste-TechMcrEmail"></datalist></div>
@@ -1710,6 +1713,7 @@
             }
             data['TechSrtListener'] = document.getElementById('TechSrtListener').checked;
             data['TechBrtListener'] = document.getElementById('TechBrtListener').checked;
+            data['TechE2ETest'] = document.getElementById('TechE2ETest').checked;
             return JSON.stringify(data);
         }
         
@@ -1731,6 +1735,10 @@
             const brtBox = document.getElementById('TechBrtListener');
             const brtGroup = document.getElementById('TechBrtListenerGroup');
             brtGroup.style.display = brtBox.checked ? 'grid' : 'none';
+            
+            const e2eBox = document.getElementById('TechE2ETest');
+            const e2eGroup = document.getElementById('TechE2ETestGroup');
+            if (e2eGroup) e2eGroup.style.display = e2eBox.checked ? 'grid' : 'none';
         }
 
         function calcE2ETime() {
@@ -1795,7 +1803,6 @@
             document.getElementById('TechBrtListener').checked = (program["BRT Listener"] === "X");
             document.getElementById('TechBrtListenerIP').value = program["BRT Listener IP"] || '';
             document.getElementById('TechBrtListenerPort').value = program["BRT Listener Port"] || '';
-            toggleTechListeners(); 
             
             for(let i=1; i<=6; i++) {
                 document.getElementById('TechA'+i).value = program["A"+i] || '';
@@ -1803,6 +1810,10 @@
             
             document.getElementById('TechUtcStart').value = program["UTC start"] || '';
             document.getElementById('TechUtcSlut').value = program["UTC slut"] || '';
+            
+            document.getElementById('TechE2ETest').checked = (program["UTC start"] || program["UTC slut"]) ? true : false;
+            
+            toggleTechListeners(); 
             calcE2ETime(); 
             
             document.getElementById('TechMcrTitel').value = program["MCR titel"] || '';
@@ -1876,8 +1887,8 @@
                 "A4": document.getElementById('TechA4').value,
                 "A5": document.getElementById('TechA5').value,
                 "A6": document.getElementById('TechA6').value,
-                "UTC start": document.getElementById('TechUtcStart').value,
-                "UTC slut": document.getElementById('TechUtcSlut').value,
+                "UTC start": document.getElementById('TechE2ETest').checked ? document.getElementById('TechUtcStart').value : "",
+                "UTC slut": document.getElementById('TechE2ETest').checked ? document.getElementById('TechUtcSlut').value : "",
                 "MCR titel": document.getElementById('TechMcrTitel').value,
                 "MCR telefon": document.getElementById('TechMcrTlf').value,
                 "MCR e-mail": document.getElementById('TechMcrEmail').value,
