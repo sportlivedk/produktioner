@@ -627,11 +627,10 @@
         </div>
     </div>
 
-    <!-- Nyt Teknisk Info Modal -->
-   <div id="techModal" class="modal">
+    <div id="techModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="forsogLukTechModal()">&times;</span>
-            <h2 id="techModalTitle">Teknisk information</h2>
+            <h2 id="techModalTitle">Teknisk info</h2>
             <form id="techForm" autocomplete="off">
                 <input type="hidden" id="TechRowId">
                 
@@ -648,7 +647,8 @@
                     <div style="grid-column: span 6;"></div> <div class="form-group" style="grid-column: span 4;">
                         <label>MAIN SRT Caller IP</label>
                         <div class="input-with-copy">
-                            <input type="text" id="TechMainIP">
+                            <input type="text" id="TechMainIP" list="liste-TechMainIP">
+                            <datalist id="liste-TechMainIP"></datalist>
                             <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainIP', this)" title="Kopier IP">
                                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             </button>
@@ -657,7 +657,8 @@
                     <div class="form-group" style="grid-column: span 3;">
                         <label>Port</label>
                         <div class="input-with-copy">
-                            <input type="text" id="TechMainPort">
+                            <input type="text" id="TechMainPort" list="liste-TechMainPort">
+                            <datalist id="liste-TechMainPort"></datalist>
                             <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainPort', this)" title="Kopier Port">
                                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             </button>
@@ -666,7 +667,8 @@
                     <div class="form-group" style="grid-column: span 5;">
                         <label>Passphrase</label>
                         <div class="input-with-copy">
-                            <input type="text" id="TechMainPass">
+                            <input type="text" id="TechMainPass" list="liste-TechMainPass">
+                            <datalist id="liste-TechMainPass"></datalist>
                             <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainPass', this)" title="Kopier Passphrase">
                                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             </button>
@@ -676,7 +678,8 @@
                     <div class="form-group" style="grid-column: span 4;">
                         <label>BACKUP SRT Caller IP</label>
                         <div class="input-with-copy">
-                            <input type="text" id="TechBackupIP">
+                            <input type="text" id="TechBackupIP" list="liste-TechBackupIP">
+                            <datalist id="liste-TechBackupIP"></datalist>
                             <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupIP', this)" title="Kopier IP">
                                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             </button>
@@ -685,7 +688,8 @@
                     <div class="form-group" style="grid-column: span 3;">
                         <label>Port</label>
                         <div class="input-with-copy">
-                            <input type="text" id="TechBackupPort">
+                            <input type="text" id="TechBackupPort" list="liste-TechBackupPort">
+                            <datalist id="liste-TechBackupPort"></datalist>
                             <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPort', this)" title="Kopier Port">
                                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             </button>
@@ -694,7 +698,8 @@
                     <div class="form-group" style="grid-column: span 5;">
                         <label>Passphrase</label>
                         <div class="input-with-copy">
-                            <input type="text" id="TechBackupPass">
+                            <input type="text" id="TechBackupPass" list="liste-TechBackupPass">
+                            <datalist id="liste-TechBackupPass"></datalist>
                             <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPass', this)" title="Kopier Passphrase">
                                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                             </button>
@@ -709,7 +714,8 @@
                         <div class="form-group" style="grid-column: span 4;">
                             <label>SRT Listener IP</label>
                             <div class="input-with-copy">
-                                <input type="text" id="TechSrtListenerIP">
+                                <input type="text" id="TechSrtListenerIP" list="liste-TechSrtListenerIP">
+                                <datalist id="liste-TechSrtListenerIP"></datalist>
                                 <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerIP', this)" title="Kopier IP">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 </button>
@@ -718,7 +724,8 @@
                         <div class="form-group" style="grid-column: span 3;">
                             <label>Port</label>
                             <div class="input-with-copy">
-                                <input type="text" id="TechSrtListenerPort">
+                                <input type="text" id="TechSrtListenerPort" list="liste-TechSrtListenerPort">
+                                <datalist id="liste-TechSrtListenerPort"></datalist>
                                 <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerPort', this)" title="Kopier Port">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 </button>
@@ -734,7 +741,8 @@
                         <div class="form-group" style="grid-column: span 4;">
                             <label>BRT Listener IP</label>
                             <div class="input-with-copy">
-                                <input type="text" id="TechBrtListenerIP">
+                                <input type="text" id="TechBrtListenerIP" list="liste-TechBrtListenerIP">
+                                <datalist id="liste-TechBrtListenerIP"></datalist>
                                 <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerIP', this)" title="Kopier IP">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 </button>
@@ -743,7 +751,8 @@
                         <div class="form-group" style="grid-column: span 3;">
                             <label>Port</label>
                             <div class="input-with-copy">
-                                <input type="text" id="TechBrtListenerPort">
+                                <input type="text" id="TechBrtListenerPort" list="liste-TechBrtListenerPort">
+                                <datalist id="liste-TechBrtListenerPort"></datalist>
                                 <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerPort', this)" title="Kopier Port">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 </button>
@@ -754,12 +763,12 @@
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">AUDIO LAYOUT</h4>
                     </div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A1</label><input type="text" id="TechA1"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A3</label><input type="text" id="TechA3"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A5</label><input type="text" id="TechA5"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A2</label><input type="text" id="TechA2"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A4</label><input type="text" id="TechA4"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>A6</label><input type="text" id="TechA6"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>A1</label><input type="text" id="TechA1" list="liste-TechA1"><datalist id="liste-TechA1"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>A3</label><input type="text" id="TechA3" list="liste-TechA3"><datalist id="liste-TechA3"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>A5</label><input type="text" id="TechA5" list="liste-TechA5"><datalist id="liste-TechA5"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>A2</label><input type="text" id="TechA2" list="liste-TechA2"><datalist id="liste-TechA2"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>A4</label><input type="text" id="TechA4" list="liste-TechA4"><datalist id="liste-TechA4"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>A6</label><input type="text" id="TechA6" list="liste-TechA6"><datalist id="liste-TechA6"></datalist></div>
 
                    <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">END-2-END TEST</h4>
@@ -782,17 +791,17 @@
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">KONTAKTER</h4>
                     </div>
-                    <div class="form-group" style="grid-column: span 4;"><label>MCR</label><input type="text" id="TechMcrTlf" placeholder="Telefonnummer"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechMcrEmail" placeholder="E-mailadresse"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechMcrTitel" placeholder="Titel på kontaktperson"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>MCR</label><input type="text" id="TechMcrTlf" list="liste-TechMcrTlf" placeholder="Telefonnummer"><datalist id="liste-TechMcrTlf"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechMcrEmail" list="liste-TechMcrEmail" placeholder="E-mailadresse"><datalist id="liste-TechMcrEmail"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechMcrTitel" list="liste-TechMcrTitel" placeholder="Titel på kontaktperson"><datalist id="liste-TechMcrTitel"></datalist></div>
                     
-                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 1</label><input type="text" id="TechKontakt1Tlf" placeholder="Telefonnummer"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt1Email" placeholder="E-mailadresse"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt1Titel" placeholder="Titel på kontaktperson"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 1</label><input type="text" id="TechKontakt1Tlf" list="liste-TechKontakt1Tlf" placeholder="Telefonnummer"><datalist id="liste-TechKontakt1Tlf"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt1Email" list="liste-TechKontakt1Email" placeholder="E-mailadresse"><datalist id="liste-TechKontakt1Email"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt1Titel" list="liste-TechKontakt1Titel" placeholder="Titel på kontaktperson"><datalist id="liste-TechKontakt1Titel"></datalist></div>
                     
-                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 2</label><input type="text" id="TechKontakt2Tlf" placeholder="Telefonnummer"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt2Email" placeholder="E-mailadresse"></div>
-                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt2Titel" placeholder="Titel på kontaktperson"></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>Anden kontakt 2</label><input type="text" id="TechKontakt2Tlf" list="liste-TechKontakt2Tlf" placeholder="Telefonnummer"><datalist id="liste-TechKontakt2Tlf"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt2Email" list="liste-TechKontakt2Email" placeholder="E-mailadresse"><datalist id="liste-TechKontakt2Email"></datalist></div>
+                    <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt2Titel" list="liste-TechKontakt2Titel" placeholder="Titel på kontaktperson"><datalist id="liste-TechKontakt2Titel"></datalist></div>
 
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">YDERLIGERE INFORMATION</h4>
@@ -1374,6 +1383,34 @@
             document.querySelector('.table-container').scrollTop = 0;
         }
 
+        // --- NY FUNKTION TIL AUTOCOMPLETE DATALISTS ---
+        function opdaterTechDatalists() {
+            const fieldsMap = {
+                'TechMainIP': 'MAIN SRT IP', 'TechMainPort': 'MAIN SRT Port', 'TechMainPass': 'MAIN Passphrase',
+                'TechBackupIP': 'BACKUP SRT IP', 'TechBackupPort': 'BACKUP SRT Port', 'TechBackupPass': 'BACKUP Passphrase',
+                'TechSrtListenerIP': 'SRT Listener IP', 'TechSrtListenerPort': 'SRT Listener Port',
+                'TechBrtListenerIP': 'BRT Listener IP', 'TechBrtListenerPort': 'BRT Listener Port',
+                'TechA1': 'A1', 'TechA2': 'A2', 'TechA3': 'A3', 'TechA4': 'A4', 'TechA5': 'A5', 'TechA6': 'A6',
+                'TechMcrTlf': 'MCR telefon', 'TechMcrEmail': 'MCR e-mail', 'TechMcrTitel': 'MCR titel',
+                'TechKontakt1Tlf': 'Kontakt 1 telefon', 'TechKontakt1Email': 'Kontakt 1 e-mail', 'TechKontakt1Titel': 'Kontakt 1 titel',
+                'TechKontakt2Tlf': 'Kontakt 2 telefon', 'TechKontakt2Email': 'Kontakt 2 e-mail', 'TechKontakt2Titel': 'Kontakt 2 titel'
+            };
+
+            for (const [elementId, dbKey] of Object.entries(fieldsMap)) {
+                const datalist = document.getElementById('liste-' + elementId);
+                if (datalist) {
+                    const uniqueValues = [...new Set(alleProgrammerGlobal.map(p => p[dbKey]).filter(val => val && String(val).trim() !== ''))].sort();
+                    
+                    datalist.innerHTML = '';
+                    uniqueValues.forEach(val => {
+                        const option = document.createElement('option');
+                        option.value = String(val).trim();
+                        datalist.appendChild(option);
+                    });
+                }
+            }
+        }
+
         async function loadProgrammer(silent = false) {
             if (!silent) {
                 document.getElementById('loader').style.display = 'block';
@@ -1448,6 +1485,7 @@
 
                 opdaterFiltreUI();
                 opdaterVisning();
+                opdaterTechDatalists(); // Opdaterer lister til Tech-vinduet
 
                 if (!silent) {
                     document.getElementById('loader').style.display = 'none';
@@ -1730,6 +1768,10 @@
             const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
             
             if (!program) return;
+
+            // Opdater dynamisk titel
+            const programTitleForModal = program["Programtitel"] ? program["Programtitel"] : "Ukendt program";
+            document.getElementById('techModalTitle').textContent = `Teknisk info | ${programTitleForModal}`;
 
             // UDFYLDER ALLE FELTER MED DATA FRA DATABASEN (Spejling)
             document.getElementById('TechFormat').value = program["Format"] || '';
@@ -2394,7 +2436,7 @@
                                 <div class="detail-list">
                                     <div class="detail-list-item"><span class="detail-label">Unit:</span> <span class="detail-value">${visUnitRen || '-'}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Format & RX:</span> <span class="detail-value">${formatOgRx}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Starttid UTC/GMT:</span> <span class="detail-value">${utcDisplay}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Teknisk info:</span> <span class="detail-value">${tInfoDisplay}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Signal skal sendes til:</span> <span class="detail-value" style="${signalStyling}">${signalTekst}</span></div>
                                 </div>
                             </div>
@@ -2403,8 +2445,8 @@
                                 <h4>Ekstra information</h4>
                                 <div class="detail-list">
                                     <div class="detail-list-item"><span class="detail-label">Lokation:</span> <span class="detail-value">${pSted}</span></div>
+                                    <div class="detail-list-item"><span class="detail-label">Starttid UTC/GMT:</span> <span class="detail-value">${utcDisplay}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
-                                    <div class="detail-list-item"><span class="detail-label">Teknisk info:</span> <span class="detail-value">${tInfoDisplay}</span></div>
                                     <div class="detail-list-item"><span class="detail-label">Noter:</span> <span class="detail-value" style="color: #0056b3; text-align: right; max-width: 75%; word-break: break-word;">${formateretNoter}</span></div>
                                 </div>
                             </div>
