@@ -885,7 +885,8 @@
 
                     <div class="form-group full-width" style="grid-column: span 12;">
                         <h4 style="margin: 15px 0 0 0; font-size: 13px;">YDERLIGERE INFORMATION</h4>
-                        <textarea id="TechYderligere" rows="3" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical; margin-top: 5px;"></textarea>
+                        <textarea id="TechYderligere" rows="3" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical; margin-top: 5px;" oninput="opdaterTechLinks()"></textarea>
+                        <div id="TechYderligereLinks" style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px;"></div>
                     </div>                 
                 </div>
                 <div class="form-actions">
@@ -1491,6 +1492,43 @@
             }
         }
 
+        function opdaterTechLinks() {
+            const tekst = document.getElementById('TechYderligere').value;
+            const container = document.getElementById('TechYderligereLinks');
+            if (!container) return;
+            container.innerHTML = ''; 
+
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const links = tekst.match(urlRegex);
+
+            if (links && links.length > 0) {
+                const unikkeLinks = [...new Set(links)];
+                unikkeLinks.forEach(url => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.target = '_blank';
+                    const visningsTekst = url.length > 60 ? url.substring(0, 57) + '...' : url;
+                    a.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>${visningsTekst}`;
+                    a.style.color = '#0056b3';
+                    a.style.fontSize = '13px';
+                    a.style.textDecoration = 'none';
+                    a.style.fontWeight = '500';
+                    a.style.display = 'inline-flex';
+                    a.style.alignItems = 'center';
+                    a.style.padding = '6px 10px';
+                    a.style.backgroundColor = '#e8f4fd';
+                    a.style.borderRadius = '4px';
+                    a.style.border = '1px solid #b8daff';
+                    a.style.width = 'fit-content';
+                    
+                    a.onmouseover = function() { this.style.backgroundColor = '#d1e7fd'; this.style.textDecoration = 'underline'; };
+                    a.onmouseout = function() { this.style.backgroundColor = '#e8f4fd'; this.style.textDecoration = 'none'; };
+
+                    container.appendChild(a);
+                });
+            }
+        }
+
         async function loadProgrammer(silent = false) {
             if (!silent) {
                 document.getElementById('loader').style.display = 'block';
@@ -1542,6 +1580,7 @@
                             });
                         }
                     } else if (feltNavn !== 'Produktionsplan' && feltNavn !== 'P-plan' && feltNavn !== 'Teknisk info') {
+                        // Inkluderer nu også den nye "Audio layout"-datalist fra Sheets
                         const datalistElement = document.getElementById('liste-' + feltNavn);
                         if (datalistElement) {
                             datalistElement.innerHTML = ''; 
@@ -1794,155 +1833,6 @@
             }).catch(err => console.error("Kopiering fejlede:", err));
         }
 
-        function kopierTechOpsaetning() {
-            kopieretTechOpsaetning = {
-                "Format": document.getElementById('TechFormat').value,
-                "RX": document.getElementById('TechRX').value,
-                "MAIN SRT IP": document.getElementById('TechMainIP').value,
-                "MAIN SRT Port": document.getElementById('TechMainPort').value,
-                "MAIN Passphrase": document.getElementById('TechMainPass').value,
-                "MAIN Stream ID": document.getElementById('TechMainStreamID').value,
-                "BACKUP SRT IP": document.getElementById('TechBackupIP').value,
-                "BACKUP SRT Port": document.getElementById('TechBackupPort').value,
-                "BACKUP Passphrase": document.getElementById('TechBackupPass').value,
-                "BACKUP Stream ID": document.getElementById('TechBackupStreamID').value,
-                "SRT Listener": document.getElementById('TechSrtListener').checked,
-                "SRT Listener IP": document.getElementById('TechSrtListenerIP').value,
-                "SRT Listener Port": document.getElementById('TechSrtListenerPort').value,
-                "SRT Listener Passphrase": document.getElementById('TechSrtListenerPass').value,
-                "SRT Listener Stream ID": document.getElementById('TechSrtListenerStreamID').value,
-                "BRT Listener": document.getElementById('TechBrtListener').checked,
-                "BRT Listener IP": document.getElementById('TechBrtListenerIP').value,
-                "BRT Listener Port": document.getElementById('TechBrtListenerPort').value,
-                "BRT Listener Passphrase": document.getElementById('TechBrtListenerPass').value,
-                "BRT Listener Stream ID": document.getElementById('TechBrtListenerStreamID').value,
-                "A1": document.getElementById('TechA1').value,
-                "A2": document.getElementById('TechA2').value,
-                "A3": document.getElementById('TechA3').value,
-                "A4": document.getElementById('TechA4').value,
-                "A5": document.getElementById('TechA5').value,
-                "A6": document.getElementById('TechA6').value,
-                "E2E Test": document.getElementById('TechE2ETest').checked,
-                "UTC start": document.getElementById('TechUtcStart').value,
-                "UTC slut": document.getElementById('TechUtcSlut').value,
-                "MCR telefon": document.getElementById('TechMcrTlf').value,
-                "MCR e-mail": document.getElementById('TechMcrEmail').value,
-                "MCR titel": document.getElementById('TechMcrTitel').value,
-                "Kontakt 1 telefon": document.getElementById('TechKontakt1Tlf').value,
-                "Kontakt 1 e-mail": document.getElementById('TechKontakt1Email').value,
-                "Kontakt 1 titel": document.getElementById('TechKontakt1Titel').value,
-                "Kontakt 2 telefon": document.getElementById('TechKontakt2Tlf').value,
-                "Kontakt 2 e-mail": document.getElementById('TechKontakt2Email').value,
-                "Kontakt 2 titel": document.getElementById('TechKontakt2Titel').value,
-                "Yderligere info": document.getElementById('TechYderligere').value
-            };
-            
-            const btn = document.getElementById('btnKopierTech');
-            const orgText = btn.innerHTML;
-            btn.innerHTML = '✔ Kopieret';
-            btn.style.backgroundColor = '#218838';
-            setTimeout(() => {
-                btn.innerHTML = orgText;
-                btn.style.backgroundColor = '#6c757d';
-            }, 1500);
-
-            const btnSaetInd = document.getElementById('btnSaetIndTech');
-            btnSaetInd.disabled = false;
-            btnSaetInd.style.opacity = '1';
-        }
-
-        function saetIndTechOpsaetning() {
-            if (!kopieretTechOpsaetning) return;
-
-            document.getElementById('TechFormat').value = kopieretTechOpsaetning["Format"];
-            document.getElementById('TechRX').value = kopieretTechOpsaetning["RX"];
-            
-            document.getElementById('TechMainIP').value = kopieretTechOpsaetning["MAIN SRT IP"];
-            document.getElementById('TechMainPort').value = kopieretTechOpsaetning["MAIN SRT Port"];
-            document.getElementById('TechMainPass').value = kopieretTechOpsaetning["MAIN Passphrase"];
-            document.getElementById('TechMainStreamID').value = kopieretTechOpsaetning["MAIN Stream ID"];
-            
-            document.getElementById('TechBackupIP').value = kopieretTechOpsaetning["BACKUP SRT IP"];
-            document.getElementById('TechBackupPort').value = kopieretTechOpsaetning["BACKUP SRT Port"];
-            document.getElementById('TechBackupPass').value = kopieretTechOpsaetning["BACKUP Passphrase"];
-            document.getElementById('TechBackupStreamID').value = kopieretTechOpsaetning["BACKUP Stream ID"];
-            
-            document.getElementById('TechSrtListener').checked = kopieretTechOpsaetning["SRT Listener"];
-            document.getElementById('TechSrtListenerIP').value = kopieretTechOpsaetning["SRT Listener IP"];
-            document.getElementById('TechSrtListenerPort').value = kopieretTechOpsaetning["SRT Listener Port"];
-            document.getElementById('TechSrtListenerPass').value = kopieretTechOpsaetning["SRT Listener Passphrase"];
-            document.getElementById('TechSrtListenerStreamID').value = kopieretTechOpsaetning["SRT Listener Stream ID"];
-            
-            document.getElementById('TechBrtListener').checked = kopieretTechOpsaetning["BRT Listener"];
-            document.getElementById('TechBrtListenerIP').value = kopieretTechOpsaetning["BRT Listener IP"];
-            document.getElementById('TechBrtListenerPort').value = kopieretTechOpsaetning["BRT Listener Port"];
-            document.getElementById('TechBrtListenerPass').value = kopieretTechOpsaetning["BRT Listener Passphrase"];
-            document.getElementById('TechBrtListenerStreamID').value = kopieretTechOpsaetning["BRT Listener Stream ID"];
-            
-            document.getElementById('TechA1').value = kopieretTechOpsaetning["A1"];
-            document.getElementById('TechA2').value = kopieretTechOpsaetning["A2"];
-            document.getElementById('TechA3').value = kopieretTechOpsaetning["A3"];
-            document.getElementById('TechA4').value = kopieretTechOpsaetning["A4"];
-            document.getElementById('TechA5').value = kopieretTechOpsaetning["A5"];
-            document.getElementById('TechA6').value = kopieretTechOpsaetning["A6"];
-            
-            document.getElementById('TechE2ETest').checked = kopieretTechOpsaetning["E2E Test"];
-            document.getElementById('TechUtcStart').value = kopieretTechOpsaetning["UTC start"];
-            document.getElementById('TechUtcSlut').value = kopieretTechOpsaetning["UTC slut"];
-            
-            document.getElementById('TechMcrTlf').value = kopieretTechOpsaetning["MCR telefon"];
-            document.getElementById('TechMcrEmail').value = kopieretTechOpsaetning["MCR e-mail"];
-            document.getElementById('TechMcrTitel').value = kopieretTechOpsaetning["MCR titel"];
-            
-            document.getElementById('TechKontakt1Tlf').value = kopieretTechOpsaetning["Kontakt 1 telefon"];
-            document.getElementById('TechKontakt1Email').value = kopieretTechOpsaetning["Kontakt 1 e-mail"];
-            document.getElementById('TechKontakt1Titel').value = kopieretTechOpsaetning["Kontakt 1 titel"];
-            
-            document.getElementById('TechKontakt2Tlf').value = kopieretTechOpsaetning["Kontakt 2 telefon"];
-            document.getElementById('TechKontakt2Email').value = kopieretTechOpsaetning["Kontakt 2 e-mail"];
-            document.getElementById('TechKontakt2Titel').value = kopieretTechOpsaetning["Kontakt 2 titel"];
-            
-            document.getElementById('TechYderligere').value = kopieretTechOpsaetning["Yderligere info"];
-
-            toggleTechListeners();
-            calcE2ETime();
-
-            const btn = document.getElementById('btnSaetIndTech');
-            const orgText = btn.innerHTML;
-            btn.innerHTML = '✔ Sat ind';
-            setTimeout(() => {
-                btn.innerHTML = orgText;
-            }, 1500);
-        }
-
-        async function rydTechOpsaetning() {
-            const bekraeft = await visCustomDialog("Er du sikker på, at du vil slette alt indhold i dette vindue?", "confirm");
-            if (!bekraeft) return;
-
-            const textFields = [
-                'TechFormat', 'TechRX', 'TechMainIP', 'TechMainPort', 'TechMainPass', 'TechMainStreamID',
-                'TechBackupIP', 'TechBackupPort', 'TechBackupPass', 'TechBackupStreamID',
-                'TechSrtListenerIP', 'TechSrtListenerPort', 'TechSrtListenerPass', 'TechSrtListenerStreamID', 
-                'TechBrtListenerIP', 'TechBrtListenerPort', 'TechBrtListenerPass', 'TechBrtListenerStreamID',
-                'TechA1', 'TechA2', 'TechA3', 'TechA4', 'TechA5', 'TechA6',
-                'TechUtcStart', 'TechUtcSlut', 'TechMcrTitel', 'TechMcrTlf', 'TechMcrEmail',
-                'TechKontakt1Titel', 'TechKontakt1Tlf', 'TechKontakt1Email',
-                'TechKontakt2Titel', 'TechKontakt2Tlf', 'TechKontakt2Email', 'TechYderligere'
-            ];
-            
-            for (let id of textFields) {
-                const el = document.getElementById(id);
-                if (el) el.value = '';
-            }
-            
-            document.getElementById('TechSrtListener').checked = false;
-            document.getElementById('TechBrtListener').checked = false;
-            document.getElementById('TechE2ETest').checked = false;
-            
-            toggleTechListeners();
-            calcE2ETime();
-        }
-
         function toggleTechListeners() {
             const srtBox = document.getElementById('TechSrtListener');
             const srtGroup = document.getElementById('TechSrtListenerGroup');
@@ -2051,6 +1941,7 @@
             document.getElementById('TechKontakt2Email').value = program["Kontakt 2 e-mail"] || '';
             
             document.getElementById('TechYderligere').value = program["Yderligere info"] || '';
+            opdaterTechLinks();
             
             techFormInitialState = hentTechFormularState();
 
@@ -2375,7 +2266,6 @@
             document.getElementById('Noter').value = program["Link / Noter"] || '';
             document.getElementById('TBC').checked = (program["TBC"] && String(program["TBC"]).toUpperCase() === 'X');
 
-            // Kopier også den tekniske info i baggrunden, så den gemmes på den nye række
             pendingTechInfoForNewProgram = {
                 "MAIN SRT IP": program["MAIN SRT IP"] || "",
                 "MAIN SRT Port": program["MAIN SRT Port"] || "",
@@ -2870,7 +2760,6 @@
                 "TX": valgtTX 
             };
 
-            // Hvis man gemmer en splinterny kopi, hvor der ligger teknisk data klar i baggrunden, flettes de ind i data-objektet:
             if (!rowId && pendingTechInfoForNewProgram) {
                 Object.assign(nyProduktion, pendingTechInfoForNewProgram);
             }
@@ -2884,7 +2773,7 @@
                 
                 closeModal();
                 document.getElementById('programForm').reset();
-                pendingTechInfoForNewProgram = null; // Nulstilles efter gem!
+                pendingTechInfoForNewProgram = null; 
                 
                 await loadProgrammer(true); 
                 
