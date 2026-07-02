@@ -1529,6 +1529,161 @@
             }
         }
 
+        // --- MANGLENDE KOPIER/SÆT IND FUNKTIONER ER NU RETUR ---
+        function kopierTechOpsaetning() {
+            kopieretTechOpsaetning = {
+                "Format": document.getElementById('TechFormat').value,
+                "RX": document.getElementById('TechRX').value,
+                "MAIN SRT IP": document.getElementById('TechMainIP').value,
+                "MAIN SRT Port": document.getElementById('TechMainPort').value,
+                "MAIN Passphrase": document.getElementById('TechMainPass').value,
+                "MAIN Stream ID": document.getElementById('TechMainStreamID').value,
+                "BACKUP SRT IP": document.getElementById('TechBackupIP').value,
+                "BACKUP SRT Port": document.getElementById('TechBackupPort').value,
+                "BACKUP Passphrase": document.getElementById('TechBackupPass').value,
+                "BACKUP Stream ID": document.getElementById('TechBackupStreamID').value,
+                "SRT Listener": document.getElementById('TechSrtListener').checked,
+                "SRT Listener IP": document.getElementById('TechSrtListenerIP').value,
+                "SRT Listener Port": document.getElementById('TechSrtListenerPort').value,
+                "SRT Listener Passphrase": document.getElementById('TechSrtListenerPass').value,
+                "SRT Listener Stream ID": document.getElementById('TechSrtListenerStreamID').value,
+                "BRT Listener": document.getElementById('TechBrtListener').checked,
+                "BRT Listener IP": document.getElementById('TechBrtListenerIP').value,
+                "BRT Listener Port": document.getElementById('TechBrtListenerPort').value,
+                "BRT Listener Passphrase": document.getElementById('TechBrtListenerPass').value,
+                "BRT Listener Stream ID": document.getElementById('TechBrtListenerStreamID').value,
+                "A1": document.getElementById('TechA1').value,
+                "A2": document.getElementById('TechA2').value,
+                "A3": document.getElementById('TechA3').value,
+                "A4": document.getElementById('TechA4').value,
+                "A5": document.getElementById('TechA5').value,
+                "A6": document.getElementById('TechA6').value,
+                "E2E Test": document.getElementById('TechE2ETest').checked,
+                "UTC start": document.getElementById('TechUtcStart').value,
+                "UTC slut": document.getElementById('TechUtcSlut').value,
+                "MCR telefon": document.getElementById('TechMcrTlf').value,
+                "MCR e-mail": document.getElementById('TechMcrEmail').value,
+                "MCR titel": document.getElementById('TechMcrTitel').value,
+                "Kontakt 1 telefon": document.getElementById('TechKontakt1Tlf').value,
+                "Kontakt 1 e-mail": document.getElementById('TechKontakt1Email').value,
+                "Kontakt 1 titel": document.getElementById('TechKontakt1Titel').value,
+                "Kontakt 2 telefon": document.getElementById('TechKontakt2Tlf').value,
+                "Kontakt 2 e-mail": document.getElementById('TechKontakt2Email').value,
+                "Kontakt 2 titel": document.getElementById('TechKontakt2Titel').value,
+                "Yderligere info": document.getElementById('TechYderligere').value
+            };
+            
+            const btn = document.getElementById('btnKopierTech');
+            const orgText = btn.innerHTML;
+            btn.innerHTML = '✔ Kopieret';
+            btn.style.backgroundColor = '#218838';
+            setTimeout(() => {
+                btn.innerHTML = orgText;
+                btn.style.backgroundColor = '#6c757d';
+            }, 1500);
+
+            const btnSaetInd = document.getElementById('btnSaetIndTech');
+            if (btnSaetInd) {
+                btnSaetInd.disabled = false;
+                btnSaetInd.style.opacity = '1';
+            }
+        }
+
+        function saetIndTechOpsaetning() {
+            if (!kopieretTechOpsaetning) return;
+
+            document.getElementById('TechFormat').value = kopieretTechOpsaetning["Format"];
+            document.getElementById('TechRX').value = kopieretTechOpsaetning["RX"];
+            
+            document.getElementById('TechMainIP').value = kopieretTechOpsaetning["MAIN SRT IP"];
+            document.getElementById('TechMainPort').value = kopieretTechOpsaetning["MAIN SRT Port"];
+            document.getElementById('TechMainPass').value = kopieretTechOpsaetning["MAIN Passphrase"];
+            document.getElementById('TechMainStreamID').value = kopieretTechOpsaetning["MAIN Stream ID"];
+            
+            document.getElementById('TechBackupIP').value = kopieretTechOpsaetning["BACKUP SRT IP"];
+            document.getElementById('TechBackupPort').value = kopieretTechOpsaetning["BACKUP SRT Port"];
+            document.getElementById('TechBackupPass').value = kopieretTechOpsaetning["BACKUP Passphrase"];
+            document.getElementById('TechBackupStreamID').value = kopieretTechOpsaetning["BACKUP Stream ID"];
+            
+            document.getElementById('TechSrtListener').checked = kopieretTechOpsaetning["SRT Listener"];
+            document.getElementById('TechSrtListenerIP').value = kopieretTechOpsaetning["SRT Listener IP"];
+            document.getElementById('TechSrtListenerPort').value = kopieretTechOpsaetning["SRT Listener Port"];
+            document.getElementById('TechSrtListenerPass').value = kopieretTechOpsaetning["SRT Listener Passphrase"];
+            document.getElementById('TechSrtListenerStreamID').value = kopieretTechOpsaetning["SRT Listener Stream ID"];
+            
+            document.getElementById('TechBrtListener').checked = kopieretTechOpsaetning["BRT Listener"];
+            document.getElementById('TechBrtListenerIP').value = kopieretTechOpsaetning["BRT Listener IP"];
+            document.getElementById('TechBrtListenerPort').value = kopieretTechOpsaetning["BRT Listener Port"];
+            document.getElementById('TechBrtListenerPass').value = kopieretTechOpsaetning["BRT Listener Passphrase"];
+            document.getElementById('TechBrtListenerStreamID').value = kopieretTechOpsaetning["BRT Listener Stream ID"];
+            
+            document.getElementById('TechA1').value = kopieretTechOpsaetning["A1"];
+            document.getElementById('TechA2').value = kopieretTechOpsaetning["A2"];
+            document.getElementById('TechA3').value = kopieretTechOpsaetning["A3"];
+            document.getElementById('TechA4').value = kopieretTechOpsaetning["A4"];
+            document.getElementById('TechA5').value = kopieretTechOpsaetning["A5"];
+            document.getElementById('TechA6').value = kopieretTechOpsaetning["A6"];
+            
+            document.getElementById('TechE2ETest').checked = kopieretTechOpsaetning["E2E Test"];
+            document.getElementById('TechUtcStart').value = kopieretTechOpsaetning["UTC start"];
+            document.getElementById('TechUtcSlut').value = kopieretTechOpsaetning["UTC slut"];
+            
+            document.getElementById('TechMcrTlf').value = kopieretTechOpsaetning["MCR telefon"];
+            document.getElementById('TechMcrEmail').value = kopieretTechOpsaetning["MCR e-mail"];
+            document.getElementById('TechMcrTitel').value = kopieretTechOpsaetning["MCR titel"];
+            
+            document.getElementById('TechKontakt1Tlf').value = kopieretTechOpsaetning["Kontakt 1 telefon"];
+            document.getElementById('TechKontakt1Email').value = kopieretTechOpsaetning["Kontakt 1 e-mail"];
+            document.getElementById('TechKontakt1Titel').value = kopieretTechOpsaetning["Kontakt 1 titel"];
+            
+            document.getElementById('TechKontakt2Tlf').value = kopieretTechOpsaetning["Kontakt 2 telefon"];
+            document.getElementById('TechKontakt2Email').value = kopieretTechOpsaetning["Kontakt 2 e-mail"];
+            document.getElementById('TechKontakt2Titel').value = kopieretTechOpsaetning["Kontakt 2 titel"];
+            
+            document.getElementById('TechYderligere').value = kopieretTechOpsaetning["Yderligere info"];
+
+            toggleTechListeners();
+            calcE2ETime();
+            opdaterTechLinks(); // Sikrer at knapperne til links også opdateres automatisk
+
+            const btn = document.getElementById('btnSaetIndTech');
+            const orgText = btn.innerHTML;
+            btn.innerHTML = '✔ Sat ind';
+            setTimeout(() => {
+                btn.innerHTML = orgText;
+            }, 1500);
+        }
+
+        async function rydTechOpsaetning() {
+            const bekraeft = await visCustomDialog("Er du sikker på, at du vil slette alt indhold i dette vindue?", "confirm");
+            if (!bekraeft) return;
+
+            const textFields = [
+                'TechFormat', 'TechRX', 'TechMainIP', 'TechMainPort', 'TechMainPass', 'TechMainStreamID',
+                'TechBackupIP', 'TechBackupPort', 'TechBackupPass', 'TechBackupStreamID',
+                'TechSrtListenerIP', 'TechSrtListenerPort', 'TechSrtListenerPass', 'TechSrtListenerStreamID', 
+                'TechBrtListenerIP', 'TechBrtListenerPort', 'TechBrtListenerPass', 'TechBrtListenerStreamID',
+                'TechA1', 'TechA2', 'TechA3', 'TechA4', 'TechA5', 'TechA6',
+                'TechUtcStart', 'TechUtcSlut', 'TechMcrTitel', 'TechMcrTlf', 'TechMcrEmail',
+                'TechKontakt1Titel', 'TechKontakt1Tlf', 'TechKontakt1Email',
+                'TechKontakt2Titel', 'TechKontakt2Tlf', 'TechKontakt2Email', 'TechYderligere'
+            ];
+            
+            for (let id of textFields) {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            }
+            
+            document.getElementById('TechSrtListener').checked = false;
+            document.getElementById('TechBrtListener').checked = false;
+            document.getElementById('TechE2ETest').checked = false;
+            
+            toggleTechListeners();
+            calcE2ETime();
+            opdaterTechLinks(); // Rydder også de genererede links i bunden
+        }
+        // -----------------------------------------------------------
+
         async function loadProgrammer(silent = false) {
             if (!silent) {
                 document.getElementById('loader').style.display = 'block';
