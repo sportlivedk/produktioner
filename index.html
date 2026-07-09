@@ -2030,7 +2030,7 @@
                 if (t >= 24) t -= 24;
                 
                 // Her indkodes et ægte SVG-Dannebrog i stedet for en emoji (og vi bruger innerHTML i stedet for textContent)
-                const flagSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 28" width="16" height="12" style="vertical-align: middle; margin-right: 5px; border-radius: 2px; box-shadow: 0 0 1px rgba(0,0,0,0.4); position: relative; top: -1px;"><rect width="37" height="28" fill="#c8102e"/><rect x="12" y="0" width="4" height="28" fill="#fff"/><rect x="0" y="12" width="37" height="4" fill="#fff"/></svg>`;
+                const flagSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 28" width="16" height="12" style="vertical-align: middle; margin-right: 5px; border-radius: 2px; box-shadow: 0 0 1px rgba(0,0,0,0.4); position: relative; top: -2px;"><rect width="37" height="28" fill="#c8102e"/><rect x="12" y="0" width="4" height="28" fill="#fff"/><rect x="0" y="12" width="37" height="4" fill="#fff"/></svg>`;
                 
                 cetDiv.innerHTML = `${flagSvg} ${tzNavn} ${type.toLowerCase()}: ${String(t).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
             });
