@@ -329,7 +329,7 @@
             .detail-row td { padding: 12px !important; background-color: #fafbfc; border-bottom: none !important; }
             .detail-list-item, .detail-label, .detail-value { font-size: 12px !important; }
             
-            /* Vis ugedag ved swipe på mobilen */
+            /* Vis ugedag ved swipe på mobil */
             body.show-mobile-weekday th:nth-child(2),
             body.show-mobile-weekday .main-row td:nth-child(2) {
                 display: table-cell !important;
@@ -847,6 +847,7 @@
                         <div class="form-group" style="grid-column: span 4;"><label>A6</label><input type="text" id="TechA6" list="liste-Audio layout" placeholder="Vælg eller skriv..." autocomplete="off"></div>
                     </div>
 
+                    <!-- E2E TEST -->
                     <div class="form-group checkbox-group" style="grid-column: span 12; display: flex; align-items: center; margin-top: 15px;">
                         <input type="checkbox" id="TechE2ETest" onchange="toggleTechListeners()">
                         <label for="TechE2ETest" style="font-weight: bold; text-transform: uppercase; font-size: 13px;">End-2-End Test</label>
@@ -2028,7 +2029,7 @@
                 t = t + offset;
                 if (t >= 24) t -= 24;
                 
-                cetDiv.textContent = `${tzNavn} ${type.toLowerCase()}: ${String(t).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                cetDiv.textContent = `🇩🇰 ${tzNavn} ${type.toLowerCase()}: ${String(t).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
             });
         }
 
