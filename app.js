@@ -783,297 +783,59 @@ async function rydTechOpsaetning() {
     opdaterTechLinks(); 
 }
 
-async function loadProgrammer(silent = false) {
-    if (!silent) {
-        document.getElementById('loader').style.display = 'block';
-        document.getElementById('programTable').style.display = 'none';
-        document.getElementById('ingenResultater').style.display = 'none';
-    }
+function kopierTekst(elementId, btnElement) {
+    const el = document.getElementById(elementId);
+    if (!el || !el.value) return;
+    navigator.clipboard.writeText(el.value).then(() => {
+        const originalHtml = btnElement.innerHTML;
+        btnElement.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#28a745" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        setTimeout(() => { btnElement.innerHTML = originalHtml; }, 1500);
+    }).catch(err => console.error("Kopiering fejlede:", err));
+}
+
+function toggleTechListeners() {
+    const srtBox = document.getElementById('TechSrtListener');
+    const srtGroup = document.getElementById('TechSrtListenerGroup');
+    srtGroup.style.display = srtBox.checked ? 'grid' : 'none';
+
+    const brtBox = document.getElementById('TechBrtListener');
+    const brtGroup = document.getElementById('TechBrtListenerGroup');
+    brtGroup.style.display = brtBox.checked ? 'grid' : 'none';
     
-    try {
-        const getUrl = scriptURL + "?action=getdata";
-        const response = await fetch(getUrl);
-        const jsonData = await response.json();
-        
-        let raaProgrammer = jsonData.programmer || [];
-        
-        alleProgrammerGlobal = raaProgrammer.map(p => {
-            if (p["Dato"]) {
-                const d = new Date(p["Dato"]);
-                if (!isNaN(d.getTime())) {
-                    p["NormDato"] = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-                } else { p["NormDato"] = p["Dato"]; }
-            } else { p["NormDato"] = ""; }
-            return p;
-        });
-
-        const dropdowns = jsonData.dropdowns || {};
-
-        for (const [feltNavn, muligheder] of Object.entries(dropdowns)) {
-            if (feltNavn === 'Signal til' || feltNavn === 'Sling') {
-                const signalDropdown = document.getElementById('signalDropdown');
-                if (signalDropdown) {
-                    signalDropdown.innerHTML = '';
-                    muligheder.forEach(mulighed => {
-                        const div = document.createElement('div');
-                        div.className = 'multi-select-option';
-                        
-                        const cb = document.createElement('input');
-                        cb.type = 'checkbox';
-                        cb.value = mulighed;
-                        cb.id = 'sig-' + mulighed.replace(/\s+/g, '-');
-                        cb.onchange = updateSignalHeader;
-                        
-                        const lbl = document.createElement('label');
-                        lbl.htmlFor = cb.id;
-                        lbl.textContent = mulighed;
-                        
-                        div.appendChild(cb);
-                        div.appendChild(lbl);
-                        signalDropdown.appendChild(div);
-                    });
-                }
-            } else if (feltNavn !== 'Produktionsplan' && feltNavn !== 'P-plan' && feltNavn !== 'Teknisk info') {
-                const datalistElement = document.getElementById('liste-' + feltNavn);
-                if (datalistElement) {
-                    datalistElement.innerHTML = ''; 
-                    muligheder.forEach(mulighed => {
-                        const option = document.createElement('option');
-                        option.value = mulighed;
-                        datalistElement.appendChild(option);
-                    });
-                }
-            }
-        }
-
-        alleProgrammerGlobal.sort((a, b) => {
-            const datoA = a["NormDato"] || "";
-            const datoB = b["NormDato"] || "";
-            if (datoA !== datoB) return datoA.localeCompare(datoB);
-            const tidA = a["Tid"] || "23:59";
-            const tidB = b["Tid"] || "23:59";
-            return tidA.localeCompare(tidB);
-        });
-
-        opdaterFiltreUI();
-        opdaterVisning();
-        opdaterTechDatalists();
-
-        if (!silent) {
-            document.getElementById('loader').style.display = 'none';
-        }
-
-    } catch (error) {
-        console.error('Fejl ved indlæsning:', error);
-        if (!silent) {
-            document.getElementById('loader').textContent = "Der opstod en fejl under indlæsning af programmer.";
-            document.getElementById('loader').style.display = 'block';
-        }
-    }
+    const e2eBox = document.getElementById('TechE2ETest');
+    const e2eGroup = document.getElementById('TechE2ETestGroup');
+    if (e2eGroup) e2eGroup.style.display = e2eBox.checked ? 'grid' : 'none';
 }
 
-function filtrerAar(aar) {
-    visKunIdag = false; 
-    valgtAar = aar;
-    const aktueltAar = aktuelDato.getFullYear();
-    if (aar === aktueltAar) valgtMaaned = aktuelDato.getMonth();
-    else valgtMaaned = 0; 
-    opdaterFiltreUI();
-    opdaterVisning();
-    document.querySelector('.table-container').scrollTop = 0;
-}
+function calcE2ETime() {
+    const rowId = document.getElementById('TechRowId').value;
+    const program = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
+    const datoStr = (program && program.NormDato) ? program.NormDato : new Date().toISOString().split('T')[0];
 
-function filtrerMaaned(maanedIndex) {
-    visKunIdag = false; 
-    valgtMaaned = maanedIndex;
-    opdaterFiltreUI();
-    opdaterVisning();
-    document.querySelector('.table-container').scrollTop = 0;
-}
+    const tzTestDate = new Date(`${datoStr}T12:00:00Z`);
+    const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Copenhagen', timeZoneName: 'short' });
+    const tzPart = formatter.formatToParts(tzTestDate).find(p => p.type === 'timeZoneName');
+    const isSummertime = tzPart && (tzPart.value.includes('+2') || tzPart.value.includes('CEST') || tzPart.value.includes('GMT+2'));
+    const offset = isSummertime ? 2 : 1;
+    const tzNavn = isSummertime ? "CEST" : "CET";
 
-function filtrerIdag() {
-    visKunIdag = !visKunIdag; 
-    opdaterFiltreUI();
-    opdaterVisning();
-    document.querySelector('.table-container').scrollTop = 0;
-}
-
-function handterSogning() {
-    const input = document.getElementById('searchInput').value.trim();
-    const clearBtn = document.getElementById('clearSearchBtn');
-    clearBtn.style.display = input.length > 0 ? 'block' : 'none';
-    opdaterVisning();
-    const container = document.querySelector('.table-container');
-    if (container) container.scrollTop = 0;
-}
-
-function rydSogning() {
-    const input = document.getElementById('searchInput');
-    input.value = '';
-    document.getElementById('clearSearchBtn').style.display = 'none';
-    opdaterVisning();
-    const container = document.querySelector('.table-container');
-    if (container) container.scrollTop = 0;
-}
-
-function opdaterVisning() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-    const kategoriFilter = document.getElementById('typeFilter').value;
-    
-    const pdfBtn = document.getElementById('btnExportPDF');
-    if (pdfBtn) {
-        if (valgtMaaned !== -1 && kategoriFilter === 'sportlive' && !visKunIdag) {
-            pdfBtn.style.display = 'inline-flex';
-        } else {
-            pdfBtn.style.display = 'none';
-        }
-    }
-
-    const sysDato = new Date();
-    const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
-
-    aktuelleProgrammerVist = alleProgrammerGlobal.filter(program => {
-        const normDato = program["NormDato"] || "";
-        if (!normDato) return false;
+    ['Start', 'Slut'].forEach(type => {
+        const utcVal = document.getElementById(`TechUtc${type}`).value;
+        const cetDiv = document.getElementById(`TechCet${type}`);
         
-        if (visKunIdag) {
-            if (normDato !== idagsDatoStr) return false;
-        } else {
-            const parts = normDato.split('-');
-            const pAar = parseInt(parts[0], 10);
-            const pMaaned = parseInt(parts[1], 10) - 1; 
-            
-            if (pAar !== valgtAar) return false;
-            if (valgtMaaned !== -1 && pMaaned !== valgtMaaned) return false;
+        if (!utcVal) {
+            cetDiv.innerHTML = "";
+            return;
         }
         
-        const kanalNavn = String(program["Kanal"] || '');
-        const unitNavn = String(program["Unit"] || '');
+        let [t, m] = utcVal.split(':').map(Number);
+        t = t + offset;
+        if (t >= 24) t -= 24;
         
-        if (kategoriFilter === 'fremtidige' && normDato < idagsDatoStr) return false;
-        if (kategoriFilter === 'sportlive' && kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
-        if (kategoriFilter === 'ekstern' && (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse')) return false;
+        const flagSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 28" width="16" height="12" style="vertical-align: middle; margin-right: 5px; border-radius: 2px; box-shadow: 0 0 1px rgba(0,0,0,0.4); position: relative; top: -2px;"><rect width="37" height="28" fill="#c8102e"/><rect x="12" y="0" width="4" height="28" fill="#fff"/><rect x="0" y="12" width="37" height="4" fill="#fff"/></svg>`;
         
-        if (kategoriFilter === 'ob') {
-            const obFilterArr = ["MINITECH", "NOWTEK OB1", "NOWTEK OB2", "OB 7", "OB 9", "OB 7+9", "SAM OB", "OB"];
-            if (!obFilterArr.includes(unitNavn.toUpperCase())) return false;
-        }
-
-        if (kategoriFilter === 'tbc' && (!program["TBC"] || String(program["TBC"]).toUpperCase() !== 'X')) return false;
-        
-        if (searchTerm !== '') {
-            const alleFelterTekst = Object.values(program).map(v => String(v)).join(' ').toLowerCase();
-            if (!alleFelterTekst.includes(searchTerm)) { return false; }
-        }
-        return true;
+        cetDiv.innerHTML = `${flagSvg} ${tzNavn} ${type.toLowerCase()}: ${String(t).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     });
-    
-    const countEl = document.getElementById('programCountText');
-    if (countEl) {
-        countEl.innerHTML = `Viser <b>${aktuelleProgrammerVist.length}</b> programmer`;
-    }
-    
-    tegnTabel(aktuelleProgrammerVist);
-}
-
-function toggleDetails(btn) {
-    const trMain = btn.closest('tr');
-    const trDetail = trMain.nextElementSibling;
-    
-    const isOpening = (trDetail.style.display === 'none' || trDetail.style.display === '');
-
-    document.querySelectorAll('.detail-row').forEach(row => {
-        row.style.display = 'none';
-        const prev = row.previousElementSibling;
-        if (prev) {
-            const toggleBtn = prev.querySelector('.toggle-btn');
-            if (toggleBtn) toggleBtn.textContent = '▼';
-        }
-    });
-    
-    if (isOpening) {
-        trDetail.style.display = 'table-row';
-        btn.textContent = '▲'; 
-        
-        setTimeout(() => {
-            const container = document.querySelector('.table-container');
-            const detailRect = trDetail.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            
-            if (detailRect.bottom > containerRect.bottom) {
-                container.scrollBy({
-                    top: (detailRect.bottom - containerRect.bottom) + 15,
-                    behavior: 'smooth'
-                });
-            }
-        }, 50);
-    }
-}
-
-function toggleDetailsFromRow(event, row) {
-    if (event.target.tagName === 'BUTTON' || event.target.closest('button')) return;
-    
-    const trDetail = row.nextElementSibling;
-    const isOpening = (trDetail.style.display === 'none' || trDetail.style.display === '');
-
-    document.querySelectorAll('.detail-row').forEach(detailRow => {
-        detailRow.style.display = 'none';
-        const prev = detailRow.previousElementSibling;
-        if (prev) {
-            const toggleBtn = prev.querySelector('.toggle-btn');
-            if (toggleBtn) toggleBtn.textContent = '▼';
-        }
-    });
-
-    if (isOpening) {
-        trDetail.style.display = 'table-row';
-        const btn = row.querySelector('.toggle-btn');
-        if (btn) btn.textContent = '▲';
-        
-        setTimeout(() => {
-            const container = document.querySelector('.table-container');
-            const detailRect = trDetail.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            
-            if (detailRect.bottom > containerRect.bottom) {
-                container.scrollBy({
-                    top: (detailRect.bottom - containerRect.bottom) + 15,
-                    behavior: 'smooth'
-                });
-            }
-        }, 50);
-    }
-}
-
-async function forsogLukModal() {
-    if (hentFormularState() !== formInitialState) {
-        const bekræft = await visCustomDialog("Er du sikker på, at du vil afslutte uden at gemme?\n\nEventuelle ugemte indtastninger vil gå tabt.", "confirm");
-        if (bekræft) { closeModal(); }
-    } else {
-        closeModal();
-    }
-}
-
-function hentTechFormularState() {
-    const data = {};
-    const textFields = [
-        'TechFormat', 'TechRX', 'TechMainIP', 'TechMainPort', 'TechMainPass', 'TechMainStreamID',
-        'TechBackupIP', 'TechBackupPort', 'TechBackupPass', 'TechBackupStreamID',
-        'TechSrtListenerIP', 'TechSrtListenerPort', 'TechSrtListenerPass', 'TechSrtListenerStreamID', 
-        'TechBrtListenerIP', 'TechBrtListenerPort', 'TechBrtListenerPass', 'TechBrtListenerStreamID',
-        'TechA1', 'TechA2', 'TechA3', 'TechA4', 'TechA5', 'TechA6',
-        'TechUtcStart', 'TechUtcSlut', 'TechMcrTitel', 'TechMcrTlf', 'TechMcrEmail',
-        'TechKontakt1Titel', 'TechKontakt1Tlf', 'TechKontakt1Email',
-        'TechKontakt2Titel', 'TechKontakt2Tlf', 'TechKontakt2Email', 'TechYderligere'
-    ];
-    for (let id of textFields) {
-        const el = document.getElementById(id);
-        if (el) data[id] = el.value;
-    }
-    data['TechSrtListener'] = document.getElementById('TechSrtListener').checked;
-    data['TechBrtListener'] = document.getElementById('TechBrtListener').checked;
-    data['TechE2ETest'] = document.getElementById('TechE2ETest').checked;
-    return JSON.stringify(data);
 }
 
 async function aabenTechModal(event, rowId) {
