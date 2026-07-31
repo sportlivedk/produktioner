@@ -193,6 +193,16 @@
         let globalTick = 0; 
 
         function getProgramColorAndPriority(p) {
+            // NYT: Håndter mergede dubletter (hvis samme programtitel optræder flere gange)
+            if (p._isMerged) {
+                if (p._mergedHasOB) {
+                    return { color: 'color-blue', prio: 1 };
+                } else {
+                    return { color: 'color-red', prio: 4 }; // Rød skrift hvis ingen af dem er OB
+                }
+            }
+
+            // ... Eksisterende logik fortsætter herunder
             const kanalNavn = String(p.Kanal || "").trim();
             const unitLower = String(p.Unit || "").toLowerCase().trim();
             const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "ob 7+9", "sam ob"];
@@ -350,6 +360,39 @@
                         });
 
                         if (dagensProduktioner.length > 0) {
+
+// --- NY DEDUPLIKERINGS-LOGIK START ---
+                            let titleMap = new Map();
+                            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "ob 7+9", "sam ob"];
+
+                            dagensProduktioner.forEach(p => {
+                                let titel = String(p.Programtitel || "").trim();
+                                let unitLower = String(p.Unit || "").toLowerCase().trim();
+                                let kanalNavn = String(p.Kanal || "").trim();
+                                
+                                // Vi tjekker om den betragtes som en OB-produktion (ud fra jeres eksisterende farvekode-regler)
+                                let isOB = colorBlueUnits.includes(unitLower) || (kanalNavn === "SPORT LIVE" && unitLower === "");
+
+                                if (!titleMap.has(titel)) {
+                                    titleMap.set(titel, { original: p, isDuplicate: false, hasOB: isOB });
+                                } else {
+                                    let entry = titleMap.get(titel);
+                                    entry.isDuplicate = true;
+                                    if (isOB) entry.hasOB = true; // Hvis blot én af produktionerne er OB, markeres gruppen som OB
+                                }
+                            });
+
+                            dagensProduktioner = Array.from(titleMap.values()).map(entry => {
+                                let p = entry.original;
+                                if (entry.isDuplicate) {
+                                    p = Object.assign({}, p); // Klon programmet, så vi ikke ødelægger de oprindelige data i baggrunden
+                                    p._isMerged = true;
+                                    p._mergedHasOB = entry.hasOB;
+                                }
+                                return p;
+                            });
+                            // --- NY DEDUPLIKERINGS-LOGIK SLUT ---
+
                             dagensProduktioner.sort((a, b) => {
                                 const infoA = getProgramColorAndPriority(a);
                                 const infoB = getProgramColorAndPriority(b);
