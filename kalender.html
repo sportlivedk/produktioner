@@ -212,7 +212,7 @@
                 return { color: 'color-blue', prio: 1 };
             } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
                 return { color: 'color-green', prio: 2 };
-            } else if (kanalNavn === "EFP" || unitLower === "efp") {
+            } else if (kanalNavn === "EFP" || unitLower === "efp" || kanalNavn.toUpperCase() === "OPTAGELSE") {
                 return { color: 'color-black', prio: 3 };
             } else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
                 return { color: 'color-red', prio: 4 };
