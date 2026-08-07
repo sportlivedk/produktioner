@@ -1684,7 +1684,7 @@
                 if (kanalNavn === 'Feltet+') { badgeBg = '#ff0d99'; mobileColor = '#ff0d99'; }
                 else if (kanalNavn === 'Bold+') { badgeBg = '#92d050'; badgeFg = 'black'; mobileColor = '#92d050'; }
                 else if (kanalNavn === 'Ekstra Bladet+') { badgeBg = '#ff0000'; mobileColor = '#ff0000'; }
-                else if (kanalNavn === 'Pay-Per-View') { badgeBg = '#175b30'; mobileColor = '#175b30'; }
+                else if (kanalNavn === 'JFM') { badgeBg = '#175b30'; mobileColor = '#175b30'; }
                 else if (kanalNavn === 'Optagelse') { badgeBg = '#000000'; mobileColor = '#000000'; }
                 else if (kanalNavn === 'Pluto TV (DK)') { badgeBg = '#7030a0'; mobileColor = '#7030a0'; }
                 else if (kanalNavn === 'Pluto TV (NO)') { badgeBg = '#3b201f'; mobileColor = '#3b201f'; }
@@ -2094,7 +2094,7 @@
                         loadProgrammer(true);
                     }
                 }
-            }, 180000);
+            }, 600000);
             
             document.getElementById('Kanal').addEventListener('input', function() {
                 if (this.value === 'Optagelse') {
