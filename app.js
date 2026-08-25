@@ -1342,6 +1342,12 @@
                 document.getElementById('Dato').value = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
             }
 
+// Vis notifikationsfelt ved nyt program
+            const notifWrap = document.getElementById('notifikationWrapper');
+            if (notifWrap) notifWrap.style.display = 'inline-flex';
+            const notifCheck = document.getElementById('SendNotifNyt');
+            if (notifCheck) notifCheck.checked = false; // Reset checkbox
+
             formInitialState = hentFormularState();
             pendingTechInfoForNewProgram = null;
             openModal();
@@ -1458,6 +1464,10 @@
             document.getElementById('modalTitle').textContent = "Rediger program";
             document.getElementById('submitBtn').textContent = "Opdater program";
 
+// Skjul notifikationsfelt ved redigering
+            const notifWrap = document.getElementById('notifikationWrapper');
+            if (notifWrap) notifWrap.style.display = 'none';
+
             formInitialState = hentFormularState();
             pendingTechInfoForNewProgram = null;
             openModal();
@@ -1566,6 +1576,10 @@
             document.getElementById('modalTitle').textContent = "Kopier program";
             document.getElementById('submitBtn').textContent = "Gem program";
 
+// Skjul notifikationsfelt ved kopiering
+            const notifWrap = document.getElementById('notifikationWrapper');
+            if (notifWrap) notifWrap.style.display = 'none';
+
             formInitialState = hentFormularState();
             openModal();
         }
@@ -1595,7 +1609,12 @@
 
                 await fetch(scriptURL, {
                     method: 'POST',
-                    body: JSON.stringify({ action: "delete", RowId: rowId }),
+                    body: JSON.stringify({ 
+                        action: "delete", 
+                        RowId: rowId,
+                        TriggerEmail: true,
+                        EmailSubject: "Program er slettet"
+                    }),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
                 
@@ -1992,6 +2011,73 @@
             const tbcStatus = document.getElementById('TBC').checked ? "X" : "";
             const valgteSignaler = Array.from(document.querySelectorAll('#signalDropdown input[type="checkbox"]:checked')).map(cb => cb.value).join(', ');
 
+          // --- LOGIK TIL EMAIL NOTIFIKATIONER ---
+            let isNewProgram = !rowId;
+            let sendNotificationNew = isNewProgram && document.getElementById('SendNotifNyt') && document.getElementById('SendNotifNyt').checked;
+            
+            let emailSubject = "Produktionsdatabasen er opdateret"; // Standard fallback
+            let emailBodyContext = "";
+            let triggerEmail = false;
+
+            if (isNewProgram) {
+                if (sendNotificationNew) {
+                    triggerEmail = true;
+                    emailSubject = "Nyt program er tilføjet";
+                    emailBodyContext = "nyt_program";
+                }
+            } else {
+                // Her skal du hente det OPRINDELIGE program for at sammenligne ændringer
+                const originalProgram = alleProgrammerGlobal.find(p => String(p.RowId) === String(rowId));
+                if (originalProgram) {
+                    let changedDato = originalProgram["NormDato"] !== valgtDato;
+                    
+                    // Formatér original tid for sammenligning
+                    let origTidFormatted = "";
+                    if (originalProgram["Tid"]) {
+                        const t = new Date(originalProgram["Tid"]);
+                        if (!isNaN(t.getTime()) && String(originalProgram["Tid"]).includes('T')) {
+                            origTidFormatted = String(t.getHours()).padStart(2, '0') + ":" + String(t.getMinutes()).padStart(2, '0');
+                        } else {
+                            origTidFormatted = String(originalProgram["Tid"]).substring(0, 5);
+                        }
+                    }
+                    let changedTid = origTidFormatted !== valgtTid.substring(0,5);
+                    
+                    let changedLokation = (originalProgram["Lokation"] || "") !== document.getElementById('Lokation').value;
+                    let wasTBC = originalProgram["TBC"] && String(originalProgram["TBC"]).toUpperCase() === 'X';
+                    let isNowTBC = tbcStatus === "X";
+                    let tbcRemoved = wasTBC && !isNowTBC;
+
+                    // Byg emnefelt
+                    if (changedDato && changedTid && changedLokation) {
+                        emailSubject = "Ændring af dato, tid og lokation";
+                        triggerEmail = true;
+                    } else if (changedDato && changedLokation) {
+                        emailSubject = "Ændring af dato og lokation";
+                        triggerEmail = true;
+                    } else if (changedTid && changedLokation) {
+                        emailSubject = "Ændring af tid og lokation";
+                        triggerEmail = true;
+                    } else if (changedDato && changedTid) {
+                        emailSubject = "Ændring af dato og tid";
+                        triggerEmail = true;
+                    } else if (changedDato) {
+                        emailSubject = "Ændring af dato";
+                        triggerEmail = true;
+                    } else if (changedTid) {
+                        emailSubject = "Ændring af tidspunkt";
+                        triggerEmail = true;
+                    } else if (changedLokation) {
+                        emailSubject = "Ændring af lokation";
+                        triggerEmail = true;
+                    } else if (tbcRemoved) {
+                        emailSubject = "Program er bekræftet";
+                        triggerEmail = true;
+                    }
+                }
+            }
+            // --- LOGIK TIL EMAIL NOTIFIKATIONER SLUT ---
+
             const nyProduktion = {
                 "RowId": rowId, 
                 "Dato": valgtDato,
@@ -2015,7 +2101,11 @@
                 "Teknisk info": "", 
                 "Link / Noter": document.getElementById('Noter').value,
                 "TBC": tbcStatus,
-                "TX": valgtTX 
+                "TX": valgtTX,
+                // Nye felter til backenden (Google Apps Script)
+                "TriggerEmail": triggerEmail,
+                "EmailSubject": emailSubject,
+                "EmailContext": emailBodyContext 
             };
 
             if (!rowId && pendingTechInfoForNewProgram) {
