@@ -1576,9 +1576,11 @@
             document.getElementById('modalTitle').textContent = "Kopier program";
             document.getElementById('submitBtn').textContent = "Gem program";
 
-// Skjul notifikationsfelt ved kopiering
+// Vis notifikationsfelt ved kopiering
             const notifWrap = document.getElementById('notifikationWrapper');
-            if (notifWrap) notifWrap.style.display = 'none';
+            if (notifWrap) notifWrap.style.display = 'inline-flex';
+            const notifCheck = document.getElementById('SendNotifNyt');
+            if (notifCheck) notifCheck.checked = false; // Reset checkbox
 
             formInitialState = hentFormularState();
             openModal();
