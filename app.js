@@ -1346,7 +1346,7 @@
             const notifWrap = document.getElementById('notifikationWrapper');
             if (notifWrap) notifWrap.style.display = 'inline-flex';
             const notifCheck = document.getElementById('SendNotifNyt');
-            if (notifCheck) notifCheck.checked = false; // Reset checkbox
+            if (notifCheck) notifCheck.checked = true; // Sæt som default til true
 
             formInitialState = hentFormularState();
             pendingTechInfoForNewProgram = null;
@@ -1580,7 +1580,7 @@
             const notifWrap = document.getElementById('notifikationWrapper');
             if (notifWrap) notifWrap.style.display = 'inline-flex';
             const notifCheck = document.getElementById('SendNotifNyt');
-            if (notifCheck) notifCheck.checked = false; // Reset checkbox
+            if (notifCheck) notifCheck.checked = true; // Sæt som default til true
 
             formInitialState = hentFormularState();
             openModal();
