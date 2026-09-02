@@ -1,0 +1,724 @@
+﻿<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPORT LIVE | Kalender</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #fdfdfd;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            color: #1a1a1a;
+        }
+
+        /* --- VISNINGS-CONTAINERE --- */
+        #calendar-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.8s ease-in-out;
+            opacity: 1;
+        }
+
+        #next-live-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #111111; /* Mørk baggrund for biograf-følelse */
+            color: #ffffff;
+            transition: opacity 0.8s ease-in-out;
+            opacity: 0;
+            pointer-events: none; /* Forhindrer klik, når den er usynlig */
+            z-index: 50;
+        }
+
+        /* --- DESIGN TIL NÆSTE LIVE-SKÆRM --- */
+        .nl-logo {
+            max-width: 15vw;
+            max-height: 10vh;
+            margin-bottom: 4vh;
+        }
+
+        .nl-header {
+            font-size: 2.5vw;
+            font-weight: 800;
+            color: #dd5f12; /* SPORT LIVE orange/rød accent */
+            letter-spacing: 0.3vw;
+            text-transform: uppercase;
+            margin-bottom: 6vh;
+        }
+
+        .countdown-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1vw;
+            margin-bottom: 6vh;
+        }
+
+        .cd-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #222222;
+            padding: 2vw 2.5vw;
+            border-radius: 1vw;
+            min-width: 12vw;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+
+        .cd-num {
+            font-size: 9vw;
+            font-weight: 900;
+            line-height: 1;
+            font-variant-numeric: tabular-nums; /* Sikrer at tallene ikke "hopper" */
+        }
+
+        .cd-label {
+            font-size: 1.5vw;
+            font-weight: 600;
+            color: #aaaaaa;
+            margin-top: 1vh;
+            letter-spacing: 0.2vw;
+        }
+
+        .cd-colon {
+            font-size: 6vw;
+            font-weight: 900;
+            color: #555555;
+            margin-bottom: 3vh;
+        }
+
+        .nl-title {
+            font-size: 3.5vw;
+            font-weight: 700;
+            text-align: center;
+            max-width: 80vw;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .sender-nu {
+            font-size: 8vw;
+            font-weight: 900;
+            color: #dc3545;
+            letter-spacing: 0.5vw;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* --- DET EKSISTERENDE KALENDER DESIGN --- */
+        .month-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #d0d0d0; 
+            box-sizing: border-box;
+            min-width: 0; 
+        }
+        
+        .month-column:last-child { border-right: none; }
+
+        .month-header {
+            height: 3.2vh; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1vw; 
+            font-weight: 800;
+            text-transform: uppercase;
+            border-bottom: 2px solid #a0a0a0;
+            background-color: #fdfdfd; 
+            letter-spacing: 2px;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .day-row {
+            height: calc(96.8vh / 31); 
+            display: flex;
+            border-bottom: 1px solid #c0c0c0; 
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative; 
+        }
+        
+        .day-row:last-child { border-bottom: none; }
+
+        .date-number {
+            width: 1.6vw; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75vw; 
+            font-weight: 700;
+            border-right: 1px solid #c0c0c0; 
+            background-color: #f4f4f4; 
+            flex-shrink: 0;
+        }
+
+        .date-circle {
+            width: 1.2vw;
+            height: 1.2vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .weekend .date-circle {
+            background-color: #e68a8a; 
+            color: #ffffff;
+            font-weight: 600; 
+        }
+
+        .date-content {
+            flex: 1;
+            position: relative; 
+            overflow: hidden;
+        }
+
+        .animator-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
+
+        .page {
+            height: 100%;
+            width: 100%;
+            padding: 3px 1.5vw 0px 6px; 
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; 
+            gap: 2px; 
+        }
+
+        .program-line {
+            font-size: 0.62vw; 
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: clip; 
+            line-height: 1.05; 
+            margin-bottom: 0; 
+            -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+            mask-image: linear-gradient(to right, black 90%, transparent 100%);
+        }
+
+        .paging-dots {
+            position: absolute;
+            right: 0.4vw;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 3px;
+            width: 0.6vw;
+        }
+
+        .dot {
+            width: 3px; 
+            height: 3px; 
+            background-color: #d0d0d0;
+            border-radius: 50%;
+            transition: background-color 0.8s, transform 0.8s;
+        }
+
+        .dot.active {
+            background-color: #555;
+            transform: scale(1.4); 
+        }
+
+        .color-blue { color: #0056b3; }
+        .color-green { color: #28a745; }
+        .color-black { color: #1a1a1a; }
+        .color-red { color: #dc3545; }
+
+        .even-week { background-color: #f5f7f9; }
+        .even-week .date-number { background-color: #ebedf0; }
+
+        .empty-day .date-number { background-color: transparent; border-right: 1px solid transparent; }
+        .empty-day { border-bottom: 1px solid transparent; }
+
+        #loader {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7vw;
+            color: #ccc;
+            z-index: 100;
+            transition: opacity 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">Opdaterer...</div>
+    
+    <!-- KALENDER VISNING -->
+    <div id="calendar-container"></div>
+
+    <!-- NÆSTE LIVE VISNING -->
+    <div id="next-live-container">
+        <!-- HUSK AT RETTE STIEN TIL LOGOET HERUNDER -->
+        <img src="logo.png" alt="SPORT LIVE" class="nl-logo" id="sl-logo">
+        
+        <div class="nl-header">Næste live-sending</div>
+        
+        <div id="countdown-display" class="countdown-wrapper">
+            <div class="cd-box"><div class="cd-num" id="cd-days">00</div><div class="cd-label">DAGE</div></div>
+            <div class="cd-colon">:</div>
+            <div class="cd-box"><div class="cd-num" id="cd-hours">00</div><div class="cd-label">TIMER</div></div>
+            <div class="cd-colon">:</div>
+            <div class="cd-box"><div class="cd-num" id="cd-minutes">00</div><div class="cd-label">MIN</div></div>
+            <div class="cd-colon">:</div>
+            <div class="cd-box"><div class="cd-num" id="cd-seconds">00</div><div class="cd-label">SEK</div></div>
+        </div>
+        
+        <div id="nl-title" class="nl-title">INDLÆSER...</div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbznTiMKZZDJhmuZpArHJLwZcN-Ic745YuXZitWrdDojG-L3KuW-VXy0mtJUPOE3xCR1/exec';
+        const container = document.getElementById('calendar-container');
+        const monthNames = ['JANUAR', 'FEBRUAR', 'MARTS', 'APRIL', 'MAJ', 'JUNI', 'JULI', 'AUGUST', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DECEMBER'];
+        
+        let produktioner = [];
+        let globalTick = 0; 
+        
+        // --- ROTATIONS-LOGIK ---
+        let isShowingCalendar = true;
+        
+        function switchViews() {
+            const cal = document.getElementById('calendar-container');
+            const nl = document.getElementById('next-live-container');
+            
+            if (isShowingCalendar) {
+                // Skift til Næste Live
+                cal.style.opacity = '0';
+                setTimeout(() => { 
+                    nl.style.opacity = '1'; 
+                    nl.style.pointerEvents = 'auto'; 
+                }, 800);
+                isShowingCalendar = false;
+                setTimeout(switchViews, 30000); // Vises i 30 sekunder
+            } else {
+                // Skift til Kalender
+                nl.style.opacity = '0';
+                nl.style.pointerEvents = 'none';
+                setTimeout(() => { cal.style.opacity = '1'; }, 800);
+                isShowingCalendar = true;
+                setTimeout(switchViews, 120000); // Vises i 2 minutter (120 sek)
+            }
+        }
+        
+        // --- NEDTÆLLINGS-LOGIK ---
+        let nextProgramDateObj = null;
+
+        function parseDateTimeForCountdown(datoRaw, tidRaw) {
+            if (!datoRaw || datoRaw === "" || datoRaw === "-") return null;
+            let d = new Date(datoRaw);
+            
+            // Hvis Date falder tilbage (f.eks. pga "DD-MM-YYYY" string formater)
+            if (isNaN(d.getTime())) {
+                if (typeof datoRaw === "string" && datoRaw.includes("-")) {
+                    let parts = datoRaw.split("-");
+                    if (parts.length === 3) {
+                        if (parts[0].length === 4) { // YYYY-MM-DD
+                            d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                        } else { // DD-MM-YYYY
+                            d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                        }
+                    }
+                }
+            }
+            if (isNaN(d.getTime())) return null;
+
+            if (tidRaw && tidRaw !== "" && tidRaw !== "-") {
+                let tStr = String(tidRaw).replace('.', ':').trim();
+                let timeParts = tStr.split(':');
+                if (timeParts.length >= 2) {
+                    d.setHours(parseInt(timeParts[0], 10), parseInt(timeParts[1], 10), 0, 0);
+                }
+            } else {
+                d.setHours(0,0,0,0);
+            }
+            return d;
+        }
+
+        function findNextLiveProgram() {
+            let now = new Date();
+            let futureLive = [];
+
+            produktioner.forEach(p => {
+                let kanal = String(p.Kanal || "").trim().toUpperCase();
+                // Vi tjekker efter SPORT LIVE programmer 
+                if (kanal === "SPORT LIVE") {
+                    let brugTid = (p.RX && String(p.RX).trim() !== "" && String(p.RX).trim() !== "-") ? p.RX : p.Tid;
+                    let pDato = parseDateTimeForCountdown(p.Dato, brugTid);
+                    
+                    if (pDato && pDato > now) {
+                        futureLive.push({ program: p, dateObj: pDato });
+                    }
+                }
+            });
+
+            futureLive.sort((a, b) => a.dateObj - b.dateObj);
+
+            if (futureLive.length > 0) {
+                let next = futureLive[0];
+                nextProgramDateObj = next.dateObj;
+                let tbcTxt = (next.program.TBC && String(next.program.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
+                document.getElementById('nl-title').textContent = vaskTekst(next.program.Sportsgren, next.program.Programtitel).toUpperCase() + tbcTxt;
+            } else {
+                nextProgramDateObj = null;
+                document.getElementById('nl-title').textContent = "INGEN PLANLAGTE LIVE-UDSENDELSER";
+            }
+        }
+
+        function tickCountdown() {
+            let cdDisplay = document.getElementById('countdown-display');
+            if (!nextProgramDateObj) {
+                cdDisplay.style.display = 'none';
+                return;
+            }
+            
+            let now = new Date();
+            let diff = nextProgramDateObj - now;
+
+            if (diff <= 0) {
+                cdDisplay.style.display = 'flex';
+                cdDisplay.innerHTML = '<div class="sender-nu">SENDER NU</div>';
+                return;
+            }
+            
+            cdDisplay.style.display = 'flex';
+            
+            let d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            let h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            let m = Math.floor((diff / 1000 / 60) % 60);
+            let s = Math.floor((diff / 1000) % 60);
+            
+            // Opdater elementer
+            const elDays = document.getElementById('cd-days');
+            if(elDays) {
+                elDays.textContent = String(d).padStart(2, '0');
+                document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
+                document.getElementById('cd-minutes').textContent = String(m).padStart(2, '0');
+                document.getElementById('cd-seconds').textContent = String(s).padStart(2, '0');
+            }
+        }
+
+
+        // --- EKSISTERENDE FUNKTIONER ---
+        function getProgramColorAndPriority(p) {
+            if (p._isMerged) {
+                if (p._mergedHasOB) {
+                    return { color: 'color-blue', prio: 1 };
+                } else {
+                    return { color: 'color-red', prio: 4 }; 
+                }
+            }
+            const kanalNavn = String(p.Kanal || "").trim();
+            const unitLower = String(p.Unit || "").toLowerCase().trim();
+            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "ob 7+9", "sam ob"];
+            const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
+
+            if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
+                return { color: 'color-blue', prio: 1 };
+            } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
+                return { color: 'color-green', prio: 2 };
+            } else if (kanalNavn === "EFP" || unitLower === "efp" || kanalNavn.toUpperCase() === "OPTAGELSE") {
+                return { color: 'color-black', prio: 3 };
+            } else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
+                return { color: 'color-red', prio: 4 };
+            } else {
+                return { color: 'color-black', prio: 3 }; 
+            }
+        }
+
+        function parseTime(t) {
+            if (!t) return "99:99"; 
+            let str = String(t).replace('.', ':').trim();
+            if (str.length === 4 && str.includes(':')) {
+                str = "0" + str;
+            }
+            return str;
+        }
+
+        function vaskTekst(sportsgren, titel) {
+            let s = sportsgren ? String(sportsgren).trim() : "";
+            let t = titel ? String(titel).trim() : "";
+
+            const forkortelser = [
+                { fra: /Basketball/gi, til: "Basket" },
+                { fra: /Volleyball/gi, til: "Volley" },
+                { fra: /Amerikansk fodbold/gi, til: "Football" },
+                { fra: /European League/gi, til: "EL" },
+                { fra: /Randers Cimbria/gi, til: "Randers" },
+                { fra: /Team FOG Næstved/gi, til: "Næstved" },
+                { fra: /Horsens IC/gi, til: "Horsens" },
+                { fra: /Værløse Blue Hawks/gi, til: "Værløse" },
+                { fra: /Svendborg Rabbits/gi, til: "Svendborg" },
+                { fra: /BMS Herlev/gi, til: "Herlev" },
+                { fra: /Bakken Bears/gi, til: "Bakken" },
+                { fra: /BK Vejen/gi, til: "Vejen" },
+                { fra: /Hørsholm Rungsted/gi, til: "HRT" },
+                { fra: /United States/gi, til: "USA" },
+                { fra: /kvalifikation/gi, til: "kval" }
+            ];
+
+            const udeladelser = [
+                "basket", "futsal", "volley", "tennis", "kajak", "roning", "bordtennis", 
+                "WTT", "davis cup", "billie jean king cup", "mermaid bowl", "gokart"
+            ];
+
+            forkortelser.forEach(f => {
+                s = s.replace(f.fra, f.til);
+                t = t.replace(f.fra, f.til);
+            });
+
+            let visSportsgren = true;
+            const tLower = t.toLowerCase();
+            udeladelser.forEach(ord => {
+                if (tLower.includes(ord.toLowerCase())) visSportsgren = false;
+            });
+
+            return (!visSportsgren || s === "") ? t : `${s}: ${t}`;
+        }
+
+        function getEaster(year) {
+            const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+            const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+            const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+            const day = ((h + l - 7 * m + 114) % 31) + 1;
+            return new Date(year, month, day);
+        }
+
+        function isHoliday(y, m, d) {
+            const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
+            const easter = getEaster(y);
+            const addDays = (date, days) => {
+                const res = new Date(date.getTime());
+                res.setDate(res.getDate() + days);
+                return res.getFullYear() + "-" + String(res.getMonth() + 1).padStart(2, '0') + "-" + String(res.getDate()).padStart(2, '0');
+            };
+            const h = [y+"-01-01", y+"-06-05", y+"-12-24", y+"-12-25", y+"-12-26", y+"-12-31", addDays(easter, -3), addDays(easter, -2), addDays(easter, 0), addDays(easter, 1), addDays(easter, 39), addDays(easter, 49), addDays(easter, 50)];
+            return h.includes(dateStr);
+        }
+
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            return Math.ceil((((d - new Date(Date.UTC(d.getUTCFullYear(), 0, 1))) / 86400000) + 1) / 7);
+        }
+
+        async function fetchProductionData() {
+            const loader = document.getElementById('loader');
+            if(loader) loader.style.opacity = "1";
+            try {
+                const response = await fetch(scriptURL + "?action=getdata");
+                const data = await response.json();
+                produktioner = data.programmer || [];
+                tegnKalender();
+                findNextLiveProgram(); // Opdater nedtællings-data
+            } catch (error) { console.error(error); }
+            if(loader) loader.style.opacity = "0";
+        }
+
+        function tegnKalender() {
+            container.innerHTML = '';
+            const currentDate = new Date();
+            const currentMonthIndex = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+
+            for (let i = 0; i < 5; i++) {
+                let m = (currentMonthIndex + i) % 12;
+                let y = currentYear + Math.floor((currentMonthIndex + i) / 12);
+                let daysInMonth = new Date(y, m + 1, 0).getDate();
+
+                let col = document.createElement('div');
+                col.className = 'month-column';
+                let header = document.createElement('div');
+                header.className = 'month-header';
+                header.textContent = monthNames[m];
+                col.appendChild(header);
+
+                for (let d = 1; d <= 31; d++) {
+                    let row = document.createElement('div');
+                    row.className = 'day-row';
+                    let dateBox = document.createElement('div');
+                    dateBox.className = 'date-number';
+                    let contentBox = document.createElement('div');
+                    contentBox.className = 'date-content';
+
+                    if (d <= daysInMonth) {
+                        let circle = document.createElement('div');
+                        circle.className = 'date-circle';
+                        circle.textContent = d;
+                        dateBox.appendChild(circle);
+
+                        let dateObj = new Date(y, m, d);
+                        const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
+                        
+                        if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
+                        if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
+
+                        let dagensProduktioner = produktioner.filter(p => {
+                            if (!p.Dato) return false;
+                            const pDato = new Date(p.Dato);
+                            return (pDato.getFullYear() === y && pDato.getMonth() === m && pDato.getDate() === d);
+                        }).filter(p => {
+                            const obUnits = ["EFP", "MINITECH", "NOWTEK OB1", "NOWTEK OB2", "OB", "OB 7", "OB 9", "OB 7+9", "SAM OB"];
+                            return (p.Kanal === "SPORT LIVE") || obUnits.includes(String(p.Unit || "").trim());
+                        });
+
+                        if (dagensProduktioner.length > 0) {
+                            let titleMap = new Map();
+                            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "ob 7+9", "sam ob"];
+
+                            dagensProduktioner.forEach(p => {
+                                let titel = String(p.Programtitel || "").trim();
+                                let unitLower = String(p.Unit || "").toLowerCase().trim();
+                                let kanalNavn = String(p.Kanal || "").trim();
+                                let isOB = colorBlueUnits.includes(unitLower) || (kanalNavn === "SPORT LIVE" && unitLower === "");
+
+                                if (!titleMap.has(titel)) {
+                                    titleMap.set(titel, { original: p, isDuplicate: false, hasOB: isOB });
+                                } else {
+                                    let entry = titleMap.get(titel);
+                                    entry.isDuplicate = true;
+                                    if (isOB) entry.hasOB = true; 
+                                }
+                            });
+
+                            dagensProduktioner = Array.from(titleMap.values()).map(entry => {
+                                let p = entry.original;
+                                if (entry.isDuplicate) {
+                                    p = Object.assign({}, p); 
+                                    p._isMerged = true;
+                                    p._mergedHasOB = entry.hasOB;
+                                }
+                                return p;
+                            });
+
+                            dagensProduktioner.sort((a, b) => {
+                                const infoA = getProgramColorAndPriority(a);
+                                const infoB = getProgramColorAndPriority(b);
+                                if (infoA.prio !== infoB.prio) return infoA.prio - infoB.prio;
+                                if (infoA.prio === 1 || infoA.prio === 2) {
+                                    return parseTime(a.Tid).localeCompare(parseTime(b.Tid));
+                                }
+                                return 0; 
+                            });
+
+                            const totalPages = Math.ceil(dagensProduktioner.length / 2);
+                            const animatorWrapper = document.createElement('div');
+                            animatorWrapper.className = 'animator-wrapper';
+                            animatorWrapper.dataset.pages = totalPages;
+
+                            for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
+                                const pageDiv = document.createElement('div');
+                                pageDiv.className = 'page';
+                                const startIdx = pageIdx * 2;
+                                const visningsData = dagensProduktioner.slice(startIdx, startIdx + 2);
+
+                                visningsData.forEach(p => {
+                                    const line = document.createElement('div');
+                                    line.className = 'program-line';
+                                    const info = getProgramColorAndPriority(p);
+                                    line.classList.add(info.color);
+                                    let tbcTxt = (p.TBC && String(p.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
+                                    line.textContent = vaskTekst(p.Sportsgren, p.Programtitel) + tbcTxt;
+                                    pageDiv.appendChild(line);
+                                });
+                                animatorWrapper.appendChild(pageDiv);
+                            }
+                            contentBox.appendChild(animatorWrapper);
+
+                            if (totalPages > 1) {
+                                const startPage = globalTick % totalPages;
+                                animatorWrapper.style.transform = `translateY(-${startPage * 100}%)`;
+                                const dotsContainer = document.createElement('div');
+                                dotsContainer.className = 'paging-dots';
+                                for (let p = 0; p < totalPages; p++) {
+                                    const dot = document.createElement('div');
+                                    dot.className = 'dot' + (p === startPage ? ' active' : '');
+                                    dotsContainer.appendChild(dot);
+                                }
+                                row.appendChild(dotsContainer);
+                            }
+                        }
+                    } else { row.classList.add('empty-day'); }
+
+                    row.appendChild(dateBox);
+                    row.appendChild(contentBox);
+                    col.appendChild(row);
+                }
+                container.appendChild(col);
+            }
+        }
+
+        function opdaterAnimationer() {
+            globalTick++;
+            const wrappers = document.querySelectorAll('.animator-wrapper');
+            wrappers.forEach(wrapper => {
+                const totalPages = parseInt(wrapper.dataset.pages);
+                if (totalPages > 1) {
+                    const currentPage = globalTick % totalPages;
+                    wrapper.style.transform = `translateY(-${currentPage * 100}%)`;
+                    const row = wrapper.closest('.day-row');
+                    const dots = row.querySelectorAll('.dot');
+                    dots.forEach((dot, index) => {
+                        if (index === currentPage) dot.classList.add('active');
+                        else dot.classList.remove('active');
+                    });
+                }
+            });
+        }
+
+        // KICK-OFF
+        fetchProductionData();
+        setInterval(fetchProductionData, 1200000); 
+        setInterval(opdaterAnimationer, 7000);
+        setInterval(tickCountdown, 1000); 
+        
+        // Start side-skifteren (venter først de indledende 2 minutter)
+        setTimeout(switchViews, 120000);
+
+    </script>
+</body>
+</html>
