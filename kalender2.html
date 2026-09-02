@@ -26,11 +26,11 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 100; /* Ligger forrest, så vi kan lave 3D push effekten gennem den */
+            z-index: 100;
             opacity: 1;
             transform: scale(1);
             filter: blur(0px);
-            will-change: transform, opacity, filter; /* Sikrer 100% flydende animation på store skærme */
+            will-change: transform, opacity, filter;
         }
 
         #next-live-container {
@@ -46,7 +46,7 @@
             left: 0;
             background-color: #fdfdfd;
             color: #1a1a1a;
-            z-index: 50; /* Ligger bag kalenderen og kommer frem */
+            z-index: 50; 
             opacity: 0;
             transform: translateY(15vh) scale(0.9);
             pointer-events: none;
@@ -371,49 +371,41 @@
             
             if (isShowingCalendar) {
                 // SPEKTAKULÆR OVERGANG: Kalender -> Nedtælling
-                
-                // 1. Animer kalender ud (Cinematic Push: zoom frem, slør og fade out)
                 cal.style.transition = 'all 1.4s cubic-bezier(0.22, 1, 0.36, 1)';
                 cal.style.opacity = '0';
                 cal.style.transform = 'scale(1.15)';
                 cal.style.filter = 'blur(8px)';
                 
-                // 2. Gør Nedtællingen klar usynligt (nede i bunden, let nedskaleret)
                 nl.style.transition = 'none';
                 nl.style.transform = 'translateY(15vh) scale(0.9)';
                 nl.style.opacity = '0';
                 
-                // 3. Skub Nedtællingen op i front (slide op, scale til 1, fade ind)
                 setTimeout(() => { 
                     nl.style.transition = 'all 1.4s cubic-bezier(0.22, 1, 0.36, 1)';
                     nl.style.opacity = '1'; 
                     nl.style.transform = 'translateY(0) scale(1)';
                     nl.style.pointerEvents = 'auto'; 
-                }, 50); // Lille delay sikrer, at browseren forstår punkt 2 først
+                }, 50); 
                 
                 isShowingCalendar = false;
-                setTimeout(switchViews, 30000); // Nedtælling vises i 30 sek
+                setTimeout(switchViews, 20000); // Nedtælling vises i 30 sek
             } else {
                 // BLØD OVERGANG: Nedtælling -> Kalender
-                
-                // 1. Nulstil kalenderens scale og blur bagved uden at animere, så den er klar
                 cal.style.transition = 'none';
                 cal.style.transform = 'scale(1)';
                 cal.style.filter = 'blur(0px)';
                 
                 setTimeout(() => {
-                    // 2. Nedtællingen fader roligt ud
                     nl.style.transition = 'opacity 1s ease-in-out';
                     nl.style.opacity = '0';
                     nl.style.pointerEvents = 'none';
 
-                    // 3. Kalenderen fader roligt ind over
                     cal.style.transition = 'opacity 1s ease-in-out';
                     cal.style.opacity = '1';
                 }, 50);
                 
                 isShowingCalendar = true;
-                setTimeout(switchViews, 20000); // Kalender vises i 120 sek
+                setTimeout(switchViews, 300000); // Kalender vises i 120 sek (2 min)
             }
         }
         
@@ -495,8 +487,10 @@
 
             produktioner.forEach(p => {
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
+                let erTBC = (p.TBC && String(p.TBC).trim().toUpperCase() === "X"); // Tjekker for TBC
                 
-                if (kanal === "SPORT LIVE") {
+                // Frasorterer nu konsekvent alle programmer, der er markeret med 'X' i TBC
+                if (kanal === "SPORT LIVE" && !erTBC) {
                     let pDato = parseDateTimeForCountdown(p.Dato, p.TX, p.RX, p.Tid);
                     
                     if (pDato && pDato > activeLimit) {
@@ -510,7 +504,6 @@
             if (futureLive.length > 0) {
                 let next = futureLive[0];
                 nextProgramDateObj = next.dateObj;
-                let tbcTxt = (next.program.TBC && String(next.program.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
                 
                 let vasket = vaskTekstSplit(next.program.Sportsgren, next.program.Programtitel);
                 const sportEl = document.getElementById('nl-sport');
@@ -521,7 +514,8 @@
                     sportEl.style.display = 'none';
                 }
 
-                document.getElementById('nl-title').textContent = vasket.titel.toUpperCase() + tbcTxt;
+                // "(TBC)" er nu helt fjernet herfra, da de udelukkes på forhånd
+                document.getElementById('nl-title').textContent = vasket.titel.toUpperCase();
 
                 const locEl = document.getElementById('nl-location');
                 let lokationTxt = next.program.Lokation ? String(next.program.Lokation).trim() : "";
@@ -847,7 +841,7 @@
         setInterval(opdaterAnimationer, 7000);
         setInterval(tickCountdown, 1000); 
         
-        setTimeout(switchViews, 20000);
+        setTimeout(switchViews, 300000);
 
     </script>
 </body>
