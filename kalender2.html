@@ -160,14 +160,14 @@
             font-weight: 900;
             color: #dc3545;
             letter-spacing: 0.5vw;
-            animation: pulse 5s infinite ease-in-out;
+            animation: pulse 4s infinite ease-in-out;
         }
 
         @keyframes pulse {
-            0% { opacity: 1; }
-            55% { opacity: 1; }      /* Står fuldt synlig i størstedelen af tiden */
-            80% { opacity: 0.15; }   /* Dæmpes blødt ned */
-            100% { opacity: 1; }     /* Toner op igen */
+            0%   { opacity: 1; }
+            50%  { opacity: 1; }    /* Står helt fast og klar halvdelen af tiden */
+            75%  { opacity: 0.2; }  /* Dæmpes roligt og blødt */
+            100% { opacity: 1; }    /* Glider op på fuld styrke igen */
         }
 
         /* --- DET EKSISTERENDE KALENDER DESIGN --- */
@@ -495,7 +495,7 @@
 
         function findNextLiveProgram() {
             let now = new Date();
-            let activeLimit = new Date(now.getTime() - (2.0 * 60 * 60 * 1000));
+            let activeLimit = new Date(now.getTime() - (3.0 * 60 * 60 * 1000));
             let futureLive = [];
 
             produktioner.forEach(p => {
@@ -524,7 +524,7 @@
                 // Er program 0 gået i gang?
                 if (now >= p0.dateObj) {
                     // Starter program 1 mindre end 2 timer efter program 0?
-                    if (p1.dateObj.getTime() - p0.dateObj.getTime() < 2.0 * 60 * 60 * 1000) {
+                    if (p1.dateObj.getTime() - p0.dateObj.getTime() < 3.0 * 60 * 60 * 1000) {
                         // Så skubber vi program 0 ud, så skærmen fokuserer på program 1
                         futureLive.shift();
                         continue;
@@ -575,13 +575,43 @@
             let now = new Date();
             let diff = nextProgramDateObj - now;
 
+            // NÅR PROGRAMMET ER I GANG
             if (diff <= 0) {
                 cdDisplay.style.display = 'flex';
-                cdDisplay.innerHTML = '<div class="sender-nu">SENDER NU</div>';
+                // Tjekker om "SENDER NU" allerede er sat ind - hvis ja, rører vi den IKKE
+                if (!cdDisplay.querySelector('.sender-nu')) {
+                    cdDisplay.innerHTML = '<div class="sender-nu">SENDER NU</div>';
+                }
                 return;
             }
             
             cdDisplay.style.display = 'flex';
+
+            // Hvis skærmen lige har vist "SENDER NU" og nu skifter til et nyt program i fremtiden,
+            // genskaber vi kasserne til nedtællingen
+            if (cdDisplay.querySelector('.sender-nu')) {
+                cdDisplay.innerHTML = `
+                    <div class="cd-box">
+                        <div class="cd-num" id="cd-days">00</div>
+                        <div class="cd-label" id="cd-days-label">DAGE</div>
+                    </div>
+                    <div class="cd-colon">:</div>
+                    <div class="cd-box">
+                        <div class="cd-num" id="cd-hours">00</div>
+                        <div class="cd-label" id="cd-hours-label">TIMER</div>
+                    </div>
+                    <div class="cd-colon">:</div>
+                    <div class="cd-box">
+                        <div class="cd-num" id="cd-minutes">00</div>
+                        <div class="cd-label">MIN</div>
+                    </div>
+                    <div class="cd-colon">:</div>
+                    <div class="cd-box">
+                        <div class="cd-num" id="cd-seconds">00</div>
+                        <div class="cd-label">SEK</div>
+                    </div>
+                `;
+            }
             
             let d = Math.floor(diff / (1000 * 60 * 60 * 24));
             let h = Math.floor((diff / (1000 * 60 * 60)) % 24);
@@ -595,7 +625,6 @@
                 document.getElementById('cd-minutes').textContent = String(m).padStart(2, '0');
                 document.getElementById('cd-seconds').textContent = String(s).padStart(2, '0');
                 
-                // --- NY GRAMMATIK: Ental vs Flertal ---
                 document.getElementById('cd-days-label').textContent = (d === 1) ? "DAG" : "DAGE";
                 document.getElementById('cd-hours-label').textContent = (h === 1) ? "TIME" : "TIMER";
             }
