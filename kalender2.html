@@ -66,9 +66,9 @@
             flex-direction: column;
             justify-content: flex-start; 
             align-items: center;
-            padding-top: 8vh; 
+            padding-top: 7vh; 
             width: 100%;
-            gap: 1.5vh; 
+            gap: 2.5vh; 
         }
 
         /* --- DESIGN TIL NÆSTE LIVE-SKÆRM --- */
@@ -385,42 +385,29 @@
         // --- SKUDSIKKER DATO- OG TIDS-LOGIK ---
         let nextProgramDateObj = null;
 
-        function extractTimeFromStr(tStr) {
-            if (!tStr) return null;
-            let s = String(tStr).trim();
-            // Fanger formater som "17:55", "17.55", "kl 17:55" osv.
-            let match = s.match(/\b(\d{1,2})[:.](\d{2})\b/);
-            if (match) {
-                return { h: parseInt(match[1], 10), m: parseInt(match[2], 10) };
-            }
-            return null;
-        }
-
         function parseDateTimeForCountdown(datoRaw, tidRaw) {
             if (!datoRaw || datoRaw === "" || datoRaw === "-") return null;
             
-            let d = null;
-            let str = String(datoRaw).trim();
+            // Brug samme sikre datofortolkning som i kalenderen
+            let d = new Date(datoRaw);
             
-            // Fanger dansk DD-MM-YYYY format manuelt for at undgå at browseren bytter rundt på måned og dag
-            let regex = /^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/;
-            let match = str.match(regex);
-            
-            if (match) {
-                let day = parseInt(match[1], 10);
-                let month = parseInt(match[2], 10) - 1;
-                let year = parseInt(match[3], 10);
-                d = new Date(year, month, day);
-            } else {
-                d = new Date(str);
+            // Fallback til manuel DD-MM-YYYY, hvis standardmetoden svigter
+            if (isNaN(d.getTime())) {
+                let str = String(datoRaw).trim();
+                let match = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+                if (match) {
+                    d = new Date(parseInt(match[3], 10), parseInt(match[2], 10) - 1, parseInt(match[1], 10));
+                }
             }
             
             if (!d || isNaN(d.getTime())) return null;
 
             if (tidRaw && tidRaw !== "" && tidRaw !== "-") {
-                let extracted = extractTimeFromStr(tidRaw);
-                if (extracted) {
-                    d.setHours(extracted.h, extracted.m, 0, 0);
+                let tStr = String(tidRaw).trim();
+                // Bombesikker tidsaflæser: Leder KUN efter [tal][:][tal]. Ignorerer grænser og usynlige tegn.
+                let match = tStr.match(/(\d{1,2})[:.](\d{2})/);
+                if (match) {
+                    d.setHours(parseInt(match[1], 10), parseInt(match[2], 10), 0, 0);
                 } else {
                     d.setHours(0,0,0,0);
                 }
@@ -466,12 +453,12 @@
 
         function findNextLiveProgram() {
             let now = new Date();
-            // Nyt: Tiden reduceret til 2 timer
+            // Giver programmet lov til at stå som 'SENDER NU' i op til 2 timer efter start
             let activeLimit = new Date(now.getTime() - (2.0 * 60 * 60 * 1000));
             let futureLive = [];
 
             produktioner.forEach(p => {
-                // Nu checker vi UDELUKKENDE på, om Kanal === "SPORT LIVE"
+                // Vi checker udelukkende på, om Kanal === "SPORT LIVE"
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
                 
                 if (kanal === "SPORT LIVE") {
@@ -708,7 +695,6 @@
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
-                        // OPDATERET: Nu filtrerer kalenderen OGSÅ udelukkende på "SPORT LIVE"
                         let dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
                             const pDato = new Date(p.Dato);
