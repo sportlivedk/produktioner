@@ -127,25 +127,28 @@
             margin-bottom: 3vh;
         }
 
-        /* Ny styling til Sportsgren */
+        /* Styling til Sportsgren */
         .nl-sport {
             font-size: 2.2vw;
             font-weight: 700;
-            color: #888888; /* Diskret grå */
+            color: #888888;
             letter-spacing: 0.4vw;
             text-transform: uppercase;
             margin-bottom: 0.5vh;
         }
 
-        /* Opdateret programtitel (Markant større) */
+        /* Opdateret programtitel på én linje */
         .nl-title {
-            font-size: 5.5vw; /* Kæmpe format */
+            font-size: 3.8vw; /* Justeret ned til én linje */
             font-weight: 900; 
             color: #dd5f12; 
             text-align: center;
-            max-width: 95vw;
-            line-height: 1.1;
+            width: 95vw;
+            line-height: 1.2;
             text-transform: uppercase;
+            white-space: nowrap; /* Tvinger én linje */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Indsætter '...' ved overløb */
         }
 
         .sender-nu {
@@ -339,7 +342,7 @@
             <div class="cd-box"><div class="cd-num" id="cd-seconds">00</div><div class="cd-label">SEK</div></div>
         </div>
         
-        <!-- BUND: Sportsgren og Programtitel (nu splittet op!) -->
+        <!-- BUND: Sportsgren og Programtitel -->
         <div class="nl-bottom">
             <div id="nl-sport" class="nl-sport"></div>
             <div id="nl-title" class="nl-title">INDLÆSER...</div>
@@ -413,7 +416,7 @@
             return d;
         }
 
-        // --- NY FUNKTION: Håndterer sportsgren og titel hver for sig ---
+        // --- Håndterer sportsgren og titel (uden at skjule sportsgrenen) ---
         function vaskTekstSplit(sportsgren, titel) {
             let s = sportsgren ? String(sportsgren).trim() : "";
             let t = titel ? String(titel).trim() : "";
@@ -436,26 +439,17 @@
                 { fra: /kvalifikation/gi, til: "kval" }
             ];
 
-            const udeladelser = [
-                "basket", "futsal", "volley", "tennis", "kajak", "roning", "bordtennis", 
-                "WTT", "davis cup", "billie jean king cup", "mermaid bowl", "gokart"
-            ];
-
+            // Kører vaskemaskinen på både sportsgren og programtitel
             forkortelser.forEach(f => {
                 s = s.replace(f.fra, f.til);
                 t = t.replace(f.fra, f.til);
             });
 
-            let visSportsgren = true;
-            const tLower = t.toLowerCase();
-            udeladelser.forEach(ord => {
-                if (tLower.includes(ord.toLowerCase())) visSportsgren = false;
-            });
-
+            // Viser nu altid sportsgren, uanset om den indgår i titlen
             return {
                 sport: s,
                 titel: t,
-                visSport: (visSportsgren && s !== "")
+                visSport: (s !== "")
             };
         }
 
@@ -482,7 +476,7 @@
                 nextProgramDateObj = next.dateObj;
                 let tbcTxt = (next.program.TBC && String(next.program.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
                 
-                // Bruger den nye split-funktion
+                // Bruger den nye split-funktion, der altid viser sportsgrenen
                 let vasket = vaskTekstSplit(next.program.Sportsgren, next.program.Programtitel);
                 
                 const sportEl = document.getElementById('nl-sport');
@@ -569,7 +563,7 @@
             return str;
         }
 
-        // BEMÆRK: Den originale vaskTekst beholdes her, fordi selve kalendervisningen har brug for det kombinerede format ("Sportsgren: Titel")
+        // Den originale vaskTekst beholdes uændret, da kalendervisningen ("Sportsgren: Titel") bruger denne
         function vaskTekst(sportsgren, titel) {
             let s = sportsgren ? String(sportsgren).trim() : "";
             let t = titel ? String(titel).trim() : "";
