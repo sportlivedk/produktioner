@@ -41,7 +41,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            background-color: #fdfdfd; /* Matcher kalenderens baggrund */
+            background-color: #fdfdfd;
             color: #1a1a1a;
             transition: opacity 0.8s ease-in-out;
             opacity: 0;
@@ -49,20 +49,40 @@
             z-index: 50;
         }
 
+        /* --- STRUKTUR TIL CENTRERING AF NEDTÆLLING --- */
+        .nl-top {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Skubber indholdet ned mod midten */
+            align-items: center;
+            padding-bottom: 5vh;
+            width: 100%;
+        }
+
+        .nl-bottom {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Skubber indholdet op mod midten */
+            align-items: center;
+            padding-top: 5vh;
+            width: 100%;
+        }
+
         /* --- DESIGN TIL NÆSTE LIVE-SKÆRM --- */
         .nl-logo {
-            max-width: 22vw; /* Gjort markant større */
-            max-height: 14vh;
-            margin-bottom: 4vh;
+            max-width: 40vw; /* Dobbelt så stor */
+            max-height: 25vh;
+            margin-bottom: 3vh;
         }
 
         .nl-header {
-            font-size: 3.8vw; /* Gjort større */
+            font-size: 3.8vw;
             font-weight: 900;
-            color: #dd5f12; /* SPORT LIVE orange/rød accent */
+            color: #1a1a1a; /* Nu sort */
             letter-spacing: 0.3vw;
             text-transform: uppercase;
-            margin-bottom: 6vh;
         }
 
         .countdown-wrapper {
@@ -70,19 +90,19 @@
             align-items: center;
             justify-content: center;
             gap: 1.5vw;
-            margin-bottom: 6vh;
+            /* Margins er fjernet, da flex-boksene .nl-top og .nl-bottom styrer afstanden */
         }
 
         .cd-box {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #ffffff; /* Lys boks */
+            background-color: #ffffff;
             padding: 2vw 2.5vw;
             border-radius: 1vw;
             min-width: 12vw;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.06); /* Meget blød skygge til light-mode */
-            border: 1px solid #eaeaea; /* Diskret kant */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border: 1px solid #eaeaea;
         }
 
         .cd-num {
@@ -109,13 +129,13 @@
         }
 
         .nl-title {
-            font-size: 2.3vw; /* Gjort mindre for at passe på én linje */
-            font-weight: 700;
+            font-size: 3.8vw; /* Markant større */
+            font-weight: 900; /* Ekstra fed */
+            color: #dd5f12; /* SPORT LIVE orange */
             text-align: center;
-            max-width: 95vw; /* Tillader teksten at gå bredere ud på skærmen */
+            max-width: 95vw;
             line-height: 1.2;
             text-transform: uppercase;
-            color: #333333;
         }
 
         .sender-nu {
@@ -292,11 +312,13 @@
 
     <!-- NÆSTE LIVE VISNING -->
     <div id="next-live-container">
-        <!-- Kalder logo direkte fra samme mappe -->
-        <img src="logo.png" alt="SPORT LIVE" class="nl-logo" id="sl-logo">
+        <!-- TOP: Logo og overskrift -->
+        <div class="nl-top">
+            <img src="logo.png" alt="SPORT LIVE" class="nl-logo" id="sl-logo">
+            <div class="nl-header">Næste live-sending</div>
+        </div>
         
-        <div class="nl-header">Næste live-sending</div>
-        
+        <!-- MIDT: Nedtælling (Ligger nu 100% på midten) -->
         <div id="countdown-display" class="countdown-wrapper">
             <div class="cd-box"><div class="cd-num" id="cd-days">00</div><div class="cd-label">DAGE</div></div>
             <div class="cd-colon">:</div>
@@ -307,7 +329,10 @@
             <div class="cd-box"><div class="cd-num" id="cd-seconds">00</div><div class="cd-label">SEK</div></div>
         </div>
         
-        <div id="nl-title" class="nl-title">INDLÆSER...</div>
+        <!-- BUND: Programtitel -->
+        <div class="nl-bottom">
+            <div id="nl-title" class="nl-title">INDLÆSER...</div>
+        </div>
     </div>
 
     <script>
@@ -333,14 +358,14 @@
                     nl.style.pointerEvents = 'auto'; 
                 }, 800);
                 isShowingCalendar = false;
-                setTimeout(switchViews, 30000); // Vises i 30 sekunder
+                setTimeout(switchViews, 30000); // Test: Næste Live vises i 30 sekunder
             } else {
                 // Skift til Kalender
                 nl.style.opacity = '0';
                 nl.style.pointerEvents = 'none';
                 setTimeout(() => { cal.style.opacity = '1'; }, 800);
                 isShowingCalendar = true;
-                setTimeout(switchViews, 20000); // Vises i 2 minutter (120 sek)
+                setTimeout(switchViews, 20000); // Test: Kalender vises i 20 sekunder
             }
         }
         
@@ -439,7 +464,6 @@
                 document.getElementById('cd-seconds').textContent = String(s).padStart(2, '0');
             }
         }
-
 
         // --- EKSISTERENDE FUNKTIONER ---
         function getProgramColorAndPriority(p) {
@@ -555,7 +579,7 @@
                 const data = await response.json();
                 produktioner = data.programmer || [];
                 tegnKalender();
-                findNextLiveProgram(); // Opdater nedtællings-data
+                findNextLiveProgram(); 
             } catch (error) { console.error(error); }
             if(loader) loader.style.opacity = "0";
         }
@@ -717,7 +741,7 @@
         setInterval(opdaterAnimationer, 7000);
         setInterval(tickCountdown, 1000); 
         
-        // Start side-skifteren (venter først de indledende 2 minutter)
+        // Start side-skifteren (venter først de indledende 20 sekunder for test)
         setTimeout(switchViews, 20000);
 
     </script>
