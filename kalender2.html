@@ -337,13 +337,25 @@
         
         <!-- MIDT: Nedtælling -->
         <div id="countdown-display" class="countdown-wrapper">
-            <div class="cd-box"><div class="cd-num" id="cd-days">00</div><div class="cd-label">DAGE</div></div>
+            <div class="cd-box">
+                <div class="cd-num" id="cd-days">00</div>
+                <div class="cd-label" id="cd-days-label">DAGE</div>
+            </div>
             <div class="cd-colon">:</div>
-            <div class="cd-box"><div class="cd-num" id="cd-hours">00</div><div class="cd-label">TIMER</div></div>
+            <div class="cd-box">
+                <div class="cd-num" id="cd-hours">00</div>
+                <div class="cd-label" id="cd-hours-label">TIMER</div>
+            </div>
             <div class="cd-colon">:</div>
-            <div class="cd-box"><div class="cd-num" id="cd-minutes">00</div><div class="cd-label">MIN</div></div>
+            <div class="cd-box">
+                <div class="cd-num" id="cd-minutes">00</div>
+                <div class="cd-label">MIN</div>
+            </div>
             <div class="cd-colon">:</div>
-            <div class="cd-box"><div class="cd-num" id="cd-seconds">00</div><div class="cd-label">SEK</div></div>
+            <div class="cd-box">
+                <div class="cd-num" id="cd-seconds">00</div>
+                <div class="cd-label">SEK</div>
+            </div>
         </div>
         
         <!-- BUND: Sportsgren, Programtitel og Lokation -->
@@ -362,7 +374,7 @@
         let produktioner = [];
         let globalTick = 0; 
         
-        // --- ROTATIONS-LOGIK MED NYE OVERGANGE ---
+        // --- ROTATIONS-LOGIK ---
         let isShowingCalendar = true;
         
         function switchViews() {
@@ -370,7 +382,7 @@
             const nl = document.getElementById('next-live-container');
             
             if (isShowingCalendar) {
-                // SPEKTAKULÆR OVERGANG: Kalender -> Nedtælling
+                // Kalender -> Nedtælling (Cinematic Push)
                 cal.style.transition = 'all 1.4s cubic-bezier(0.22, 1, 0.36, 1)';
                 cal.style.opacity = '0';
                 cal.style.transform = 'scale(1.15)';
@@ -388,9 +400,9 @@
                 }, 50); 
                 
                 isShowingCalendar = false;
-                setTimeout(switchViews, 20000); // Nedtælling vises i 30 sek
+                setTimeout(switchViews, 20000); // Nedtælling vises i 20 sekunder
             } else {
-                // BLØD OVERGANG: Nedtælling -> Kalender
+                // Nedtælling -> Kalender (Soft Fade)
                 cal.style.transition = 'none';
                 cal.style.transform = 'scale(1)';
                 cal.style.filter = 'blur(0px)';
@@ -405,7 +417,7 @@
                 }, 50);
                 
                 isShowingCalendar = true;
-                setTimeout(switchViews, 300000); // Kalender vises i 120 sek (2 min)
+                setTimeout(switchViews, 50000); // Kalender vises i 5 minutter
             }
         }
         
@@ -487,9 +499,8 @@
 
             produktioner.forEach(p => {
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
-                let erTBC = (p.TBC && String(p.TBC).trim().toUpperCase() === "X"); // Tjekker for TBC
+                let erTBC = (p.TBC && String(p.TBC).trim().toUpperCase() === "X");
                 
-                // Frasorterer nu konsekvent alle programmer, der er markeret med 'X' i TBC
                 if (kanal === "SPORT LIVE" && !erTBC) {
                     let pDato = parseDateTimeForCountdown(p.Dato, p.TX, p.RX, p.Tid);
                     
@@ -500,6 +511,26 @@
             });
 
             futureLive.sort((a, b) => a.dateObj - b.dateObj);
+
+            // --- NY LOGIK: SKJUL "SENDER NU" HVIS NÆSTE KAMP STARTER SNART ---
+            // Hvis det første program på listen er i gang (now >= starttid),
+            // tjekker vi om næste program på listen starter mindre end 2 timer efter det igangværende.
+            // Hvis ja: Så fjerner vi det igangværende program, så vi får nedtællingen til det nye!
+            while (futureLive.length > 1) {
+                let p0 = futureLive[0];
+                let p1 = futureLive[1];
+                
+                // Er program 0 gået i gang?
+                if (now >= p0.dateObj) {
+                    // Starter program 1 mindre end 2 timer efter program 0?
+                    if (p1.dateObj.getTime() - p0.dateObj.getTime() < 2.0 * 60 * 60 * 1000) {
+                        // Så skubber vi program 0 ud, så skærmen fokuserer på program 1
+                        futureLive.shift();
+                        continue;
+                    }
+                }
+                break; // Hvis ingen af betingelserne er opfyldt, afbryder vi loopet
+            }
 
             if (futureLive.length > 0) {
                 let next = futureLive[0];
@@ -514,7 +545,6 @@
                     sportEl.style.display = 'none';
                 }
 
-                // "(TBC)" er nu helt fjernet herfra, da de udelukkes på forhånd
                 document.getElementById('nl-title').textContent = vasket.titel.toUpperCase();
 
                 const locEl = document.getElementById('nl-location');
@@ -563,6 +593,10 @@
                 document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
                 document.getElementById('cd-minutes').textContent = String(m).padStart(2, '0');
                 document.getElementById('cd-seconds').textContent = String(s).padStart(2, '0');
+                
+                // --- NY GRAMMATIK: Ental vs Flertal ---
+                document.getElementById('cd-days-label').textContent = (d === 1) ? "DAG" : "DAGE";
+                document.getElementById('cd-hours-label').textContent = (h === 1) ? "TIME" : "TIMER";
             }
         }
 
@@ -841,7 +875,8 @@
         setInterval(opdaterAnimationer, 7000);
         setInterval(tickCountdown, 1000); 
         
-        setTimeout(switchViews, 300000);
+        // Venter 5 minutter ved start, som aftalt
+        setTimeout(switchViews, 50000);
 
     </script>
 </body>
