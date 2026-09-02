@@ -41,24 +41,24 @@
             position: absolute;
             top: 0;
             left: 0;
-            background-color: #111111; /* Mørk baggrund for biograf-følelse */
-            color: #ffffff;
+            background-color: #fdfdfd; /* Matcher kalenderens baggrund */
+            color: #1a1a1a;
             transition: opacity 0.8s ease-in-out;
             opacity: 0;
-            pointer-events: none; /* Forhindrer klik, når den er usynlig */
+            pointer-events: none;
             z-index: 50;
         }
 
         /* --- DESIGN TIL NÆSTE LIVE-SKÆRM --- */
         .nl-logo {
-            max-width: 15vw;
-            max-height: 10vh;
+            max-width: 22vw; /* Gjort markant større */
+            max-height: 14vh;
             margin-bottom: 4vh;
         }
 
         .nl-header {
-            font-size: 2.5vw;
-            font-weight: 800;
+            font-size: 3.8vw; /* Gjort større */
+            font-weight: 900;
             color: #dd5f12; /* SPORT LIVE orange/rød accent */
             letter-spacing: 0.3vw;
             text-transform: uppercase;
@@ -69,7 +69,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1vw;
+            gap: 1.5vw;
             margin-bottom: 6vh;
         }
 
@@ -77,25 +77,26 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #222222;
+            background-color: #ffffff; /* Lys boks */
             padding: 2vw 2.5vw;
             border-radius: 1vw;
             min-width: 12vw;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06); /* Meget blød skygge til light-mode */
+            border: 1px solid #eaeaea; /* Diskret kant */
         }
 
         .cd-num {
             font-size: 9vw;
             font-weight: 900;
             line-height: 1;
-            font-variant-numeric: tabular-nums; /* Sikrer at tallene ikke "hopper" */
+            color: #1a1a1a;
+            font-variant-numeric: tabular-nums; 
         }
 
         .cd-label {
             font-size: 1.5vw;
-            font-weight: 600;
-            color: #aaaaaa;
+            font-weight: 700;
+            color: #888888;
             margin-top: 1vh;
             letter-spacing: 0.2vw;
         }
@@ -103,17 +104,18 @@
         .cd-colon {
             font-size: 6vw;
             font-weight: 900;
-            color: #555555;
+            color: #cccccc;
             margin-bottom: 3vh;
         }
 
         .nl-title {
-            font-size: 3.5vw;
+            font-size: 2.3vw; /* Gjort mindre for at passe på én linje */
             font-weight: 700;
             text-align: center;
-            max-width: 80vw;
+            max-width: 95vw; /* Tillader teksten at gå bredere ud på skærmen */
             line-height: 1.2;
             text-transform: uppercase;
+            color: #333333;
         }
 
         .sender-nu {
@@ -290,7 +292,7 @@
 
     <!-- NÆSTE LIVE VISNING -->
     <div id="next-live-container">
-        <!-- HUSK AT RETTE STIEN TIL LOGOET HERUNDER -->
+        <!-- Kalder logo direkte fra samme mappe -->
         <img src="logo.png" alt="SPORT LIVE" class="nl-logo" id="sl-logo">
         
         <div class="nl-header">Næste live-sending</div>
@@ -338,7 +340,7 @@
                 nl.style.pointerEvents = 'none';
                 setTimeout(() => { cal.style.opacity = '1'; }, 800);
                 isShowingCalendar = true;
-                setTimeout(switchViews, 120000); // Vises i 2 minutter (120 sek)
+                setTimeout(switchViews, 20000); // Vises i 2 minutter (120 sek)
             }
         }
         
@@ -349,7 +351,6 @@
             if (!datoRaw || datoRaw === "" || datoRaw === "-") return null;
             let d = new Date(datoRaw);
             
-            // Hvis Date falder tilbage (f.eks. pga "DD-MM-YYYY" string formater)
             if (isNaN(d.getTime())) {
                 if (typeof datoRaw === "string" && datoRaw.includes("-")) {
                     let parts = datoRaw.split("-");
@@ -717,7 +718,7 @@
         setInterval(tickCountdown, 1000); 
         
         // Start side-skifteren (venter først de indledende 2 minutter)
-        setTimeout(switchViews, 120000);
+        setTimeout(switchViews, 20000);
 
     </script>
 </body>
