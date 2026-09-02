@@ -66,9 +66,9 @@
             flex-direction: column;
             justify-content: flex-start; 
             align-items: center;
-            padding-top: 7vh;
+            padding-top: 8vh; 
             width: 100%;
-            gap: 3vh; /* Sikrer 100% identisk afstand mellem sportsgren, titel og lokation */
+            gap: 1.5vh; 
         }
 
         /* --- DESIGN TIL NÆSTE LIVE-SKÆRM --- */
@@ -128,7 +128,6 @@
             margin-bottom: 3vh;
         }
 
-        /* Fælles styling for Sportsgren og Lokation (top/bund) */
         .nl-sub {
             font-size: 2.2vw;
             font-weight: 700;
@@ -139,7 +138,6 @@
             line-height: 1;
         }
 
-        /* Programtitel i midten */
         .nl-title {
             font-size: 3.8vw; 
             font-weight: 900; 
@@ -344,7 +342,7 @@
             <div class="cd-box"><div class="cd-num" id="cd-seconds">00</div><div class="cd-label">SEK</div></div>
         </div>
         
-        <!-- BUND: Sportsgren, Programtitel og Lokation med identisk afstand -->
+        <!-- BUND: Sportsgren, Programtitel og Lokation -->
         <div class="nl-bottom">
             <div id="nl-sport" class="nl-sub"></div>
             <div id="nl-title" class="nl-title">INDLÆSER...</div>
@@ -368,50 +366,63 @@
             const nl = document.getElementById('next-live-container');
             
             if (isShowingCalendar) {
-                // Skift til Næste Live
                 cal.style.opacity = '0';
                 setTimeout(() => { 
                     nl.style.opacity = '1'; 
                     nl.style.pointerEvents = 'auto'; 
                 }, 800);
                 isShowingCalendar = false;
-                setTimeout(switchViews, 30000); // Test: Næste Live vises i 30 sekunder
+                setTimeout(switchViews, 30000); // Næste Live vises i 30 sek
             } else {
-                // Skift til Kalender
                 nl.style.opacity = '0';
                 nl.style.pointerEvents = 'none';
                 setTimeout(() => { cal.style.opacity = '1'; }, 800);
                 isShowingCalendar = true;
-                setTimeout(switchViews, 20000); // Test: Kalender vises i 20 sekunder
+                setTimeout(switchViews, 120000); // Kalender vises i 120 sek (2 min)
             }
         }
         
-        // --- NEDTÆLLINGS-LOGIK ---
+        // --- SKUDSIKKER DATO- OG TIDS-LOGIK ---
         let nextProgramDateObj = null;
+
+        function extractTimeFromStr(tStr) {
+            if (!tStr) return null;
+            let s = String(tStr).trim();
+            // Fanger formater som "17:55", "17.55", "kl 17:55" osv.
+            let match = s.match(/\b(\d{1,2})[:.](\d{2})\b/);
+            if (match) {
+                return { h: parseInt(match[1], 10), m: parseInt(match[2], 10) };
+            }
+            return null;
+        }
 
         function parseDateTimeForCountdown(datoRaw, tidRaw) {
             if (!datoRaw || datoRaw === "" || datoRaw === "-") return null;
-            let d = new Date(datoRaw);
             
-            if (isNaN(d.getTime())) {
-                if (typeof datoRaw === "string" && datoRaw.includes("-")) {
-                    let parts = datoRaw.split("-");
-                    if (parts.length === 3) {
-                        if (parts[0].length === 4) { 
-                            d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                        } else { 
-                            d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-                        }
-                    }
-                }
+            let d = null;
+            let str = String(datoRaw).trim();
+            
+            // Fanger dansk DD-MM-YYYY format manuelt for at undgå at browseren bytter rundt på måned og dag
+            let regex = /^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/;
+            let match = str.match(regex);
+            
+            if (match) {
+                let day = parseInt(match[1], 10);
+                let month = parseInt(match[2], 10) - 1;
+                let year = parseInt(match[3], 10);
+                d = new Date(year, month, day);
+            } else {
+                d = new Date(str);
             }
-            if (isNaN(d.getTime())) return null;
+            
+            if (!d || isNaN(d.getTime())) return null;
 
             if (tidRaw && tidRaw !== "" && tidRaw !== "-") {
-                let tStr = String(tidRaw).replace('.', ':').trim();
-                let timeParts = tStr.split(':');
-                if (timeParts.length >= 2) {
-                    d.setHours(parseInt(timeParts[0], 10), parseInt(timeParts[1], 10), 0, 0);
+                let extracted = extractTimeFromStr(tidRaw);
+                if (extracted) {
+                    d.setHours(extracted.h, extracted.m, 0, 0);
+                } else {
+                    d.setHours(0,0,0,0);
                 }
             } else {
                 d.setHours(0,0,0,0);
@@ -455,15 +466,19 @@
 
         function findNextLiveProgram() {
             let now = new Date();
+            // Nyt: Tiden reduceret til 2 timer
+            let activeLimit = new Date(now.getTime() - (2.0 * 60 * 60 * 1000));
             let futureLive = [];
 
             produktioner.forEach(p => {
+                // Nu checker vi UDELUKKENDE på, om Kanal === "SPORT LIVE"
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
+                
                 if (kanal === "SPORT LIVE") {
                     let brugTid = (p.RX && String(p.RX).trim() !== "" && String(p.RX).trim() !== "-") ? p.RX : p.Tid;
                     let pDato = parseDateTimeForCountdown(p.Dato, brugTid);
                     
-                    if (pDato && pDato > now) {
+                    if (pDato && pDato > activeLimit) {
                         futureLive.push({ program: p, dateObj: pDato });
                     }
                 }
@@ -476,7 +491,6 @@
                 nextProgramDateObj = next.dateObj;
                 let tbcTxt = (next.program.TBC && String(next.program.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
                 
-                // Udskriv Sportsgren
                 let vasket = vaskTekstSplit(next.program.Sportsgren, next.program.Programtitel);
                 const sportEl = document.getElementById('nl-sport');
                 if (vasket.visSport) {
@@ -486,10 +500,8 @@
                     sportEl.style.display = 'none';
                 }
 
-                // Udskriv Programtitel
                 document.getElementById('nl-title').textContent = vasket.titel.toUpperCase() + tbcTxt;
 
-                // Udskriv Lokation
                 const locEl = document.getElementById('nl-location');
                 let lokationTxt = next.program.Lokation ? String(next.program.Lokation).trim() : "";
                 if (lokationTxt !== "" && lokationTxt !== "-") {
@@ -696,13 +708,13 @@
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
+                        // OPDATERET: Nu filtrerer kalenderen OGSÅ udelukkende på "SPORT LIVE"
                         let dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
                             const pDato = new Date(p.Dato);
                             return (pDato.getFullYear() === y && pDato.getMonth() === m && pDato.getDate() === d);
                         }).filter(p => {
-                            const obUnits = ["EFP", "MINITECH", "NOWTEK OB1", "NOWTEK OB2", "OB", "OB 7", "OB 9", "OB 7+9", "SAM OB"];
-                            return (p.Kanal === "SPORT LIVE") || obUnits.includes(String(p.Unit || "").trim());
+                            return (String(p.Kanal || "").trim().toUpperCase() === "SPORT LIVE");
                         });
 
                         if (dagensProduktioner.length > 0) {
@@ -815,8 +827,7 @@
         setInterval(opdaterAnimationer, 7000);
         setInterval(tickCountdown, 1000); 
         
-        // Start side-skifteren (venter først de indledende 20 sekunder for test)
-        setTimeout(switchViews, 20000);
+        setTimeout(switchViews, 120000);
 
     </script>
 </body>
