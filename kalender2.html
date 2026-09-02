@@ -26,11 +26,9 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 100;
+            transition: opacity 0.8s ease-in-out;
             opacity: 1;
-            transform: scale(1);
-            filter: blur(0px);
-            will-change: transform, opacity, filter;
+            z-index: 10;
         }
 
         #next-live-container {
@@ -46,11 +44,10 @@
             left: 0;
             background-color: #fdfdfd;
             color: #1a1a1a;
-            z-index: 50; 
+            transition: opacity 0.8s ease-in-out;
             opacity: 0;
-            transform: translateY(15vh) scale(0.9);
             pointer-events: none;
-            will-change: transform, opacity;
+            z-index: 20;
         }
 
         /* --- STRUKTUR TIL CENTRERING AF NEDTÆLLING --- */
@@ -383,42 +380,29 @@
             const nl = document.getElementById('next-live-container');
             
             if (isShowingCalendar) {
-                // Kalender -> Nedtælling (Cinematic Push)
-                cal.style.transition = 'all 1.4s cubic-bezier(0.22, 1, 0.36, 1)';
+                // Kalender fader ud -> Nedtælling fader ind
                 cal.style.opacity = '0';
-                cal.style.transform = 'scale(1.15)';
-                cal.style.filter = 'blur(8px)';
-                
-                nl.style.transition = 'none';
-                nl.style.transform = 'translateY(15vh) scale(0.9)';
-                nl.style.opacity = '0';
+                cal.style.pointerEvents = 'none';
                 
                 setTimeout(() => { 
-                    nl.style.transition = 'all 1.4s cubic-bezier(0.22, 1, 0.36, 1)';
                     nl.style.opacity = '1'; 
-                    nl.style.transform = 'translateY(0) scale(1)';
                     nl.style.pointerEvents = 'auto'; 
-                }, 50); 
+                }, 800);
                 
                 isShowingCalendar = false;
-                setTimeout(switchViews, 20000); // Nedtælling vises i 20 sekunder
+                setTimeout(switchViews, 20000); // 20 sekunders nedtælling
             } else {
-                // Nedtælling -> Kalender (Soft Fade)
-                cal.style.transition = 'none';
-                cal.style.transform = 'scale(1)';
-                cal.style.filter = 'blur(0px)';
+                // Nedtælling fader ud -> Kalender fader ind
+                nl.style.opacity = '0';
+                nl.style.pointerEvents = 'none';
                 
-                setTimeout(() => {
-                    nl.style.transition = 'opacity 1s ease-in-out';
-                    nl.style.opacity = '0';
-                    nl.style.pointerEvents = 'none';
-
-                    cal.style.transition = 'opacity 1s ease-in-out';
-                    cal.style.opacity = '1';
-                }, 50);
+                setTimeout(() => { 
+                    cal.style.opacity = '1'; 
+                    cal.style.pointerEvents = 'auto'; 
+                }, 800);
                 
                 isShowingCalendar = true;
-                setTimeout(switchViews, 300000); // Kalender vises i 5 minutter
+                setTimeout(switchViews, 300000); // 5 minutters kalender
             }
         }
         
