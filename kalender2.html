@@ -495,7 +495,7 @@
 
         function findNextLiveProgram() {
             let now = new Date();
-            let activeLimit = new Date(now.getTime() - (3.0 * 60 * 60 * 1000));
+            let activeLimit = new Date(now.getTime() - (0.5 * 60 * 60 * 1000));
             let futureLive = [];
 
             produktioner.forEach(p => {
@@ -524,7 +524,7 @@
                 // Er program 0 gået i gang?
                 if (now >= p0.dateObj) {
                     // Starter program 1 mindre end 2 timer efter program 0?
-                    if (p1.dateObj.getTime() - p0.dateObj.getTime() < 3.0 * 60 * 60 * 1000) {
+                    if (p1.dateObj.getTime() - p0.dateObj.getTime() < 0.5 * 60 * 60 * 1000) {
                         // Så skubber vi program 0 ud, så skærmen fokuserer på program 1
                         futureLive.shift();
                         continue;
