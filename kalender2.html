@@ -372,48 +372,55 @@
                     nl.style.pointerEvents = 'auto'; 
                 }, 800);
                 isShowingCalendar = false;
-                setTimeout(switchViews, 30000); // Næste Live vises i 30 sek
+                setTimeout(switchViews, 30000); // Næste Live vises i 30 sekunder
             } else {
                 nl.style.opacity = '0';
                 nl.style.pointerEvents = 'none';
                 setTimeout(() => { cal.style.opacity = '1'; }, 800);
                 isShowingCalendar = true;
-                setTimeout(switchViews, 20000); // Kalender vises i 120 sek (2 min)
+                setTimeout(switchViews, 20000); // Kalender vises i 120 sekunder
             }
         }
         
         // --- SKUDSIKKER DATO- OG TIDS-LOGIK ---
         let nextProgramDateObj = null;
 
-        function parseDateTimeForCountdown(datoRaw, tidRaw) {
-            if (!datoRaw || datoRaw === "" || datoRaw === "-") return null;
+        function parseDateTimeForCountdown(datoRaw, rxRaw, tidRaw) {
+            if (!datoRaw || String(datoRaw).trim() === "" || String(datoRaw).trim() === "-") return null;
             
-            // Brug samme sikre datofortolkning som i kalenderen
-            let d = new Date(datoRaw);
+            let d = null;
+            let str = String(datoRaw).trim();
             
-            // Fallback til manuel DD-MM-YYYY, hvis standardmetoden svigter
-            if (isNaN(d.getTime())) {
-                let str = String(datoRaw).trim();
-                let match = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
-                if (match) {
-                    d = new Date(parseInt(match[3], 10), parseInt(match[2], 10) - 1, parseInt(match[1], 10));
-                }
+            // Fanger dansk DD-MM-YYYY format manuelt
+            let dateMatch = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+            if (dateMatch) {
+                d = new Date(parseInt(dateMatch[3], 10), parseInt(dateMatch[2], 10) - 1, parseInt(dateMatch[1], 10));
+            } else {
+                d = new Date(str);
             }
             
             if (!d || isNaN(d.getTime())) return null;
 
-            if (tidRaw && tidRaw !== "" && tidRaw !== "-") {
-                let tStr = String(tidRaw).trim();
-                // Bombesikker tidsaflæser: Leder KUN efter [tal][:][tal]. Ignorerer grænser og usynlige tegn.
-                let match = tStr.match(/(\d{1,2})[:.](\d{2})/);
-                if (match) {
-                    d.setHours(parseInt(match[1], 10), parseInt(match[2], 10), 0, 0);
-                } else {
-                    d.setHours(0,0,0,0);
-                }
+            // Funktion der tvinger tidsudtræk (isolerer udelukkende tal:tal)
+            function extTime(ts) {
+                if (!ts) return null;
+                // Tillader både "17:55", "17.55" og slåfejl som "17.:55"
+                let m = String(ts).match(/(\d{1,2})\s*[:.]+\s*(\d{2})/);
+                return m ? { h: parseInt(m[1],10), m: parseInt(m[2],10) } : null;
+            }
+
+            // Prøver altid RX først. Er den defekt/tekst, hopper den ned og prøver Tid i stedet.
+            let tMatch = extTime(rxRaw);
+            if (!tMatch) {
+                tMatch = extTime(tidRaw);
+            }
+            
+            if (tMatch) {
+                d.setHours(tMatch.h, tMatch.m, 0, 0);
             } else {
                 d.setHours(0,0,0,0);
             }
+            
             return d;
         }
 
@@ -453,17 +460,15 @@
 
         function findNextLiveProgram() {
             let now = new Date();
-            // Giver programmet lov til at stå som 'SENDER NU' i op til 2 timer efter start
             let activeLimit = new Date(now.getTime() - (2.0 * 60 * 60 * 1000));
             let futureLive = [];
 
             produktioner.forEach(p => {
-                // Vi checker udelukkende på, om Kanal === "SPORT LIVE"
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
                 
                 if (kanal === "SPORT LIVE") {
-                    let brugTid = (p.RX && String(p.RX).trim() !== "" && String(p.RX).trim() !== "-") ? p.RX : p.Tid;
-                    let pDato = parseDateTimeForCountdown(p.Dato, brugTid);
+                    // Vi sender begge tidsfelter med ned til den nye skudsikre scanner
+                    let pDato = parseDateTimeForCountdown(p.Dato, p.RX, p.Tid);
                     
                     if (pDato && pDato > activeLimit) {
                         futureLive.push({ program: p, dateObj: pDato });
