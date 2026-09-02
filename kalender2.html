@@ -68,6 +68,7 @@
             align-items: center;
             padding-top: 5vh;
             width: 100%;
+            gap: 1.5vh; /* Sikrer 100% identisk afstand mellem sportsgren, titel og lokation */
         }
 
         /* --- DESIGN TIL NÆSTE LIVE-SKÆRM --- */
@@ -127,28 +128,29 @@
             margin-bottom: 3vh;
         }
 
-        /* Styling til Sportsgren */
-        .nl-sport {
+        /* Fælles styling for Sportsgren og Lokation (top/bund) */
+        .nl-sub {
             font-size: 2.2vw;
             font-weight: 700;
             color: #888888;
             letter-spacing: 0.4vw;
             text-transform: uppercase;
-            margin-bottom: 0.5vh;
+            text-align: center;
+            line-height: 1;
         }
 
-        /* Opdateret programtitel på én linje */
+        /* Programtitel i midten */
         .nl-title {
-            font-size: 3.8vw; /* Justeret ned til én linje */
+            font-size: 3.8vw; 
             font-weight: 900; 
             color: #dd5f12; 
             text-align: center;
             width: 95vw;
-            line-height: 1.2;
+            line-height: 1.1;
             text-transform: uppercase;
-            white-space: nowrap; /* Tvinger én linje */
+            white-space: nowrap; 
             overflow: hidden;
-            text-overflow: ellipsis; /* Indsætter '...' ved overløb */
+            text-overflow: ellipsis; 
         }
 
         .sender-nu {
@@ -342,10 +344,11 @@
             <div class="cd-box"><div class="cd-num" id="cd-seconds">00</div><div class="cd-label">SEK</div></div>
         </div>
         
-        <!-- BUND: Sportsgren og Programtitel -->
+        <!-- BUND: Sportsgren, Programtitel og Lokation med identisk afstand -->
         <div class="nl-bottom">
-            <div id="nl-sport" class="nl-sport"></div>
+            <div id="nl-sport" class="nl-sub"></div>
             <div id="nl-title" class="nl-title">INDLÆSER...</div>
+            <div id="nl-location" class="nl-sub"></div>
         </div>
     </div>
 
@@ -416,7 +419,6 @@
             return d;
         }
 
-        // --- Håndterer sportsgren og titel (uden at skjule sportsgrenen) ---
         function vaskTekstSplit(sportsgren, titel) {
             let s = sportsgren ? String(sportsgren).trim() : "";
             let t = titel ? String(titel).trim() : "";
@@ -439,13 +441,11 @@
                 { fra: /kvalifikation/gi, til: "kval" }
             ];
 
-            // Kører vaskemaskinen på både sportsgren og programtitel
             forkortelser.forEach(f => {
                 s = s.replace(f.fra, f.til);
                 t = t.replace(f.fra, f.til);
             });
 
-            // Viser nu altid sportsgren, uanset om den indgår i titlen
             return {
                 sport: s,
                 titel: t,
@@ -476,9 +476,8 @@
                 nextProgramDateObj = next.dateObj;
                 let tbcTxt = (next.program.TBC && String(next.program.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
                 
-                // Bruger den nye split-funktion, der altid viser sportsgrenen
+                // Udskriv Sportsgren
                 let vasket = vaskTekstSplit(next.program.Sportsgren, next.program.Programtitel);
-                
                 const sportEl = document.getElementById('nl-sport');
                 if (vasket.visSport) {
                     sportEl.textContent = vasket.sport.toUpperCase();
@@ -487,10 +486,23 @@
                     sportEl.style.display = 'none';
                 }
 
+                // Udskriv Programtitel
                 document.getElementById('nl-title').textContent = vasket.titel.toUpperCase() + tbcTxt;
+
+                // Udskriv Lokation
+                const locEl = document.getElementById('nl-location');
+                let lokationTxt = next.program.Lokation ? String(next.program.Lokation).trim() : "";
+                if (lokationTxt !== "" && lokationTxt !== "-") {
+                    locEl.textContent = lokationTxt.toUpperCase();
+                    locEl.style.display = 'block';
+                } else {
+                    locEl.style.display = 'none';
+                }
+                
             } else {
                 nextProgramDateObj = null;
                 document.getElementById('nl-sport').style.display = 'none';
+                document.getElementById('nl-location').style.display = 'none';
                 document.getElementById('nl-title').textContent = "INGEN PLANLAGTE LIVE-UDSENDELSER";
             }
         }
@@ -563,7 +575,6 @@
             return str;
         }
 
-        // Den originale vaskTekst beholdes uændret, da kalendervisningen ("Sportsgren: Titel") bruger denne
         function vaskTekst(sportsgren, titel) {
             let s = sportsgren ? String(sportsgren).trim() : "";
             let t = titel ? String(titel).trim() : "";
