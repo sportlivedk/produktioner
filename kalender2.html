@@ -54,7 +54,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* Skubber indholdet ned mod midten */
+            justify-content: flex-end; 
             align-items: center;
             padding-bottom: 5vh;
             width: 100%;
@@ -64,7 +64,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Skubber indholdet op mod midten */
+            justify-content: flex-start; 
             align-items: center;
             padding-top: 5vh;
             width: 100%;
@@ -72,7 +72,7 @@
 
         /* --- DESIGN TIL NÆSTE LIVE-SKÆRM --- */
         .nl-logo {
-            max-width: 40vw; /* Dobbelt så stor */
+            max-width: 40vw; 
             max-height: 25vh;
             margin-bottom: 3vh;
         }
@@ -80,7 +80,7 @@
         .nl-header {
             font-size: 3.8vw;
             font-weight: 900;
-            color: #1a1a1a; /* Nu sort */
+            color: #1a1a1a; 
             letter-spacing: 0.3vw;
             text-transform: uppercase;
         }
@@ -90,7 +90,6 @@
             align-items: center;
             justify-content: center;
             gap: 1.5vw;
-            /* Margins er fjernet, da flex-boksene .nl-top og .nl-bottom styrer afstanden */
         }
 
         .cd-box {
@@ -128,13 +127,24 @@
             margin-bottom: 3vh;
         }
 
+        /* Ny styling til Sportsgren */
+        .nl-sport {
+            font-size: 2.2vw;
+            font-weight: 700;
+            color: #888888; /* Diskret grå */
+            letter-spacing: 0.4vw;
+            text-transform: uppercase;
+            margin-bottom: 0.5vh;
+        }
+
+        /* Opdateret programtitel (Markant større) */
         .nl-title {
-            font-size: 3.8vw; /* Markant større */
-            font-weight: 900; /* Ekstra fed */
-            color: #dd5f12; /* SPORT LIVE orange */
+            font-size: 5.5vw; /* Kæmpe format */
+            font-weight: 900; 
+            color: #dd5f12; 
             text-align: center;
             max-width: 95vw;
-            line-height: 1.2;
+            line-height: 1.1;
             text-transform: uppercase;
         }
 
@@ -318,7 +328,7 @@
             <div class="nl-header">Næste live-sending</div>
         </div>
         
-        <!-- MIDT: Nedtælling (Ligger nu 100% på midten) -->
+        <!-- MIDT: Nedtælling -->
         <div id="countdown-display" class="countdown-wrapper">
             <div class="cd-box"><div class="cd-num" id="cd-days">00</div><div class="cd-label">DAGE</div></div>
             <div class="cd-colon">:</div>
@@ -329,8 +339,9 @@
             <div class="cd-box"><div class="cd-num" id="cd-seconds">00</div><div class="cd-label">SEK</div></div>
         </div>
         
-        <!-- BUND: Programtitel -->
+        <!-- BUND: Sportsgren og Programtitel (nu splittet op!) -->
         <div class="nl-bottom">
+            <div id="nl-sport" class="nl-sport"></div>
             <div id="nl-title" class="nl-title">INDLÆSER...</div>
         </div>
     </div>
@@ -380,9 +391,9 @@
                 if (typeof datoRaw === "string" && datoRaw.includes("-")) {
                     let parts = datoRaw.split("-");
                     if (parts.length === 3) {
-                        if (parts[0].length === 4) { // YYYY-MM-DD
+                        if (parts[0].length === 4) { 
                             d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                        } else { // DD-MM-YYYY
+                        } else { 
                             d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
                         }
                     }
@@ -402,13 +413,58 @@
             return d;
         }
 
+        // --- NY FUNKTION: Håndterer sportsgren og titel hver for sig ---
+        function vaskTekstSplit(sportsgren, titel) {
+            let s = sportsgren ? String(sportsgren).trim() : "";
+            let t = titel ? String(titel).trim() : "";
+
+            const forkortelser = [
+                { fra: /Basketball/gi, til: "Basket" },
+                { fra: /Volleyball/gi, til: "Volley" },
+                { fra: /Amerikansk fodbold/gi, til: "Football" },
+                { fra: /European League/gi, til: "EL" },
+                { fra: /Randers Cimbria/gi, til: "Randers" },
+                { fra: /Team FOG Næstved/gi, til: "Næstved" },
+                { fra: /Horsens IC/gi, til: "Horsens" },
+                { fra: /Værløse Blue Hawks/gi, til: "Værløse" },
+                { fra: /Svendborg Rabbits/gi, til: "Svendborg" },
+                { fra: /BMS Herlev/gi, til: "Herlev" },
+                { fra: /Bakken Bears/gi, til: "Bakken" },
+                { fra: /BK Vejen/gi, til: "Vejen" },
+                { fra: /Hørsholm Rungsted/gi, til: "HRT" },
+                { fra: /United States/gi, til: "USA" },
+                { fra: /kvalifikation/gi, til: "kval" }
+            ];
+
+            const udeladelser = [
+                "basket", "futsal", "volley", "tennis", "kajak", "roning", "bordtennis", 
+                "WTT", "davis cup", "billie jean king cup", "mermaid bowl", "gokart"
+            ];
+
+            forkortelser.forEach(f => {
+                s = s.replace(f.fra, f.til);
+                t = t.replace(f.fra, f.til);
+            });
+
+            let visSportsgren = true;
+            const tLower = t.toLowerCase();
+            udeladelser.forEach(ord => {
+                if (tLower.includes(ord.toLowerCase())) visSportsgren = false;
+            });
+
+            return {
+                sport: s,
+                titel: t,
+                visSport: (visSportsgren && s !== "")
+            };
+        }
+
         function findNextLiveProgram() {
             let now = new Date();
             let futureLive = [];
 
             produktioner.forEach(p => {
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
-                // Vi tjekker efter SPORT LIVE programmer 
                 if (kanal === "SPORT LIVE") {
                     let brugTid = (p.RX && String(p.RX).trim() !== "" && String(p.RX).trim() !== "-") ? p.RX : p.Tid;
                     let pDato = parseDateTimeForCountdown(p.Dato, brugTid);
@@ -425,9 +481,22 @@
                 let next = futureLive[0];
                 nextProgramDateObj = next.dateObj;
                 let tbcTxt = (next.program.TBC && String(next.program.TBC).toUpperCase() === 'X') ? " (TBC)" : "";
-                document.getElementById('nl-title').textContent = vaskTekst(next.program.Sportsgren, next.program.Programtitel).toUpperCase() + tbcTxt;
+                
+                // Bruger den nye split-funktion
+                let vasket = vaskTekstSplit(next.program.Sportsgren, next.program.Programtitel);
+                
+                const sportEl = document.getElementById('nl-sport');
+                if (vasket.visSport) {
+                    sportEl.textContent = vasket.sport.toUpperCase();
+                    sportEl.style.display = 'block';
+                } else {
+                    sportEl.style.display = 'none';
+                }
+
+                document.getElementById('nl-title').textContent = vasket.titel.toUpperCase() + tbcTxt;
             } else {
                 nextProgramDateObj = null;
+                document.getElementById('nl-sport').style.display = 'none';
                 document.getElementById('nl-title').textContent = "INGEN PLANLAGTE LIVE-UDSENDELSER";
             }
         }
@@ -455,7 +524,6 @@
             let m = Math.floor((diff / 1000 / 60) % 60);
             let s = Math.floor((diff / 1000) % 60);
             
-            // Opdater elementer
             const elDays = document.getElementById('cd-days');
             if(elDays) {
                 elDays.textContent = String(d).padStart(2, '0');
@@ -501,6 +569,7 @@
             return str;
         }
 
+        // BEMÆRK: Den originale vaskTekst beholdes her, fordi selve kalendervisningen har brug for det kombinerede format ("Sportsgren: Titel")
         function vaskTekst(sportsgren, titel) {
             let s = sportsgren ? String(sportsgren).trim() : "";
             let t = titel ? String(titel).trim() : "";
