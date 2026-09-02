@@ -26,8 +26,11 @@
             position: absolute;
             top: 0;
             left: 0;
-            transition: opacity 0.8s ease-in-out;
+            z-index: 100; /* Ligger forrest, så vi kan lave 3D push effekten gennem den */
             opacity: 1;
+            transform: scale(1);
+            filter: blur(0px);
+            will-change: transform, opacity, filter; /* Sikrer 100% flydende animation på store skærme */
         }
 
         #next-live-container {
@@ -43,10 +46,11 @@
             left: 0;
             background-color: #fdfdfd;
             color: #1a1a1a;
-            transition: opacity 0.8s ease-in-out;
+            z-index: 50; /* Ligger bag kalenderen og kommer frem */
             opacity: 0;
+            transform: translateY(15vh) scale(0.9);
             pointer-events: none;
-            z-index: 50;
+            will-change: transform, opacity;
         }
 
         /* --- STRUKTUR TIL CENTRERING AF NEDTÆLLING --- */
@@ -358,7 +362,7 @@
         let produktioner = [];
         let globalTick = 0; 
         
-        // --- ROTATIONS-LOGIK ---
+        // --- ROTATIONS-LOGIK MED NYE OVERGANGE ---
         let isShowingCalendar = true;
         
         function switchViews() {
@@ -366,40 +370,68 @@
             const nl = document.getElementById('next-live-container');
             
             if (isShowingCalendar) {
+                // SPEKTAKULÆR OVERGANG: Kalender -> Nedtælling
+                
+                // 1. Animer kalender ud (Cinematic Push: zoom frem, slør og fade out)
+                cal.style.transition = 'all 1.4s cubic-bezier(0.22, 1, 0.36, 1)';
                 cal.style.opacity = '0';
-                setTimeout(() => { 
-                    nl.style.opacity = '1'; 
-                    nl.style.pointerEvents = 'auto'; 
-                }, 800);
-                isShowingCalendar = false;
-                setTimeout(switchViews, 30000); // Næste Live vises i 30 sek
-            } else {
+                cal.style.transform = 'scale(1.15)';
+                cal.style.filter = 'blur(8px)';
+                
+                // 2. Gør Nedtællingen klar usynligt (nede i bunden, let nedskaleret)
+                nl.style.transition = 'none';
+                nl.style.transform = 'translateY(15vh) scale(0.9)';
                 nl.style.opacity = '0';
-                nl.style.pointerEvents = 'none';
-                setTimeout(() => { cal.style.opacity = '1'; }, 800);
+                
+                // 3. Skub Nedtællingen op i front (slide op, scale til 1, fade ind)
+                setTimeout(() => { 
+                    nl.style.transition = 'all 1.4s cubic-bezier(0.22, 1, 0.36, 1)';
+                    nl.style.opacity = '1'; 
+                    nl.style.transform = 'translateY(0) scale(1)';
+                    nl.style.pointerEvents = 'auto'; 
+                }, 50); // Lille delay sikrer, at browseren forstår punkt 2 først
+                
+                isShowingCalendar = false;
+                setTimeout(switchViews, 30000); // Nedtælling vises i 30 sek
+            } else {
+                // BLØD OVERGANG: Nedtælling -> Kalender
+                
+                // 1. Nulstil kalenderens scale og blur bagved uden at animere, så den er klar
+                cal.style.transition = 'none';
+                cal.style.transform = 'scale(1)';
+                cal.style.filter = 'blur(0px)';
+                
+                setTimeout(() => {
+                    // 2. Nedtællingen fader roligt ud
+                    nl.style.transition = 'opacity 1s ease-in-out';
+                    nl.style.opacity = '0';
+                    nl.style.pointerEvents = 'none';
+
+                    // 3. Kalenderen fader roligt ind over
+                    cal.style.transition = 'opacity 1s ease-in-out';
+                    cal.style.opacity = '1';
+                }, 50);
+                
                 isShowingCalendar = true;
-                setTimeout(switchViews, 20000); // Kalender vises i 120 sek (2 min)
+                setTimeout(switchViews, 20000); // Kalender vises i 120 sek
             }
         }
         
         // --- SKUDSIKKER DATO- OG TIDS-LOGIK ---
         let nextProgramDateObj = null;
 
-        // Fanger formater som "17:55", "17.55", "kl 17:55" og selv slåfejl som "17.:55"
         function extractTimeFromStr(tStr) {
             if (!tStr) return null;
             let m = String(tStr).match(/(\d{1,2})\s*[:.]+\s*(\d{2})/);
             return m ? { h: parseInt(m[1], 10), m: parseInt(m[2], 10) } : null;
         }
 
-        // Tager nu imod tre tids-parametre: TX, RX og Tid
         function parseDateTimeForCountdown(datoRaw, txRaw, rxRaw, tidRaw) {
             if (!datoRaw || String(datoRaw).trim() === "" || String(datoRaw).trim() === "-") return null;
             
             let d = null;
             let str = String(datoRaw).trim();
             
-            // Fanger dansk DD-MM-YYYY format manuelt
             let dateMatch = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
             if (dateMatch) {
                 d = new Date(parseInt(dateMatch[3], 10), parseInt(dateMatch[2], 10) - 1, parseInt(dateMatch[1], 10));
@@ -409,7 +441,6 @@
             
             if (!d || isNaN(d.getTime())) return null;
 
-            // Kaskade: Prøv TX først. Virker det ikke, så RX. Virker det ikke, så Tid.
             let tMatch = extractTimeFromStr(txRaw);
             if (!tMatch) tMatch = extractTimeFromStr(rxRaw);
             if (!tMatch) tMatch = extractTimeFromStr(tidRaw);
@@ -466,7 +497,6 @@
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
                 
                 if (kanal === "SPORT LIVE") {
-                    // Vi sender TX, RX og Tid med ned til udtrækningen
                     let pDato = parseDateTimeForCountdown(p.Dato, p.TX, p.RX, p.Tid);
                     
                     if (pDato && pDato > activeLimit) {
