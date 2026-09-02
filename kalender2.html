@@ -372,20 +372,28 @@
                     nl.style.pointerEvents = 'auto'; 
                 }, 800);
                 isShowingCalendar = false;
-                setTimeout(switchViews, 30000); // Næste Live vises i 30 sekunder
+                setTimeout(switchViews, 30000); // Næste Live vises i 30 sek
             } else {
                 nl.style.opacity = '0';
                 nl.style.pointerEvents = 'none';
                 setTimeout(() => { cal.style.opacity = '1'; }, 800);
                 isShowingCalendar = true;
-                setTimeout(switchViews, 20000); // Kalender vises i 120 sekunder
+                setTimeout(switchViews, 20000); // Kalender vises i 120 sek (2 min)
             }
         }
         
         // --- SKUDSIKKER DATO- OG TIDS-LOGIK ---
         let nextProgramDateObj = null;
 
-        function parseDateTimeForCountdown(datoRaw, rxRaw, tidRaw) {
+        // Fanger formater som "17:55", "17.55", "kl 17:55" og selv slåfejl som "17.:55"
+        function extractTimeFromStr(tStr) {
+            if (!tStr) return null;
+            let m = String(tStr).match(/(\d{1,2})\s*[:.]+\s*(\d{2})/);
+            return m ? { h: parseInt(m[1], 10), m: parseInt(m[2], 10) } : null;
+        }
+
+        // Tager nu imod tre tids-parametre: TX, RX og Tid
+        function parseDateTimeForCountdown(datoRaw, txRaw, rxRaw, tidRaw) {
             if (!datoRaw || String(datoRaw).trim() === "" || String(datoRaw).trim() === "-") return null;
             
             let d = null;
@@ -401,19 +409,10 @@
             
             if (!d || isNaN(d.getTime())) return null;
 
-            // Funktion der tvinger tidsudtræk (isolerer udelukkende tal:tal)
-            function extTime(ts) {
-                if (!ts) return null;
-                // Tillader både "17:55", "17.55" og slåfejl som "17.:55"
-                let m = String(ts).match(/(\d{1,2})\s*[:.]+\s*(\d{2})/);
-                return m ? { h: parseInt(m[1],10), m: parseInt(m[2],10) } : null;
-            }
-
-            // Prøver altid RX først. Er den defekt/tekst, hopper den ned og prøver Tid i stedet.
-            let tMatch = extTime(rxRaw);
-            if (!tMatch) {
-                tMatch = extTime(tidRaw);
-            }
+            // Kaskade: Prøv TX først. Virker det ikke, så RX. Virker det ikke, så Tid.
+            let tMatch = extractTimeFromStr(txRaw);
+            if (!tMatch) tMatch = extractTimeFromStr(rxRaw);
+            if (!tMatch) tMatch = extractTimeFromStr(tidRaw);
             
             if (tMatch) {
                 d.setHours(tMatch.h, tMatch.m, 0, 0);
@@ -467,8 +466,8 @@
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
                 
                 if (kanal === "SPORT LIVE") {
-                    // Vi sender begge tidsfelter med ned til den nye skudsikre scanner
-                    let pDato = parseDateTimeForCountdown(p.Dato, p.RX, p.Tid);
+                    // Vi sender TX, RX og Tid med ned til udtrækningen
+                    let pDato = parseDateTimeForCountdown(p.Dato, p.TX, p.RX, p.Tid);
                     
                     if (pDato && pDato > activeLimit) {
                         futureLive.push({ program: p, dateObj: pDato });
