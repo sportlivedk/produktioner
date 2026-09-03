@@ -162,9 +162,9 @@
 
         @keyframes pulse {
             0%   { opacity: 1; }
-            50%  { opacity: 1; }    /* Står helt fast og klar halvdelen af tiden */
-            75%  { opacity: 0.2; }  /* Dæmpes roligt og blødt */
-            100% { opacity: 1; }    /* Glider op på fuld styrke igen */
+            50%  { opacity: 1; }    
+            75%  { opacity: 0.2; }  
+            100% { opacity: 1; }    
         }
 
         /* --- DET EKSISTERENDE KALENDER DESIGN --- */
@@ -380,7 +380,6 @@
             const nl = document.getElementById('next-live-container');
             
             if (isShowingCalendar) {
-                // Kalender fader ud -> Nedtælling fader ind
                 cal.style.opacity = '0';
                 cal.style.pointerEvents = 'none';
                 
@@ -390,9 +389,8 @@
                 }, 800);
                 
                 isShowingCalendar = false;
-                setTimeout(switchViews, 20000); // 20 sekunders nedtælling
+                setTimeout(switchViews, 20000); 
             } else {
-                // Nedtælling fader ud -> Kalender fader ind
                 nl.style.opacity = '0';
                 nl.style.pointerEvents = 'none';
                 
@@ -402,7 +400,7 @@
                 }, 800);
                 
                 isShowingCalendar = true;
-                setTimeout(switchViews, 300000); // 5 minutters kalender
+                setTimeout(switchViews, 300000); 
             }
         }
         
@@ -482,6 +480,7 @@
             let activeLimit = new Date(now.getTime() - (0.5 * 60 * 60 * 1000));
             let futureLive = [];
 
+            // NEDTÆLLING: Udelukkende SPORT LIVE og ikke TBC
             produktioner.forEach(p => {
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
                 let erTBC = (p.TBC && String(p.TBC).trim().toUpperCase() === "X");
@@ -497,24 +496,17 @@
 
             futureLive.sort((a, b) => a.dateObj - b.dateObj);
 
-            // --- NY LOGIK: SKJUL "SENDER NU" HVIS NÆSTE KAMP STARTER SNART ---
-            // Hvis det første program på listen er i gang (now >= starttid),
-            // tjekker vi om næste program på listen starter mindre end 2 timer efter det igangværende.
-            // Hvis ja: Så fjerner vi det igangværende program, så vi får nedtællingen til det nye!
             while (futureLive.length > 1) {
                 let p0 = futureLive[0];
                 let p1 = futureLive[1];
                 
-                // Er program 0 gået i gang?
                 if (now >= p0.dateObj) {
-                    // Starter program 1 mindre end 2 timer efter program 0?
                     if (p1.dateObj.getTime() - p0.dateObj.getTime() < 0.5 * 60 * 60 * 1000) {
-                        // Så skubber vi program 0 ud, så skærmen fokuserer på program 1
                         futureLive.shift();
                         continue;
                     }
                 }
-                break; // Hvis ingen af betingelserne er opfyldt, afbryder vi loopet
+                break; 
             }
 
             if (futureLive.length > 0) {
@@ -559,10 +551,8 @@
             let now = new Date();
             let diff = nextProgramDateObj - now;
 
-            // NÅR PROGRAMMET ER I GANG
             if (diff <= 0) {
                 cdDisplay.style.display = 'flex';
-                // Tjekker om "SENDER NU" allerede er sat ind - hvis ja, rører vi den IKKE
                 if (!cdDisplay.querySelector('.sender-nu')) {
                     cdDisplay.innerHTML = '<div class="sender-nu">SENDER NU</div>';
                 }
@@ -571,8 +561,6 @@
             
             cdDisplay.style.display = 'flex';
 
-            // Hvis skærmen lige har vist "SENDER NU" og nu skifter til et nyt program i fremtiden,
-            // genskaber vi kasserne til nedtællingen
             if (cdDisplay.querySelector('.sender-nu')) {
                 cdDisplay.innerHTML = `
                     <div class="cd-box">
@@ -614,28 +602,32 @@
             }
         }
 
-        // --- EKSISTERENDE FUNKTIONER ---
+        // --- KALENDER FARVE- OG PRIORITERINGSSTYRING ---
         function getProgramColorAndPriority(p) {
-            if (p._isMerged) {
-                if (p._mergedHasOB) {
-                    return { color: 'color-blue', prio: 1 };
-                } else {
-                    return { color: 'color-red', prio: 4 }; 
-                }
-            }
-            const kanalNavn = String(p.Kanal || "").trim();
-            const unitLower = String(p.Unit || "").toLowerCase().trim();
             const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "ob 7+9", "sam ob"];
             const boksUnits = ["boks", "boks 1", "boks 2", "boks 3", "boks 4", "boks 5", "boks 6", "boks 7", "brt", "srt"];
+
+            if (p._isMerged) {
+                if (p._mergedHasSportLiveOB) {
+                    return { color: 'color-blue', prio: 1 };
+                } else if (p._mergedHasExternalOB) {
+                    return { color: 'color-red', prio: 4 }; 
+                } else {
+                    return { color: 'color-black', prio: 3 }; 
+                }
+            }
+
+            const kanalNavn = String(p.Kanal || "").trim().toUpperCase();
+            const unitLower = String(p.Unit || "").toLowerCase().trim();
 
             if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
                 return { color: 'color-blue', prio: 1 };
             } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
                 return { color: 'color-green', prio: 2 };
-            } else if (kanalNavn === "EFP" || unitLower === "efp" || kanalNavn.toUpperCase() === "OPTAGELSE") {
+            } else if (kanalNavn === "EFP" || unitLower === "efp" || kanalNavn === "OPTAGELSE") {
                 return { color: 'color-black', prio: 3 };
             } else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
-                return { color: 'color-red', prio: 4 };
+                return { color: 'color-red', prio: 4 }; // Ekstern OB -> Rød
             } else {
                 return { color: 'color-black', prio: 3 }; 
             }
@@ -738,6 +730,7 @@
             const currentDate = new Date();
             const currentMonthIndex = currentDate.getMonth();
             const currentYear = currentDate.getFullYear();
+            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "ob 7+9", "sam ob"];
 
             for (let i = 0; i < 5; i++) {
                 let m = (currentMonthIndex + i) % 12;
@@ -766,35 +759,50 @@
                         dateBox.appendChild(circle);
 
                         let dateObj = new Date(y, m, d);
-                        const dateStr = y + "-" + String(m + 1).padStart(2, '0') + "-" + String(d).padStart(2, '0');
                         
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
+                        // KALENDER-FILTER: Viser SPORT LIVE, alle OB-produktioner og alle EFP-produktioner
                         let dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
                             const pDato = new Date(p.Dato);
                             return (pDato.getFullYear() === y && pDato.getMonth() === m && pDato.getDate() === d);
                         }).filter(p => {
-                            return (String(p.Kanal || "").trim().toUpperCase() === "SPORT LIVE");
+                            const kanalNavn = String(p.Kanal || "").trim().toUpperCase();
+                            const unitLower = String(p.Unit || "").toLowerCase().trim();
+                            
+                            const isSportLive = (kanalNavn === "SPORT LIVE");
+                            const isOB = colorBlueUnits.includes(unitLower);
+                            const isEFP = (unitLower === "efp" || kanalNavn === "EFP" || kanalNavn === "OPTAGELSE");
+
+                            return isSportLive || isOB || isEFP;
                         });
 
                         if (dagensProduktioner.length > 0) {
                             let titleMap = new Map();
-                            const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "ob 7+9", "sam ob"];
 
                             dagensProduktioner.forEach(p => {
                                 let titel = String(p.Programtitel || "").trim();
                                 let unitLower = String(p.Unit || "").toLowerCase().trim();
-                                let kanalNavn = String(p.Kanal || "").trim();
-                                let isOB = colorBlueUnits.includes(unitLower) || (kanalNavn === "SPORT LIVE" && unitLower === "");
+                                let kanalNavn = String(p.Kanal || "").trim().toUpperCase();
+
+                                let isSportLiveOB = (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === ""));
+                                let isExternalOB = (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower));
 
                                 if (!titleMap.has(titel)) {
-                                    titleMap.set(titel, { original: p, isDuplicate: false, hasOB: isOB });
+                                    titleMap.set(titel, { 
+                                        original: p, 
+                                        isDuplicate: false, 
+                                        hasSportLiveOB: isSportLiveOB,
+                                        hasExternalOB: isExternalOB 
+                                    });
                                 } else {
                                     let entry = titleMap.get(titel);
                                     entry.isDuplicate = true;
-                                    if (isOB) entry.hasOB = true; 
+                                    if (isSportLiveOB) entry.hasSportLiveOB = true;
+                                    if (isExternalOB) entry.hasExternalOB = true;
+                                    if (kanalNavn === "SPORT LIVE") entry.original = p;
                                 }
                             });
 
@@ -803,7 +811,8 @@
                                 if (entry.isDuplicate) {
                                     p = Object.assign({}, p); 
                                     p._isMerged = true;
-                                    p._mergedHasOB = entry.hasOB;
+                                    p._mergedHasSportLiveOB = entry.hasSportLiveOB;
+                                    p._mergedHasExternalOB = entry.hasExternalOB;
                                 }
                                 return p;
                             });
@@ -889,7 +898,6 @@
         setInterval(opdaterAnimationer, 7000);
         setInterval(tickCountdown, 1000); 
         
-        // Venter 5 minutter ved start, som aftalt
         setTimeout(switchViews, 300000);
 
     </script>
