@@ -624,7 +624,7 @@
                 return { color: 'color-blue', prio: 1 };
             } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
                 return { color: 'color-green', prio: 2 };
-            } else if (kanalNavn === "EFP" || unitLower === "efp" || kanalNavn === "OPTAGELSE") {
+            } else if (unitLower === "efp") {
                 return { color: 'color-black', prio: 3 };
             } else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
                 return { color: 'color-red', prio: 4 }; // Ekstern OB -> Rød
@@ -763,7 +763,11 @@
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
-                        // KALENDER-FILTER: Viser SPORT LIVE, alle OB-produktioner og alle EFP-produktioner
+                        // KALENDER-FILTER: 
+                        // 1. SPORT LIVE (vises altid, uanset unit)
+                        // 2. OB (vises altid uanset kanal - rød skrift for eksterne)
+                        // 3. EFP (vises altid uanset kanal - sort skrift)
+                        // 4. Alt andet udelukkes (f.eks. eksterne "STUDIE" optagelser)
                         let dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
                             const pDato = new Date(p.Dato);
@@ -774,7 +778,7 @@
                             
                             const isSportLive = (kanalNavn === "SPORT LIVE");
                             const isOB = colorBlueUnits.includes(unitLower);
-                            const isEFP = (unitLower === "efp" || kanalNavn === "EFP" || kanalNavn === "OPTAGELSE");
+                            const isEFP = (unitLower === "efp");
 
                             return isSportLive || isOB || isEFP;
                         });
