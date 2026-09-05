@@ -140,16 +140,22 @@
         }
 
         .nl-title {
-            font-size: 3.8vw; 
+            font-size: 3.6vw; 
             font-weight: 900; 
             color: #dd5f12; 
             text-align: center;
-            width: 95vw;
-            line-height: 1.1;
+            width: 90vw; 
+            line-height: 1.15;
             text-transform: uppercase;
-            white-space: nowrap; 
+            
+            white-space: normal; 
+            display: -webkit-box;
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis; 
+
+            /* Magien, der balancerer linjerne og forhindrer enlige ord: */
+            text-wrap: balance;
         }
 
         .sender-nu {
