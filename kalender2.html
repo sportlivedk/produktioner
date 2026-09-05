@@ -539,6 +539,21 @@
                     locEl.style.display = 'none';
                 }
                 
+                // --- NY LOGIK: SKJUL LOKATION VED 2 LINJER ---
+                const titleEl = document.getElementById('nl-title');
+                const compStyle = window.getComputedStyle(titleEl);
+                let lHeight = parseFloat(compStyle.lineHeight);
+                
+                // Sikkerhedsnet hvis visse tv-browsere returnerer "normal" i stedet for pixels
+                if (isNaN(lHeight)) {
+                    lHeight = parseFloat(compStyle.fontSize) * 1.15;
+                }
+                
+                // Hvis elementets højde er mere end 1,5 gange en enkelt linje, er titlen knækket
+                if (titleEl.offsetHeight > lHeight * 1.5) {
+                    locEl.style.display = 'none';
+                }
+                
             } else {
                 nextProgramDateObj = null;
                 document.getElementById('nl-sport').style.display = 'none';
