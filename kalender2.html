@@ -464,7 +464,7 @@
             ];
 
             forkortelser.forEach(f => {
-                s = s.replace(f.fra, f.til);
+                // Vi forkorter KUN titlen (t) her. Sportsgren (s) bevares i sin fulde længde.
                 t = t.replace(f.fra, f.til);
             });
 
@@ -763,11 +763,6 @@
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
-                        // KALENDER-FILTER: 
-                        // 1. SPORT LIVE (vises altid, uanset unit)
-                        // 2. OB (vises altid uanset kanal - rød skrift for eksterne)
-                        // 3. EFP (vises altid uanset kanal - sort skrift)
-                        // 4. Alt andet udelukkes (f.eks. eksterne "STUDIE" optagelser)
                         let dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
                             const pDato = new Date(p.Dato);
