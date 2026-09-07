@@ -2170,15 +2170,16 @@ function renderMcrVagter(vagter) {
         }
         
         htmlString += `
-        <div style="background: #f9f9f9; padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #6c757d; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-            <div style="font-weight: bold; font-size: 15px; color: #333; margin-bottom: 4px;">${vagt.Navn}</div>
-            <div style="font-size: 13px; color: #666;">Kl. ${vagt.Start} - ${vagt.Slut}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #dc5e11; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            <div style="font-weight: bold; font-size: 15px; color: #333;">${vagt.Navn}</div>
+            <div style="font-size: 14px; color: #555; white-space: nowrap; font-weight: 500;">Kl. ${vagt.Start} - ${vagt.Slut}</div>
         </div>
         `;
     });
 
     container.innerHTML = htmlString;
 }
+
 // -----------------------------------------------------------------
 
 window.onload = function() {

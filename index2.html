@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SPORT LIVE | Produktioner</title>
+    
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    
+    <!-- Link til din nye CSS-fil -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <img src="logo.png" alt="SPORT LIVE Logo">
+            <h2>Produktionsdatabase</h2>
+            
+            <div id="loginError" class="login-error">Forkert brugernavn eller adgangskode</div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Brugernavn</label>
+                <input type="text" id="loginUsername" autocomplete="off" onkeypress="if(event.key === 'Enter') document.getElementById('loginPassword').focus();">
+            </div>
+            <div class="form-group">
+                <label>Adgangskode</label>
+                <input type="password" id="loginPassword" onkeypress="if(event.key === 'Enter') logInd();">
+            </div>
+            
+            <button id="btnLogin" class="btn btn-login" onclick="logInd()">Log ind</button>
+            <div id="loginLoader" class="login-loader">Validerer login...</div>
+        </div>
+    </div>
+
+    <div class="top-section">
+        <div class="header">
+            <div class="title-wrapper">
+                <img src="logo.png" alt="SPORT LIVE Logo" style="height: 68px; width: auto; cursor: pointer;" onclick="filtrerAar(new Date().getFullYear())" title="Hjem">
+                <h1>
+                    Produktioner
+                    <div class="year-filter" id="yearFilterContainer"></div>
+                </h1>
+            </div>
+            
+            <div class="header-right">
+                <div class="controls-wrapper">
+                    <button id="btnExportPDF" class="btn" style="display: none;" onclick="genererPDF()">Download PDF</button>
+
+                    <div style="position: relative;">
+                        <select id="typeFilter" class="filter-select" onchange="handterFilterSkift()">
+                            <option value="alle">Vis alle programmer</option>
+                            <option value="fremtidige">Vis kun fremtidige</option>
+                            <option value="sportlive">Vis kun SPORT LIVE</option>
+                            <option value="ekstern">Vis kun eksterne modtagere</option>
+                            <option value="ob">Vis kun OB-produktioner</option>
+                            <option value="tbc">Vis kun ubekræftede (TBC)</option> 
+                        </select>
+                        <div id="programCountText" style="position: absolute; top: 100%; left: 10px; font-size: 13px; color: #000000; margin-top: 6px; white-space: nowrap;">Viser <b>0</b> programmer</div>
+                    </div>
+                    
+                    <div class="search-container">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Søg i alt (titel, sted, person...)" onkeyup="handterSogning()" autocomplete="off">
+                        <button id="clearSearchBtn" class="search-clear-btn" onclick="rydSogning()" title="Ryd søgning">✕</button>
+                    </div>
+                    
+                    <!-- TILFØJET: MCR Vagtplan knap -->
+                    <button id="btnMcrVagtplan" class="btn" style="background-color: #dc5e11;" onclick="aabenMcrModal()">MCR-vagter</button>
+                    <button id="btnTilfoejProgram" class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>
+                </div>
+                
+                <div id="userInfoContainer" class="user-info-text">
+                    Logget ind som <strong id="displayUsername"></strong> 
+                    <span class="desktop-only-divider" style="color: #ccc; margin: 0 4px;">|</span>
+                    <a href="#" class="profil-link" onclick="aabenProfil(event)">Profil</a>
+                    <span style="color: #ccc; margin: 0 4px;">|</span>
+                    <a href="#" class="logout-link" onclick="logUd(event)">Log ud</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="month-filter">
+            <button class="month-btn" id="btn-month--1" onclick="filtrerMaaned(-1)">ALLE</button>
+            <button class="month-btn" id="btn-month-0" onclick="filtrerMaaned(0)">JANUAR</button>
+            <button class="month-btn" id="btn-month-1" onclick="filtrerMaaned(1)">FEBRUAR</button>
+            <button class="month-btn" id="btn-month-2" onclick="filtrerMaaned(2)">MARTS</button>
+            <button class="month-btn" id="btn-month-3" onclick="filtrerMaaned(3)">APRIL</button>
+            <button class="month-btn" id="btn-month-4" onclick="filtrerMaaned(4)">MAJ</button>
+            <button class="month-btn" id="btn-month-5" onclick="filtrerMaaned(5)">JUNI</button>
+            <button class="month-btn" id="btn-month-6" onclick="filtrerMaaned(6)">JULI</button>
+            <button class="month-btn" id="btn-month-7" onclick="filtrerMaaned(7)">AUGUST</button>
+            <button class="month-btn" id="btn-month-8" onclick="filtrerMaaned(8)">SEPTEMBER</button>
+            <button class="month-btn" id="btn-month-9" onclick="filtrerMaaned(9)">OKTOBER</button>
+            <button class="month-btn" id="btn-month-10" onclick="filtrerMaaned(10)">NOVEMBER</button>
+            <button class="month-btn" id="btn-month-11" onclick="filtrerMaaned(11)">DECEMBER</button>
+            <button class="month-btn btn-idag" id="btn-idag" onclick="filtrerIdag()">I DAG</button>
+        </div>
+        
+        <select id="mobileMonthFilter" class="mobile-month-select" onchange="handterMobileMaanedSkift(this.value)">
+            <option value="-1">ALLE PROGRAMMER</option>
+            <option value="idag">I DAG</option>
+            <option value="0">JANUAR</option>
+            <option value="1">FEBRUAR</option>
+            <option value="2">MARTS</option>
+            <option value="3">APRIL</option>
+            <option value="4">MAJ</option>
+            <option value="5">JUNI</option>
+            <option value="6">JULI</option>
+            <option value="7">AUGUST</option>
+            <option value="8">SEPTEMBER</option>
+            <option value="9">OKTOBER</option>
+            <option value="10">NOVEMBER</option>
+            <option value="11">DECEMBER</option>
+        </select>
+    </div>
+
+    <div class="table-container">
+        <div id="loader" style="display: none;">Indlæser programmer ...</div>
+        <div id="ingenResultater">Ingen programmer matcher dine valgte filtre eller søgning.</div>
+        
+        <table id="programTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th style="width: 95px;">Dato</th>
+                    <th style="width: 75px;">Ugedag</th>
+                    <th style="width: 55px;">Tid</th>
+                    <th style="width: 55px;">TX</th>
+                    <th style="width: 140px;">Kanal</th>
+                    <th style="width: 90px;">Sportsgren</th>
+                    <th style="width: 360px;">Programtitel</th>
+                    <th style="width: 190px;">Kommentator/vært</th>
+                    <th style="width: 90px;">Unit</th>
+                    <th style="width: 220px;">Handling</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <div id="customDialog" class="custom-dialog-overlay">
+        <div class="custom-dialog-box">
+            <div id="dialogMessage" class="custom-dialog-message"></div>
+            <div id="dialogActions" class="custom-dialog-actions"></div>
+        </div>
+    </div>
+
+    <div id="profileModal" class="modal" style="display: none; align-items: center; justify-content: center;">
+        <div class="modal-content" style="max-width: 400px; margin: auto;">
+            <span class="close" onclick="forsogLukProfil()">&times;</span>
+            
+            <div id="profileView" style="text-align: left;">
+                <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Profiloplysninger</h2>
+                
+                <div style="margin-top: 20px; font-size: 14px; color: #666;">Navn</div>
+                <div style="font-size: 16px; font-weight: bold; color: #000000; margin-bottom: 5px;" id="profileNameText"></div>
+                
+                <div style="margin-top: 15px; font-size: 14px; color: #666;">Brugernavn</div>
+                <div style="font-size: 16px; font-weight: bold; color: #000000; margin-bottom: 5px;" id="profileUsernameText"></div>
+                
+                <div style="margin-top: 15px; font-size: 14px; color: #666;">Adgangskode</div>
+                <div style="font-size: 20px; font-weight: bold; color: #000000; letter-spacing: 2px; margin-bottom: 5px;" id="profilePasswordText">********</div>
+                
+                <a href="#" onclick="visSkiftAdgangskode(event)" style="display: block; margin-bottom: 15px; color: #dc3545; font-size: 14px; font-weight: bold; text-decoration: none;">Klik her for at ændre din adgangskode</a>
+
+                <div style="margin: 15px 0 25px 0; display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="profileNotifCheckbox" class="custom-cb">
+                    <label for="profileNotifCheckbox" style="font-size: 14px; font-weight: 500; color: #000000; cursor: pointer; user-select: none;">Send mig e-mails om vigtige opdateringer</label>
+                </div>
+                
+                <button class="btn" style="width: 100%; background-color: #0056b3;" onclick="gemProfil()">Gem</button>
+            </div>
+
+            <div id="changePasswordView" style="display: none; text-align: left;">
+                <h2 style="font-size: 26px; margin-top: 0; color: #000000;">Skift adgangskode</h2>
+                <div id="passwordErrorMsg" style="color: #dc3545; font-size: 14px; font-weight: bold; margin-bottom: 15px; text-align: center; display: none;">Fejlbesked</div>
+                
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Nuværende adgangskode</label>
+                    <input type="password" id="inputCurrentPassword">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Ny adgangskode</label>
+                    <input type="password" id="inputNewPassword">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>Gentag ny adgangskode</label>
+                    <input type="password" id="inputRepeatNewPassword">
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-dialog danger" style="flex: 1;" onclick="visProfilInfo()">Afbryd</button>
+                    <button id="btnConfirmPass" class="btn btn-dialog primary" style="flex: 1; background-color: #28a745;" onclick="udfoerSkiftAdgangskode()">Bekræft</button>
+                </div>
+            </div>
+
+            <div id="passwordSuccessView" style="display: none; text-align: left;">
+                <h2 style="font-size: 26px; margin-top: 0; color: #28a745;">Adgangskode ændret</h2>
+                <p style="font-size: 15px; line-height: 1.5; color: #000000; margin-bottom: 25px;">Din adgangskode er blevet ændret.<br><br>Du skal nu logge ind med din nye adgangskode.</p>
+                <div style="font-size: 30px; text-align: center;">⏳</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="programModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="forsogLukModal()">&times;</span>
+            <h2 id="modalTitle">Tilf&oslash;j nyt program</h2>
+            <form id="programForm" autocomplete="off">
+                <input type="hidden" id="RowId">
+                <div class="form-grid">
+                    <div class="form-group"><label>Dato</label><input type="date" id="Dato" autocomplete="off"></div>
+                    <div class="form-group"><label>Tid</label><input type="time" id="Tid" autocomplete="off"></div>
+                    <div class="form-group"><label>TX</label><input type="time" id="TX" autocomplete="off"></div>
+                    <div class="form-group">
+                        <label>Kanal</label>
+                        <input type="text" id="Kanal" list="liste-Kanal" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
+                        <datalist id="liste-Kanal"></datalist>
+                    </div>
+                    <div class="form-group" id="group-Premieredato" style="display: none;">
+                        <label>Premieredato</label>
+                        <input type="date" id="Premieredato" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>Sportsgren</label>
+                        <input type="text" id="Sportsgren" list="liste-Sportsgren" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
+                        <datalist id="liste-Sportsgren"></datalist>
+                    </div>
+                    <div class="form-group"><label>Programtitel</label><input type="text" id="Programtitel" autocomplete="off"></div>
+                    <div class="form-group">
+                        <label>Lokation</label>
+                        <input type="text" id="Lokation" list="liste-Lokation" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
+                        <datalist id="liste-Lokation"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit</label>
+                        <input type="text" id="Unit" list="liste-Unit" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
+                        <datalist id="liste-Unit"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Format</label>
+                        <input type="text" id="Format" list="liste-Format" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
+                        <datalist id="liste-Format"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>RX</label>
+                        <input type="text" id="RX" list="liste-RX" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
+                        <datalist id="liste-RX"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Signal skal sendes til</label>
+                        <div class="multi-select-container">
+                            <div class="multi-select-header" onclick="toggleMultiSelect()">
+                                <span id="signalHeaderText">V&aelig;lg...</span>
+                                <span style="font-size: 10px;">▼</span>
+                            </div>
+                            <div class="multi-select-dropdown" id="signalDropdown">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Producer</label>
+                        <input type="text" id="Producer" list="liste-Producer" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
+                        <datalist id="liste-Producer"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Kommentator/vært</label>
+                        <input type="text" id="Kommentator" list="liste-Kommentator" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
+                        <datalist id="liste-Kommentator"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Ekspert/gæst</label>
+                        <input type="text" id="Ekspert" list="liste-Ekspert" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
+                        <datalist id="liste-Ekspert"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Reporter</label>
+                        <input type="text" id="Reporter" list="liste-Reporter" placeholder="V&aelig;lg eller skriv..." autocomplete="off">
+                        <datalist id="liste-Reporter"></datalist>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Produktionsplan (inds&aelig;t link)</label>
+                        <input type="text" id="P-plan" autocomplete="off">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Noter</label>
+                        <input type="text" id="Noter" autocomplete="off">
+                    </div>
+                    <div class="form-group full-width checkbox-group">
+                        <input type="checkbox" id="TBC">
+                        <label for="TBC">Afventer endelig bekr&aelig;ftelse (TBC)</label>
+                        
+                        <!-- NYT FELT TIL NOTIFIKATION VED OPRETTELSE -->
+                        <span id="notifikationWrapper" style="display: none; align-items: center; gap: 10px; margin-left: 30px;">
+                            <input type="checkbox" id="SendNotifNyt">
+                            <label for="SendNotifNyt">Send notifikation til brugere</label>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="submitBtn" class="btn" onclick="gemProgram()">Gem program</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+   <div id="techModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="forsogLukTechModal()">&times;</span>
+            <h2 id="techModalTitle" style="margin-left: 15px;">Teknisk info</h2>
+            <form id="techForm" autocomplete="off">
+                <input type="hidden" id="TechRowId">
+                
+                <div class="form-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 15px;">
+                    
+                    <div style="grid-column: span 12; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; padding: 0 15px;">
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>Format</label>
+                            <input type="text" id="TechFormat" list="liste-Format" placeholder="Vælg eller skriv..." autocomplete="off">
+                        </div>
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>RX</label>
+                            <input type="text" id="TechRX" list="liste-RX" placeholder="Vælg eller skriv..." autocomplete="off">
+                        </div>
+                        <div style="grid-column: span 6; display: flex; align-items: flex-end; justify-content: flex-end; gap: 10px;">
+                            <button type="button" id="btnKopierTech" class="btn" style="background-color: #6c757d; padding: 0 15px; height: 36px; font-size: 13px;" onclick="kopierTechOpsaetning()" title="Kopier alle data i dette vindue">Kopier opsætning</button>
+                            <button type="button" id="btnSaetIndTech" class="btn" style="background-color: #28a745; padding: 0 15px; height: 36px; font-size: 13px; opacity: 0.5;" onclick="saetIndTechOpsaetning()" title="Sæt kopierede data ind" disabled>Sæt ind</button>
+                            <button type="button" id="btnSletAltTech" class="btn" style="background-color: #dc3545; padding: 0 15px; height: 36px; font-size: 13px;" onclick="rydTechOpsaetning()" title="Ryd alle data i dette vindue">Slet alt</button>
+                        </div>
+                    </div>
+                    
+                    <div style="grid-column: span 12; background-color: #fffdf2; padding: 15px; border-radius: 6px; border: 1px solid #fff3cd; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #000000;">MAIN SRT</h4>
+                        
+                        <div class="form-group" style="grid-column: span 8;">
+                            <label>Caller IP</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechMainIP" list="liste-TechMainIP" autocomplete="off">
+                                <datalist id="liste-TechMainIP"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainIP', this)" title="Kopier IP">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 4;">
+                            <label>Port</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechMainPort" list="liste-TechMainPort" autocomplete="off">
+                                <datalist id="liste-TechMainPort"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainPort', this)" title="Kopier Port">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Passphrase</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechMainPass" list="liste-TechMainPass" autocomplete="off">
+                                <datalist id="liste-TechMainPass"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainPass', this)" title="Kopier Passphrase">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Stream ID</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechMainStreamID" list="liste-TechMainStreamID" autocomplete="off">
+                                <datalist id="liste-TechMainStreamID"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechMainStreamID', this)" title="Kopier Stream ID">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="grid-column: span 12; background-color: #fef6f6; padding: 15px; border-radius: 6px; border: 1px solid #fde2e2; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #000000;">BACKUP SRT</h4>
+                        
+                        <div class="form-group" style="grid-column: span 8;">
+                            <label>Caller IP</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBackupIP" list="liste-TechBackupIP" autocomplete="off">
+                                <datalist id="liste-TechBackupIP"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupIP', this)" title="Kopier IP">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 4;">
+                            <label>Port</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBackupPort" list="liste-TechBackupPort" autocomplete="off">
+                                <datalist id="liste-TechBackupPort"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPort', this)" title="Kopier Port">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Passphrase</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBackupPass" list="liste-TechBackupPass" autocomplete="off">
+                                <datalist id="liste-TechBackupPass"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupPass', this)" title="Kopier Passphrase">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Stream ID</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBackupStreamID" list="liste-TechBackupStreamID" autocomplete="off">
+                                <datalist id="liste-TechBackupStreamID"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBackupStreamID', this)" title="Kopier Stream ID">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group" style="grid-column: span 12; display: flex; align-items: center; margin-top: 5px; padding: 0 15px; box-sizing: border-box;">
+                        <input type="checkbox" id="TechSrtListener" onchange="toggleTechListeners()">
+                        <label for="TechSrtListener" style="font-weight: bold;">SRT Listener</label>
+                    </div>
+                    <div id="TechSrtListenerGroup" style="display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: -5px; padding: 0 15px;">
+                        <div class="form-group" style="grid-column: span 8;">
+                            <label>SRT Listener IP</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechSrtListenerIP" list="liste-TechSrtListenerIP" autocomplete="off">
+                                <datalist id="liste-TechSrtListenerIP"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerIP', this)" title="Kopier IP">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 4;">
+                            <label>Port</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechSrtListenerPort" list="liste-TechSrtListenerPort" autocomplete="off">
+                                <datalist id="liste-TechSrtListenerPort"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerPort', this)" title="Kopier Port">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Passphrase</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechSrtListenerPass" list="liste-TechSrtListenerPass" autocomplete="off">
+                                <datalist id="liste-TechSrtListenerPass"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerPass', this)" title="Kopier Passphrase">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Stream ID</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechSrtListenerStreamID" list="liste-TechSrtListenerStreamID" autocomplete="off">
+                                <datalist id="liste-TechSrtListenerStreamID"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechSrtListenerStreamID', this)" title="Kopier Stream ID">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group" style="grid-column: span 12; display: flex; align-items: center; margin-top: 5px; padding: 0 15px; box-sizing: border-box;">
+                        <input type="checkbox" id="TechBrtListener" onchange="toggleTechListeners()">
+                        <label for="TechBrtListener" style="font-weight: bold;">BRT Listener (UDP)</label>
+                    </div>
+                    <div id="TechBrtListenerGroup" style="display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: -5px; padding: 0 15px;">
+                        <div class="form-group" style="grid-column: span 8;">
+                            <label>BRT Listener IP</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBrtListenerIP" list="liste-TechBrtListenerIP" autocomplete="off">
+                                <datalist id="liste-TechBrtListenerIP"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerIP', this)" title="Kopier IP">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 4;">
+                            <label>Port</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBrtListenerPort" list="liste-TechBrtListenerPort" autocomplete="off">
+                                <datalist id="liste-TechBrtListenerPort"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerPort', this)" title="Kopier Port">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Passphrase</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBrtListenerPass" list="liste-TechBrtListenerPass" autocomplete="off">
+                                <datalist id="liste-TechBrtListenerPass"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerPass', this)" title="Kopier Passphrase">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 6;">
+                            <label>Stream ID</label>
+                            <div class="input-with-copy">
+                                <input type="text" id="TechBrtListenerStreamID" list="liste-TechBrtListenerStreamID" autocomplete="off">
+                                <datalist id="liste-TechBrtListenerStreamID"></datalist>
+                                <button type="button" class="copy-btn-tech" onclick="kopierTekst('TechBrtListenerStreamID', this)" title="Kopier Stream ID">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="grid-column: span 12; background-color: #f6fafe; padding: 15px; border-radius: 6px; border: 1px solid #e6f0ff; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #000000;">AUDIO LAYOUT</h4>
+                        <datalist id="liste-Audio layout"></datalist>
+                        <div class="form-group" style="grid-column: span 4;"><label>A1</label><input type="text" id="TechA1" list="liste-Audio layout" placeholder="Vælg eller skriv..." autocomplete="off"></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>A3</label><input type="text" id="TechA3" list="liste-Audio layout" placeholder="Vælg eller skriv..." autocomplete="off"></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>A5</label><input type="text" id="TechA5" list="liste-Audio layout" placeholder="Vælg eller skriv..." autocomplete="off"></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>A2</label><input type="text" id="TechA2" list="liste-Audio layout" placeholder="Vælg eller skriv..." autocomplete="off"></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>A4</label><input type="text" id="TechA4" list="liste-Audio layout" placeholder="Vælg eller skriv..." autocomplete="off"></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>A6</label><input type="text" id="TechA6" list="liste-Audio layout" placeholder="Vælg eller skriv..." autocomplete="off"></div>
+                    </div>
+
+                    <div class="form-group checkbox-group" style="grid-column: span 12; display: flex; align-items: center; margin-top: 15px; padding: 0 15px; box-sizing: border-box;">
+                        <input type="checkbox" id="TechE2ETest" onchange="toggleTechListeners()">
+                        <label for="TechE2ETest" style="font-weight: bold; text-transform: uppercase; font-size: 13px;">End-2-End Test</label>
+                    </div>
+                    <div id="TechE2ETestGroup" style="display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: -5px; padding: 0 15px;">
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>UTC/GMT start</label>
+                            <input type="time" id="TechUtcStart" oninput="calcE2ETime()" autocomplete="off">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2; display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column;">
+                            <div id="TechCetStart" style="font-size: 13px; color: #000; font-weight: bold; margin-bottom: 9px;"></div>
+                        </div>
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label>UTC/GMT slut</label>
+                            <input type="time" id="TechUtcSlut" oninput="calcE2ETime()" autocomplete="off">
+                        </div>
+                        <div class="form-group" style="grid-column: span 4; display: flex; align-items: flex-start; justify-content: flex-end; flex-direction: column;">
+                            <div id="TechCetSlut" style="font-size: 13px; color: #000; font-weight: bold; margin-bottom: 9px;"></div>
+                        </div>
+                    </div>
+
+                    <div style="grid-column: span 12; background-color: #f9fdfa; padding: 15px; border-radius: 6px; border: 1px solid #e8f5e9; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; margin-top: 5px;">
+                        <h4 style="grid-column: span 12; margin: 0 0 -5px 0; font-size: 13px; color: #000000;">KONTAKTER</h4>
+                        
+                        <div class="form-group" style="grid-column: span 4;"><label>MCR</label><input type="text" id="TechMcrTlf" list="liste-TechMcrTlf" placeholder="Telefonnummer" autocomplete="off"><datalist id="liste-TechMcrTlf"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechMcrEmail" list="liste-TechMcrEmail" placeholder="E-mailadresse" autocomplete="off"><datalist id="liste-TechMcrEmail"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechMcrTitel" list="liste-TechMcrTitel" placeholder="Titel på kontaktperson" autocomplete="off"><datalist id="liste-TechMcrTitel"></datalist></div>
+                        
+                        <div class="form-group" style="grid-column: span 4;"><label>Kontakt 2</label><input type="text" id="TechKontakt1Tlf" list="liste-TechKontakt1Tlf" placeholder="Telefonnummer" autocomplete="off"><datalist id="liste-TechKontakt1Tlf"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt1Email" list="liste-TechKontakt1Email" placeholder="E-mailadresse" autocomplete="off"><datalist id="liste-TechKontakt1Email"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt1Titel" list="liste-TechKontakt1Titel" placeholder="Titel på kontaktperson" autocomplete="off"><datalist id="liste-TechKontakt1Titel"></datalist></div>
+                        
+                        <div class="form-group" style="grid-column: span 4;"><label>Kontakt 3</label><input type="text" id="TechKontakt2Tlf" list="liste-TechKontakt2Tlf" placeholder="Telefonnummer" autocomplete="off"><datalist id="liste-TechKontakt2Tlf"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt2Email" list="liste-TechKontakt2Email" placeholder="E-mailadresse" autocomplete="off"><datalist id="liste-TechKontakt2Email"></datalist></div>
+                        <div class="form-group" style="grid-column: span 4;"><label>&nbsp;</label><input type="text" id="TechKontakt2Titel" list="liste-TechKontakt2Titel" placeholder="Titel på kontaktperson" autocomplete="off"><datalist id="liste-TechKontakt2Titel"></datalist></div>
+                    </div>
+
+                    <div class="form-group full-width" style="grid-column: span 12; padding: 0 15px; box-sizing: border-box;">
+                        <h4 style="margin: 15px 0 0 0; font-size: 13px;">YDERLIGERE INFORMATION</h4>
+                        <textarea id="TechYderligere" rows="3" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background-color: white; color: #000000; resize: vertical; margin-top: 5px;" oninput="opdaterTechLinks()"></textarea>
+                        <div id="TechYderligereLinks" style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px;"></div>
+                    </div>                 
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="btnTechSubmit" class="btn" onclick="gemTechInfo()">Gem teknisk info</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TILFØJET: MCR VAGTPLAN MODAL -->
+    <div id="mcrModal" class="modal" style="display: none; align-items: center; justify-content: center;">
+    <div class="modal-content" style="max-width: 675px; width: 90%; margin: auto; padding: 25px;">
+        <span class="close" onclick="lukMcrModal()">&times;</span>
+        <h2 style="font-size: 24px; margin-top: 0; color: #000000; text-align: left;">MCR-vagtplan</h2>
+        
+        <div id="mcrModalContent" style="margin-top: 20px; max-height: 35vh; overflow-y: auto; text-align: left;">
+            <p style="font-size: 14px; color: #666;">Indlæser vagter...</p>
+        </div>
+    </div>
+</div>
+
+    <!-- Her henter vi din nye JavaScript-fil -->
+    <script src="app.js"></script>
+</body>
+</html>
