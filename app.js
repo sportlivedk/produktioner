@@ -2150,7 +2150,8 @@ function renderMcrVagter(vagter) {
     const container = document.getElementById('mcrModalContent');
     
     if (!vagter || vagter.length === 0) {
-        container.innerHTML = "<p style='font-size: 14px; color: #666;'>Ingen fremtidige MCR-vagter fundet.</p>";
+        // Skriftstørrelse sat op til 16px her
+        container.innerHTML = "<p style='font-size: 16px; color: #666;'>Ingen fremtidige MCR-vagter fundet.</p>";
         return;
     }
 
@@ -2165,14 +2166,16 @@ function renderMcrVagter(vagter) {
             let d = new Date(vagt.Dato);
             let danskDatoFormat = `${ugedage[d.getDay()]} d. ${d.getDate()}. ${maaneder[d.getMonth()]}`;
             
-            htmlString += `<div style="${htmlString !== '' ? 'margin-top: 25px;' : ''} margin-bottom: 10px; font-size: 14px; font-weight: bold; color: #0056b3; border-bottom: 1px solid #ccc; padding-bottom: 5px; text-transform: uppercase;">${danskDatoFormat}</div>`;
+            // font-size: 16px til dato-overskriften
+            htmlString += `<div style="${htmlString !== '' ? 'margin-top: 25px;' : ''} margin-bottom: 10px; font-size: 16px; font-weight: bold; color: #0056b3; border-bottom: 1px solid #ccc; padding-bottom: 5px; text-transform: uppercase;">${danskDatoFormat}</div>`;
             currentDato = vagt.Dato;
         }
         
+        // font-size: 17px til navnet og 16px til tiden
         htmlString += `
         <div style="display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #dc5e11; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-            <div style="font-weight: bold; font-size: 15px; color: #333;">${vagt.Navn}</div>
-            <div style="font-size: 14px; color: #555; white-space: nowrap; font-weight: 500;">Kl. ${vagt.Start} - ${vagt.Slut}</div>
+            <div style="font-weight: bold; font-size: 17px; color: #333;">${vagt.Navn}</div>
+            <div style="font-size: 16px; color: #555; white-space: nowrap; font-weight: 500;">Kl. ${vagt.Start} - ${vagt.Slut}</div>
         </div>
         `;
     });
