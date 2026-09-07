@@ -2140,6 +2140,7 @@ async function gemProgram() {
 // -----------------------------------------------------------------
 function aabenMcrModal() {
     document.getElementById('mcrModal').style.display = "flex";
+    document.getElementById('mcrModalContent').scrollTop = 0;
 }
 
 function lukMcrModal() {
