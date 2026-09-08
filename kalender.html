@@ -448,39 +448,39 @@
         }
 
         function vaskTekstSplit(sportsgren, titel) {
-            let s = sportsgren ? String(sportsgren).trim() : "";
-            let t = titel ? String(titel).trim() : "";
+    let s = sportsgren ? String(sportsgren).trim() : "";
+    let t = titel ? String(titel).trim() : "";
 
-            const forkortelser = [
-                { fra: /Basketball/gi, til: "Basket" },
-                { fra: /Volleyball/gi, til: "Volley" },
-                { fra: /Amerikansk fodbold/gi, til: "Football" },
-                { fra: /European League/gi, til: "EL" },
-                { fra: /Randers Cimbria/gi, til: "Randers" },
-                { fra: /Team FOG Næstved/gi, til: "Næstved" },
-                { fra: /Horsens IC/gi, til: "Horsens" },
-                { fra: /Værløse Blue Hawks/gi, til: "Værløse" },
-                { fra: /Svendborg Rabbits/gi, til: "Svendborg" },
-                { fra: /BMS Herlev/gi, til: "Herlev" },
-                { fra: /Bakken Bears/gi, til: "Bakken" },
-                { fra: /BK Vejen/gi, til: "Vejen" },
-                { fra: /Hørsholm Rungsted/gi, til: "HRT" },
-                { fra: /United States/gi, til: "USA" },
-                { fra: /kvalifikation/gi, til: "kval" }
-                { fra: /Gladsaxe BK/gi, til: "Gladsaxe" }
-            ];
+    const forkortelser = [
+        { fra: /Basketball/gi, til: "Basket" },
+        { fra: /Volleyball/gi, til: "Volley" },
+        { fra: /Amerikansk fodbold/gi, til: "Football" },
+        { fra: /European League/gi, til: "EL" },
+        { fra: /Randers Cimbria/gi, til: "Randers" },
+        { fra: /Team FOG Næstved/gi, til: "Næstved" },
+        { fra: /Horsens IC/gi, til: "Horsens" },
+        { fra: /Værløse Blue Hawks/gi, til: "Værløse" },
+        { fra: /Svendborg Rabbits/gi, til: "Svendborg" },
+        { fra: /BMS Herlev/gi, til: "Herlev" },
+        { fra: /Bakken Bears/gi, til: "Bakken" },
+        { fra: /BK Vejen/gi, til: "Vejen" },
+        { fra: /Hørsholm Rungsted/gi, til: "HRT" },
+        { fra: /United States/gi, til: "USA" },
+        { fra: /kvalifikation/gi, til: "kval" },
+        { fra: /Gladsaxe BK/gi, til: "Gladsaxe" }
+    ];
 
-            forkortelser.forEach(f => {
-                // Vi forkorter KUN titlen (t) her. Sportsgren (s) bevares i sin fulde længde.
-                t = t.replace(f.fra, f.til);
-            });
+    forkortelser.forEach(f => {
+        // Vi forkorter KUN titlen (t) her. Sportsgren (s) bevares i sin fulde længde.
+        t = t.replace(f.fra, f.til);
+    });
 
-            return {
-                sport: s,
-                titel: t,
-                visSport: (s !== "")
-            };
-        }
+    return {
+        sport: s,
+        titel: t,
+        visSport: (s !== "")
+    };
+}
 
         function findNextLiveProgram() {
             let now = new Date();
@@ -665,45 +665,46 @@
         }
 
         function vaskTekst(sportsgren, titel) {
-            let s = sportsgren ? String(sportsgren).trim() : "";
-            let t = titel ? String(titel).trim() : "";
+    let s = sportsgren ? String(sportsgren).trim() : "";
+    let t = titel ? String(titel).trim() : "";
 
-            const forkortelser = [
-                { fra: /Basketball/gi, til: "Basket" },
-                { fra: /Volleyball/gi, til: "Volley" },
-                { fra: /Amerikansk fodbold/gi, til: "Football" },
-                { fra: /European League/gi, til: "EL" },
-                { fra: /Randers Cimbria/gi, til: "Randers" },
-                { fra: /Team FOG Næstved/gi, til: "Næstved" },
-                { fra: /Horsens IC/gi, til: "Horsens" },
-                { fra: /Værløse Blue Hawks/gi, til: "Værløse" },
-                { fra: /Svendborg Rabbits/gi, til: "Svendborg" },
-                { fra: /BMS Herlev/gi, til: "Herlev" },
-                { fra: /Bakken Bears/gi, til: "Bakken" },
-                { fra: /BK Vejen/gi, til: "Vejen" },
-                { fra: /Hørsholm Rungsted/gi, til: "HRT" },
-                { fra: /United States/gi, til: "USA" },
-                { fra: /kvalifikation/gi, til: "kval" }
-            ];
+    const forkortelser = [
+        { fra: /Basketball/gi, til: "Basket" },
+        { fra: /Volleyball/gi, til: "Volley" },
+        { fra: /Amerikansk fodbold/gi, til: "Football" },
+        { fra: /European League/gi, til: "EL" },
+        { fra: /Randers Cimbria/gi, til: "Randers" },
+        { fra: /Team FOG Næstved/gi, til: "Næstved" },
+        { fra: /Horsens IC/gi, til: "Horsens" },
+        { fra: /Værløse Blue Hawks/gi, til: "Værløse" },
+        { fra: /Svendborg Rabbits/gi, til: "Svendborg" },
+        { fra: /BMS Herlev/gi, til: "Herlev" },
+        { fra: /Bakken Bears/gi, til: "Bakken" },
+        { fra: /BK Vejen/gi, til: "Vejen" },
+        { fra: /Hørsholm Rungsted/gi, til: "HRT" },
+        { fra: /United States/gi, til: "USA" },
+        { fra: /kvalifikation/gi, til: "kval" },
+        { fra: /Gladsaxe BK/gi, til: "Gladsaxe" }
+    ];
 
-            const udeladelser = [
-                "basket", "futsal", "volley", "tennis", "kajak", "roning", "bordtennis", 
-                "WTT", "davis cup", "billie jean king cup", "mermaid bowl", "gokart"
-            ];
+    const udeladelser = [
+        "basket", "futsal", "volley", "tennis", "kajak", "roning", "bordtennis", 
+        "WTT", "davis cup", "billie jean king cup", "mermaid bowl", "gokart"
+    ];
 
-            forkortelser.forEach(f => {
-                s = s.replace(f.fra, f.til);
-                t = t.replace(f.fra, f.til);
-            });
+    forkortelser.forEach(f => {
+        s = s.replace(f.fra, f.til);
+        t = t.replace(f.fra, f.til);
+    });
 
-            let visSportsgren = true;
-            const tLower = t.toLowerCase();
-            udeladelser.forEach(ord => {
-                if (tLower.includes(ord.toLowerCase())) visSportsgren = false;
-            });
+    let visSportsgren = true;
+    const tLower = t.toLowerCase();
+    udeladelser.forEach(ord => {
+        if (tLower.includes(ord.toLowerCase())) visSportsgren = false;
+    });
 
-            return (!visSportsgren || s === "") ? t : `${s}: ${t}`;
-        }
+    return (!visSportsgren || s === "") ? t : `${s}: ${t}`;
+}
 
         function getEaster(year) {
             const a = year % 19, b = Math.floor(year / 100), c = year % 100;
