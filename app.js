@@ -292,7 +292,7 @@ async function logInd() {
 
 function afslutLogin() {
     document.getElementById('loginOverlay').style.display = "none";
-    document.getElementById('userInfoContainer').style.display = "block";
+    document.getElementById('userInfoContainer').style.display = "flex"; // Rettet til flex
     document.getElementById('displayUsername').textContent = aktueltNavn;
     loadProgrammer();
 }
@@ -321,7 +321,9 @@ function logUd(event) {
     document.getElementById('loginPassword').value = "";
     document.getElementById('btnLogin').style.display = "block";
     document.getElementById('loginLoader').style.display = "none";
-    document.getElementById('loginOverlay').style.display = "flex";
+    
+    // Her er rettelsen: Sørg for at loginOverlay vises korrekt igen
+    document.getElementById('loginOverlay').style.display = "flex"; 
     document.getElementById('loginUsername').focus();
 }
 
