@@ -2251,7 +2251,7 @@ window.onload = function() {
 var modal = document.getElementById("programModal");
 var profilModal = document.getElementById("profileModal");
 
-function openModal() { modal.style.display = "flex"; }
+function openModal() { modal.style.display = "block"; }
 function closeModal() { modal.style.display = "none"; }
 
 let touchstartX = 0;
