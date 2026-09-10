@@ -2151,6 +2151,7 @@ function renderMcrVagter(vagter) {
     const container = document.getElementById('mcrModalContent');
     
     if (!vagter || vagter.length === 0) {
+        // Skriftstørrelse sat op til 16px her
         container.innerHTML = "<p style='font-size: 16px; color: #666;'>Ingen fremtidige MCR-vagter fundet.</p>";
         return;
     }
@@ -2166,27 +2167,15 @@ function renderMcrVagter(vagter) {
             let d = new Date(vagt.Dato);
             let danskDatoFormat = `${ugedage[d.getDay()]} d. ${d.getDate()}. ${maaneder[d.getMonth()]}`;
             
+            // font-size: 16px til dato-overskriften
             htmlString += `<div style="${htmlString !== '' ? 'margin-top: 25px;' : ''} margin-bottom: 10px; font-size: 16px; font-weight: bold; color: #0056b3; border-bottom: 1px solid #ccc; padding-bottom: 5px; text-transform: uppercase;">${danskDatoFormat}</div>`;
             currentDato = vagt.Dato;
         }
         
-        // --- NY LOGIK: Visuel styling af ubesatte vagter ---
-        let navnStyling = "color: #333;";
-        let ikon = "";
-        let leftBorder = "#dc5e11";
-        let bgStyling = "#f9f9f9";
-        
-        if (vagt.Navn === "Afventer bemanding ...") {
-            navnStyling = "color: #dc3545; font-style: italic;"; // Rød og kursiv
-            ikon = "⚠️ "; // Lille advarselsikon
-            leftBorder = "#dc3545"; // Rød venstrekant
-            bgStyling = "#fff5f5"; // Svag rød baggrund for ekstra synlighed
-        }
-        // ---------------------------------------------------
-
+        // font-size: 17px til navnet og 16px til tiden
         htmlString += `
-        <div style="display: flex; justify-content: space-between; align-items: center; background: ${bgStyling}; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid ${leftBorder}; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-            <div style="font-weight: bold; font-size: 17px; ${navnStyling}">${ikon}${vagt.Navn}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #dc5e11; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            <div style="font-weight: bold; font-size: 17px; color: #333;">${vagt.Navn}</div>
             <div style="font-size: 16px; color: #555; white-space: nowrap; font-weight: 500;">Kl. ${vagt.Start} - ${vagt.Slut}</div>
         </div>
         `;
@@ -2262,7 +2251,7 @@ window.onload = function() {
 var modal = document.getElementById("programModal");
 var profilModal = document.getElementById("profileModal");
 
-function openModal() { modal.style.display = "block"; }
+function openModal() { modal.style.display = "flex"; }
 function closeModal() { modal.style.display = "none"; }
 
 let touchstartX = 0;
