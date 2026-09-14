@@ -313,8 +313,9 @@
         .empty-day .date-number { background-color: transparent; border-right: 1px solid transparent; }
         .empty-day { border-bottom: 1px solid transparent; }
 
-        /* --- DAGS DATO MARKERING --- */
-        .day-row.idag {
+        /* --- TEST: GUL BAGGRUND PÅ ALLE DAGE --- */
+        /* Dette lægger farven på alle dage (der ikke er tomme) for at vi kan teste designet */
+        .day-row:not(.empty-day) {
             background-color: #fffde0 !important; 
         }
 
@@ -476,7 +477,6 @@
             ];
 
             forkortelser.forEach(f => {
-                // Vi forkorter KUN titlen (t) her. Sportsgren (s) bevares i sin fulde længde.
                 t = t.replace(f.fra, f.til);
             });
 
@@ -545,17 +545,14 @@
                     locEl.style.display = 'none';
                 }
                 
-                // --- NY LOGIK: SKJUL LOKATION VED 2 LINJER ---
                 const titleEl = document.getElementById('nl-title');
                 const compStyle = window.getComputedStyle(titleEl);
                 let lHeight = parseFloat(compStyle.lineHeight);
                 
-                // Sikkerhedsnet hvis visse tv-browsere returnerer "normal" i stedet for pixels
                 if (isNaN(lHeight)) {
                     lHeight = parseFloat(compStyle.fontSize) * 1.15;
                 }
                 
-                // Hvis elementets højde er mere end 1,5 gange en enkelt linje, er titlen knækket
                 if (titleEl.offsetHeight > lHeight * 1.5) {
                     locEl.style.display = 'none';
                 }
@@ -791,7 +788,7 @@
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
-                        // --- NYT: Tjekker om det er dags dato ---
+                        // --- KODE TIL NÅR TESTEN ER FÆRDIG ---
                         if (y === currentDate.getFullYear() && m === currentDate.getMonth() && d === currentDate.getDate()) {
                             row.classList.add('idag');
                         }
