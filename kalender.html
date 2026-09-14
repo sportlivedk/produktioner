@@ -313,9 +313,11 @@
         .empty-day .date-number { background-color: transparent; border-right: 1px solid transparent; }
         .empty-day { border-bottom: 1px solid transparent; }
 
-       /* --- DAGS DATO MARKERING --- */
-        .day-row.idag {
-            background-color: #fdfce3 !important; 
+       /* --- DAGS DATO MARKERING (GRØN CIRKEL) --- */
+        .day-row.idag .date-circle {
+            background-color: #7ab87a !important; /* Afdæmpet grøn, der matcher den røde weekend-farve */
+            color: #ffffff !important;
+            font-weight: 600 !important;
         }
 
         #loader {
@@ -787,7 +789,7 @@
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
-                        // --- KODE TIL NÅR TESTEN ER FÆRDIG ---
+                        // Tilføjer "idag" class, hvis det er dags dato
                         if (y === currentDate.getFullYear() && m === currentDate.getMonth() && d === currentDate.getDate()) {
                             row.classList.add('idag');
                         }
