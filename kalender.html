@@ -313,6 +313,11 @@
         .empty-day .date-number { background-color: transparent; border-right: 1px solid transparent; }
         .empty-day { border-bottom: 1px solid transparent; }
 
+       /* --- DAGS DATO MARKERING --- */
+        .day-row.idag {
+            background-color: #fdfce3 !important; 
+        }
+
         #loader {
             position: fixed;
             top: 10px;
@@ -448,39 +453,38 @@
         }
 
         function vaskTekstSplit(sportsgren, titel) {
-    let s = sportsgren ? String(sportsgren).trim() : "";
-    let t = titel ? String(titel).trim() : "";
+            let s = sportsgren ? String(sportsgren).trim() : "";
+            let t = titel ? String(titel).trim() : "";
 
-    const forkortelser = [
-        { fra: /Basketball/gi, til: "Basket" },
-        { fra: /Volleyball/gi, til: "Volley" },
-        { fra: /Amerikansk fodbold/gi, til: "Football" },
-        { fra: /European League/gi, til: "EL" },
-        { fra: /Randers Cimbria/gi, til: "Randers" },
-        { fra: /Team FOG Næstved/gi, til: "Næstved" },
-        { fra: /Horsens IC/gi, til: "Horsens" },
-        { fra: /Værløse Blue Hawks/gi, til: "Værløse" },
-        { fra: /Svendborg Rabbits/gi, til: "Svendborg" },
-        { fra: /BMS Herlev/gi, til: "Herlev" },
-        { fra: /Bakken Bears/gi, til: "Bakken" },
-        { fra: /BK Vejen/gi, til: "Vejen" },
-        { fra: /Hørsholm Rungsted/gi, til: "HRT" },
-        { fra: /United States/gi, til: "USA" },
-        { fra: /kvalifikation/gi, til: "kval" },
-        { fra: /Gladsaxe BK/gi, til: "Gladsaxe" }
-    ];
+            const forkortelser = [
+                { fra: /Basketball/gi, til: "Basket" },
+                { fra: /Volleyball/gi, til: "Volley" },
+                { fra: /Amerikansk fodbold/gi, til: "Football" },
+                { fra: /European League/gi, til: "EL" },
+                { fra: /Randers Cimbria/gi, til: "Randers" },
+                { fra: /Team FOG Næstved/gi, til: "Næstved" },
+                { fra: /Horsens IC/gi, til: "Horsens" },
+                { fra: /Værløse Blue Hawks/gi, til: "Værløse" },
+                { fra: /Svendborg Rabbits/gi, til: "Svendborg" },
+                { fra: /BMS Herlev/gi, til: "Herlev" },
+                { fra: /Bakken Bears/gi, til: "Bakken" },
+                { fra: /BK Vejen/gi, til: "Vejen" },
+                { fra: /Hørsholm Rungsted/gi, til: "HRT" },
+                { fra: /United States/gi, til: "USA" },
+                { fra: /kvalifikation/gi, til: "kval" },
+                { fra: /Gladsaxe BK/gi, til: "Gladsaxe" }
+            ];
 
-    forkortelser.forEach(f => {
-        // Vi forkorter KUN titlen (t) her. Sportsgren (s) bevares i sin fulde længde.
-        t = t.replace(f.fra, f.til);
-    });
+            forkortelser.forEach(f => {
+                t = t.replace(f.fra, f.til);
+            });
 
-    return {
-        sport: s,
-        titel: t,
-        visSport: (s !== "")
-    };
-}
+            return {
+                sport: s,
+                titel: t,
+                visSport: (s !== "")
+            };
+        }
 
         function findNextLiveProgram() {
             let now = new Date();
@@ -540,17 +544,14 @@
                     locEl.style.display = 'none';
                 }
                 
-                // --- NY LOGIK: SKJUL LOKATION VED 2 LINJER ---
                 const titleEl = document.getElementById('nl-title');
                 const compStyle = window.getComputedStyle(titleEl);
                 let lHeight = parseFloat(compStyle.lineHeight);
                 
-                // Sikkerhedsnet hvis visse tv-browsere returnerer "normal" i stedet for pixels
                 if (isNaN(lHeight)) {
                     lHeight = parseFloat(compStyle.fontSize) * 1.15;
                 }
                 
-                // Hvis elementets højde er mere end 1,5 gange en enkelt linje, er titlen knækket
                 if (titleEl.offsetHeight > lHeight * 1.5) {
                     locEl.style.display = 'none';
                 }
@@ -665,46 +666,46 @@
         }
 
         function vaskTekst(sportsgren, titel) {
-    let s = sportsgren ? String(sportsgren).trim() : "";
-    let t = titel ? String(titel).trim() : "";
+            let s = sportsgren ? String(sportsgren).trim() : "";
+            let t = titel ? String(titel).trim() : "";
 
-    const forkortelser = [
-        { fra: /Basketball/gi, til: "Basket" },
-        { fra: /Volleyball/gi, til: "Volley" },
-        { fra: /Amerikansk fodbold/gi, til: "Football" },
-        { fra: /European League/gi, til: "EL" },
-        { fra: /Randers Cimbria/gi, til: "Randers" },
-        { fra: /Team FOG Næstved/gi, til: "Næstved" },
-        { fra: /Horsens IC/gi, til: "Horsens" },
-        { fra: /Værløse Blue Hawks/gi, til: "Værløse" },
-        { fra: /Svendborg Rabbits/gi, til: "Svendborg" },
-        { fra: /BMS Herlev/gi, til: "Herlev" },
-        { fra: /Bakken Bears/gi, til: "Bakken" },
-        { fra: /BK Vejen/gi, til: "Vejen" },
-        { fra: /Hørsholm Rungsted/gi, til: "HRT" },
-        { fra: /United States/gi, til: "USA" },
-        { fra: /kvalifikation/gi, til: "kval" },
-        { fra: /Gladsaxe BK/gi, til: "Gladsaxe" }
-    ];
+            const forkortelser = [
+                { fra: /Basketball/gi, til: "Basket" },
+                { fra: /Volleyball/gi, til: "Volley" },
+                { fra: /Amerikansk fodbold/gi, til: "Football" },
+                { fra: /European League/gi, til: "EL" },
+                { fra: /Randers Cimbria/gi, til: "Randers" },
+                { fra: /Team FOG Næstved/gi, til: "Næstved" },
+                { fra: /Horsens IC/gi, til: "Horsens" },
+                { fra: /Værløse Blue Hawks/gi, til: "Værløse" },
+                { fra: /Svendborg Rabbits/gi, til: "Svendborg" },
+                { fra: /BMS Herlev/gi, til: "Herlev" },
+                { fra: /Bakken Bears/gi, til: "Bakken" },
+                { fra: /BK Vejen/gi, til: "Vejen" },
+                { fra: /Hørsholm Rungsted/gi, til: "HRT" },
+                { fra: /United States/gi, til: "USA" },
+                { fra: /kvalifikation/gi, til: "kval" },
+                { fra: /Gladsaxe BK/gi, til: "Gladsaxe" }
+            ];
 
-    const udeladelser = [
-        "basket", "futsal", "volley", "tennis", "kajak", "roning", "bordtennis", 
-        "WTT", "davis cup", "billie jean king cup", "mermaid bowl", "gokart"
-    ];
+            const udeladelser = [
+                "basket", "futsal", "volley", "tennis", "kajak", "roning", "bordtennis", 
+                "WTT", "davis cup", "billie jean king cup", "mermaid bowl", "gokart"
+            ];
 
-    forkortelser.forEach(f => {
-        s = s.replace(f.fra, f.til);
-        t = t.replace(f.fra, f.til);
-    });
+            forkortelser.forEach(f => {
+                s = s.replace(f.fra, f.til);
+                t = t.replace(f.fra, f.til);
+            });
 
-    let visSportsgren = true;
-    const tLower = t.toLowerCase();
-    udeladelser.forEach(ord => {
-        if (tLower.includes(ord.toLowerCase())) visSportsgren = false;
-    });
+            let visSportsgren = true;
+            const tLower = t.toLowerCase();
+            udeladelser.forEach(ord => {
+                if (tLower.includes(ord.toLowerCase())) visSportsgren = false;
+            });
 
-    return (!visSportsgren || s === "") ? t : `${s}: ${t}`;
-}
+            return (!visSportsgren || s === "") ? t : `${s}: ${t}`;
+        }
 
         function getEaster(year) {
             const a = year % 19, b = Math.floor(year / 100), c = year % 100;
@@ -785,6 +786,11 @@
                         
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
+
+                        // --- KODE TIL NÅR TESTEN ER FÆRDIG ---
+                        if (y === currentDate.getFullYear() && m === currentDate.getMonth() && d === currentDate.getDate()) {
+                            row.classList.add('idag');
+                        }
 
                         let dagensProduktioner = produktioner.filter(p => {
                             if (!p.Dato) return false;
