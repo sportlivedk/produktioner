@@ -313,11 +313,42 @@
         .empty-day .date-number { background-color: transparent; border-right: 1px solid transparent; }
         .empty-day { border-bottom: 1px solid transparent; }
 
-       /* --- DAGS DATO MARKERING (GRØN CIRKEL) --- */
-        .day-row.idag .date-circle {
-            background-color: #7ab87a !important; /* Afdæmpet grøn, der matcher den røde weekend-farve */
-            color: #ffffff !important;
-            font-weight: 600 !important;
+        /* --- DAGS DATO MARKERING (SKARPT KLIP-BLINK 50/50) --- */
+        
+        /* Almindelige hverdage skifter hårdt mellem grøn og normal */
+        .day-row.idag:not(.weekend) .date-circle {
+            animation: blink-hverdag 2s infinite;
+        }
+
+        @keyframes blink-hverdag {
+            0%, 49.9% {
+                background-color: #7ab87a; /* Grøn */
+                color: #ffffff;
+                font-weight: 600;
+            }
+            50%, 100% {
+                background-color: transparent; /* Normal hverdags-visning */
+                color: #1a1a1a;
+                font-weight: 700;
+            }
+        }
+
+        /* Weekender og helligdage skifter hårdt mellem grøn og rød */
+        .day-row.idag.weekend .date-circle {
+            animation: blink-weekend 2s infinite;
+        }
+
+        @keyframes blink-weekend {
+            0%, 49.9% {
+                background-color: #7ab87a; /* Grøn */
+                color: #ffffff;
+                font-weight: 600;
+            }
+            50%, 100% {
+                background-color: #e68a8a; /* Rød weekend/helligdags-visning */
+                color: #ffffff;
+                font-weight: 600;
+            }
         }
 
         #loader {
