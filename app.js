@@ -1904,15 +1904,15 @@ function tegnTabel(programmer) {
         let pFormat = program["Format"] ? String(program["Format"]).trim() : '';
         let pRX = program["RX"] ? String(program["RX"]).trim() : '';
 
-        // -- NY KODE TIL ESTimeret SENDETIDSRUM START --
+        // -- EST. SENDETIDSRUM START --
         let sendetidsrumDisplay = '-';
-        let pSluttid = program["Sluttid"] ? String(program["Sluttid"]).trim() : '';
+        let pSluttidRaw = program["Sluttid"] ? String(program["Sluttid"]).trim() : '';
+        let pSluttid = '';
         
-        if (pSluttid !== '-' && pSluttid.includes('T')) {
-            const tSlut = new Date(pSluttid);
-            pSluttid = tSlut.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
-        } else if (pSluttid !== '') {
-            pSluttid = pSluttid.substring(0, 5);
+        // Vi bruger et skudsikkert tjek for at trække klokkeslættet ud
+        let slutMatch = pSluttidRaw.match(/(\d{1,2})\s*[:.]+\s*(\d{2})/);
+        if (slutMatch) {
+            pSluttid = String(slutMatch[1]).padStart(2, '0') + ':' + String(slutMatch[2]).padStart(2, '0');
         }
 
         let startTidBeregning = (pTX !== '-' && pTX !== '') ? pTX : (pTid !== '-' && pTid !== '' ? pTid : '');
@@ -2043,15 +2043,33 @@ async function gemProgram() {
     const valgtPremieredato = document.getElementById('Premieredato') ? document.getElementById('Premieredato').value : "";
 
     if (valgtTX && valgtTid) {
-        if (valgtTX > valgtTid) {
+        let [th, tm] = valgtTid.split(':').map(Number);
+        let [txh, txm] = valgtTX.split(':').map(Number);
+        let tidMins = th * 60 + tm;
+        let txMins = txh * 60 + txm;
+        
+        // Undtagelse: Hvis TX ligger tæt på midnat og Tid er kort efter midnat (fx TX 23:45 og Tid 00:00)
+        if (txMins > tidMins && (txMins - tidMins) < 12 * 60) {
             await visCustomDialog("Transmission (TX) kan ikke begynde senere end starttidspunktet for begivenheden.", 'alert');
             return;
         }
     }
     
     if (valgtSluttid && valgtTid) {
-        if (valgtSluttid < valgtTid) {
-            await visCustomDialog("Den estimerede sluttid kan ikke være tidligere end starttidspunktet for begivenheden.", 'alert');
+        let [sh, sm] = valgtTid.split(':').map(Number);
+        let [eh, em] = valgtSluttid.split(':').map(Number);
+        let startMins = sh * 60 + sm;
+        let endMins = eh * 60 + em;
+        
+        // Hvis sluttid er mindre end starttid, krydser vi midnat (vi lægger 24 timer til)
+        if (endMins < startMins) {
+            endMins += 24 * 60;
+        }
+        
+        // I stedet for blot at spærre, tjekker vi om programmet "udregnes" til at vare mere end f.eks. 16 timer. 
+        // I så fald er der tale om en regulær slåfejl (f.eks. start 14:00, slut 12:00)
+        if ((endMins - startMins) > 16 * 60) {
+            await visCustomDialog("Den estimerede sluttid ser forkert ud. Tjek venligst klokkeslættene.", 'alert');
             return;
         }
     }
