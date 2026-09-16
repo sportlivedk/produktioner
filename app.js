@@ -1661,6 +1661,77 @@ function tegnTabel(programmer) {
     } else {
         table.style.display = 'table';
         ingenResultater.style.display = 'none';
+if (programmer.length === 0) {
+        table.style.display = 'none';
+        ingenResultater.style.display = 'block';
+        return;
+    } else {
+        table.style.display = 'table';
+        ingenResultater.style.display = 'none';
+    }
+
+    // --- OVERLAP BEREGNING START ---
+    function parseToMinutes(tStr) {
+        if (!tStr || tStr === '-' || String(tStr).trim() === '') return null;
+        let str = String(tStr).trim();
+        if (str.includes('T')) {
+            str = new Date(str).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+        } else {
+            str = str.substring(0, 5);
+        }
+        let parts = str.split(':');
+        if (parts.length === 2) {
+            let h = parseInt(parts[0], 10);
+            let m = parseInt(parts[1], 10);
+            if (!isNaN(h) && !isNaN(m)) return h * 60 + m;
+        }
+        return null;
+    }
+
+    // Nulstil overlap-status for alle for en sikkerheds skyld
+    programmer.forEach(p => p._harOverlap = false);
+
+    // Grupper programmer pr. dato, så vi kun sammenligner programmer på samme dag
+    let byDate = {};
+    programmer.forEach(p => {
+        const dato = p["NormDato"];
+        if (!dato) return;
+        if (!byDate[dato]) byDate[dato] = [];
+        byDate[dato].push(p);
+    });
+
+    // Tjek for overlap på kryds og tværs internt på hver dato
+    for (let dato in byDate) {
+        let dagensProg = byDate[dato];
+        for (let i = 0; i < dagensProg.length; i++) {
+            for (let j = i + 1; j < dagensProg.length; j++) {
+                let pA = dagensProg[i];
+                let pB = dagensProg[j];
+
+                // Starttid: Brug i første omgang TX, ellers Tid
+                let startA = parseToMinutes(pA["TX"] ? pA["TX"] : pA["Tid"]);
+                let slutA = parseToMinutes(pA["Sluttid"]);
+                let startB = parseToMinutes(pB["TX"] ? pB["TX"] : pB["Tid"]);
+                let slutB = parseToMinutes(pB["Sluttid"]);
+
+                if (startA !== null && slutA !== null && startB !== null && slutB !== null) {
+                    // Tag højde for midnatkrydsning (f.eks. 23:00 - 01:00)
+                    let calcSlutA = slutA < startA ? slutA + 24 * 60 : slutA;
+                    let calcSlutB = slutB < startB ? slutB + 24 * 60 : slutB;
+
+                    // Hvis program A starter før B slutter, OG program B starter før A slutter = Overlap!
+                    if (startA < calcSlutB && startB < calcSlutA) {
+                        pA._harOverlap = true;
+                        pB._harOverlap = true;
+                    }
+                }
+            }
+        }
+    }
+    // --- OVERLAP BEREGNING SLUT ---
+
+    const sysDato = new Date();
+
     }
 
     const sysDato = new Date();
@@ -1887,10 +1958,13 @@ function tegnTabel(programmer) {
         trMain.className = 'main-row';
         trMain.onclick = function(e) { toggleDetailsFromRow(e, this); };
         
+        // Lav HTML for den røde firkant, HVIS programmet har et overlap
+        let overlapHTML = program._harOverlap ? `<span class="overlap-indicator" title="Dette program overlapper tidsmæssigt med et andet program på dagen!"></span>` : '';
+        
         trMain.innerHTML = `
             <td style="${datoCelleStyle}">${pDatoFormat}</td>
             <td style="${ugedagCelleStyle}">${pUgedag}</td>
-            <td><b>${pTid}</b></td>
+            <td style="white-space: nowrap;"><b>${pTid}</b>${overlapHTML}</td>
             <td><b>${pTX}</b></td>
             <td>${kanalDisplay}</td>
             <td><div class="mobile-sportsgren-wrapper">${program["Sportsgren"] || ''}</div></td>
