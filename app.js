@@ -21,7 +21,7 @@ let pendingTechInfoForNewProgram = null;
 
 function hentFormularState() {
     const data = {};
-    const fieldsToCheck = ['Dato', 'Tid', 'TX', 'Kanal', 'Premieredato', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'P-plan', 'Noter', 'Producer', 'Kommentator', 'Ekspert', 'Reporter'];
+    const fieldsToCheck = ['Dato', 'Tid', 'TX', 'Sluttid', 'Kanal', 'Premieredato', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'P-plan', 'Noter', 'Producer', 'Kommentator', 'Ekspert', 'Reporter'];
     
     for (let id of fieldsToCheck) {
         const el = document.getElementById(id);
@@ -322,7 +322,6 @@ function logUd(event) {
     document.getElementById('btnLogin').style.display = "block";
     document.getElementById('loginLoader').style.display = "none";
     
-    // Her er rettelsen: Sørg for at loginOverlay vises korrekt igen
     document.getElementById('loginOverlay').style.display = "flex"; 
     document.getElementById('loginUsername').focus();
 }
@@ -1332,6 +1331,9 @@ async function opretNytProgram() {
     
     document.getElementById('group-Premieredato').style.display = 'none';
     document.getElementById('Premieredato').value = '';
+    const txGroup = document.getElementById('group-TX');
+    if (txGroup) txGroup.style.display = 'flex';
+    if (document.getElementById('Sluttid')) document.getElementById('Sluttid').value = '';
 
     document.querySelectorAll('#signalDropdown input[type="checkbox"]').forEach(cb => cb.checked = false);
     updateSignalHeader();
@@ -1432,15 +1434,23 @@ async function redigerProgram(rowId) {
             document.getElementById('TX').value = String(txDate.getHours()).padStart(2, '0') + ":" + String(txDate.getMinutes()).padStart(2, '0');
         } else { document.getElementById('TX').value = String(program["TX"]).substring(0, 5); }
     } else { document.getElementById('TX').value = ""; }
+    
+    if (document.getElementById('Sluttid')) {
+        document.getElementById('Sluttid').value = program["Sluttid"] || '';
+    }
 
     document.getElementById('Kanal').value = program["Kanal"] || '';
     
     if (program["Kanal"] === 'Optagelse') {
         document.getElementById('group-Premieredato').style.display = 'flex';
         document.getElementById('Premieredato').value = program["Premieredato"] || '';
+        const txGroup = document.getElementById('group-TX');
+        if (txGroup) txGroup.style.display = 'none';
     } else {
         document.getElementById('group-Premieredato').style.display = 'none';
         document.getElementById('Premieredato').value = '';
+        const txGroup = document.getElementById('group-TX');
+        if (txGroup) txGroup.style.display = 'flex';
     }
 
     document.getElementById('Sportsgren').value = program["Sportsgren"] || '';
@@ -1505,14 +1515,22 @@ async function kopierProgram(rowId) {
         } else { document.getElementById('TX').value = String(program["TX"]).substring(0, 5); }
     } else { document.getElementById('TX').value = ""; }
 
+    if (document.getElementById('Sluttid')) {
+        document.getElementById('Sluttid').value = program["Sluttid"] || '';
+    }
+
     document.getElementById('Kanal').value = program["Kanal"] || '';
     
     if (program["Kanal"] === 'Optagelse') {
         document.getElementById('group-Premieredato').style.display = 'flex';
         document.getElementById('Premieredato').value = program["Premieredato"] || '';
+        const txGroup = document.getElementById('group-TX');
+        if (txGroup) txGroup.style.display = 'none';
     } else {
         document.getElementById('group-Premieredato').style.display = 'none';
         document.getElementById('Premieredato').value = '';
+        const txGroup = document.getElementById('group-TX');
+        if (txGroup) txGroup.style.display = 'flex';
     }
 
     document.getElementById('Sportsgren').value = program["Sportsgren"] || '';
@@ -1822,25 +1840,48 @@ function tegnTabel(programmer) {
         let pFormat = program["Format"] ? String(program["Format"]).trim() : '';
         let pRX = program["RX"] ? String(program["RX"]).trim() : '';
 
-        let utcDisplay = '-';
-        if (pTid !== '-' && pTid.includes(':') && normDato !== '') {
-            const [timerStr, minutterStr] = pTid.split(':');
-            let timer = parseInt(timerStr, 10);
-            let minutter = parseInt(minutterStr, 10);
-            
-            if (!isNaN(timer) && !isNaN(minutter)) {
-                const tzTestDate = new Date(`${normDato}T12:00:00Z`);
-                const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Copenhagen', timeZoneName: 'short' });
-                const tzPart = formatter.formatToParts(tzTestDate).find(p => p.type === 'timeZoneName');
-                const isSummertime = tzPart && (tzPart.value.includes('+2') || tzPart.value.includes('CEST') || tzPart.value.includes('GMT+2'));
-                const offset = isSummertime ? 2 : 1;
+        // -- NY KODE TIL ESTimeret SENDETIDSRUM START --
+        let sendetidsrumDisplay = '-';
+        let pSluttid = program["Sluttid"] ? String(program["Sluttid"]).trim() : '';
+        
+        if (pSluttid !== '-' && pSluttid.includes('T')) {
+            const tSlut = new Date(pSluttid);
+            pSluttid = tSlut.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+        } else if (pSluttid !== '') {
+            pSluttid = pSluttid.substring(0, 5);
+        }
+
+        let startTidBeregning = (pTX !== '-' && pTX !== '') ? pTX : (pTid !== '-' && pTid !== '' ? pTid : '');
+        
+        if (startTidBeregning !== '') {
+            if (pSluttid !== '') {
+                let [sh, sm] = startTidBeregning.split(':').map(Number);
+                let [eh, em] = pSluttid.split(':').map(Number);
                 
-                timer -= offset;
-                if (timer < 0) timer += 24;
-                
-                utcDisplay = "Kl. " + String(timer).padStart(2, '0') + ':' + String(minutter).padStart(2, '0');
+                if (!isNaN(sh) && !isNaN(sm) && !isNaN(eh) && !isNaN(em)) {
+                    let startMins = sh * 60 + sm;
+                    let endMins = eh * 60 + em;
+                    if (endMins < startMins) endMins += 24 * 60; // Krydser midnat
+                    
+                    let diff = endMins - startMins;
+                    let diffH = Math.floor(diff / 60);
+                    let diffM = diff % 60;
+                    
+                    let varighedStr = "";
+                    if (diffH > 0) varighedStr += diffH + (diffH === 1 ? " time " : " timer ");
+                    if (diffM > 0) varighedStr += diffM + " min.";
+                    varighedStr = varighedStr.trim();
+                    if (varighedStr === "") varighedStr = "0 min.";
+                    
+                    sendetidsrumDisplay = `Kl. ${startTidBeregning.substring(0,5).replace(':', '.')} - ${pSluttid.substring(0,5).replace(':', '.')} (${varighedStr})`;
+                } else {
+                    sendetidsrumDisplay = `Kl. ${startTidBeregning.substring(0,5).replace(':', '.')} - ${pSluttid.substring(0,5).replace(':', '.')}`;
+                }
+            } else {
+                sendetidsrumDisplay = `Kl. ${startTidBeregning.substring(0,5).replace(':', '.')} - (sluttid mangler)`;
             }
         }
+        // -- NY KODE TIL ESTimeret SENDETIDSRUM SLUT --
 
         const trMain = document.createElement('tr');
         trMain.className = 'main-row';
@@ -1893,7 +1934,7 @@ function tegnTabel(programmer) {
                         <h4>Ekstra information</h4>
                         <div class="detail-list">
                             <div class="detail-list-item"><span class="detail-label">Lokation:</span> <span class="detail-value">${pSted}</span></div>
-                            <div class="detail-list-item"><span class="detail-label">Starttid UTC/GMT:</span> <span class="detail-value">${utcDisplay}</span></div>
+                            <div class="detail-list-item"><span class="detail-label">Estimeret sendetidsrum:</span> <span class="detail-value">${sendetidsrumDisplay}</span></div>
                             <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
                             <div class="detail-list-item"><span class="detail-label">Noter:</span> <span class="detail-value" style="color: #000000; text-align: right; max-width: 75%; word-break: break-word;">${formateretNoter}</span></div>
                         </div>
@@ -1920,6 +1961,7 @@ async function gemProgram() {
     const valgtProgramtitel = document.getElementById('Programtitel').value;
     const valgtTid = document.getElementById('Tid').value;
     const valgtTX = document.getElementById('TX').value; 
+    const valgtSluttid = document.getElementById('Sluttid') ? document.getElementById('Sluttid').value : "";
     const valgtUnit = document.getElementById('Unit').value; 
     const rowId = document.getElementById('RowId').value;
     const valgtPremieredato = document.getElementById('Premieredato') ? document.getElementById('Premieredato').value : "";
@@ -1927,6 +1969,13 @@ async function gemProgram() {
     if (valgtTX && valgtTid) {
         if (valgtTX > valgtTid) {
             await visCustomDialog("Transmission (TX) kan ikke begynde senere end starttidspunktet for begivenheden.", 'alert');
+            return;
+        }
+    }
+    
+    if (valgtSluttid && valgtTid) {
+        if (valgtSluttid < valgtTid) {
+            await visCustomDialog("Den estimerede sluttid kan ikke være tidligere end starttidspunktet for begivenheden.", 'alert');
             return;
         }
     }
@@ -2088,6 +2137,7 @@ async function gemProgram() {
         "Programtitel": valgtProgramtitel,
         "Lokation": document.getElementById('Lokation').value,
         "Tid": valgtTid,
+        "Sluttid": valgtSluttid,
         "Unit": document.getElementById('Unit').value,
         "Format": document.getElementById('Format').value,
         "RX": document.getElementById('RX').value,
@@ -2153,7 +2203,6 @@ function renderMcrVagter(vagter) {
     const container = document.getElementById('mcrModalContent');
     
     if (!vagter || vagter.length === 0) {
-        // Skriftstørrelse sat op til 16px her
         container.innerHTML = "<p style='font-size: 16px; color: #666;'>Ingen fremtidige MCR-vagter fundet.</p>";
         return;
     }
@@ -2169,12 +2218,10 @@ function renderMcrVagter(vagter) {
             let d = new Date(vagt.Dato);
             let danskDatoFormat = `${ugedage[d.getDay()]} d. ${d.getDate()}. ${maaneder[d.getMonth()]}`;
             
-            // font-size: 16px til dato-overskriften
             htmlString += `<div style="${htmlString !== '' ? 'margin-top: 25px;' : ''} margin-bottom: 10px; font-size: 16px; font-weight: bold; color: #0056b3; border-bottom: 1px solid #ccc; padding-bottom: 5px; text-transform: uppercase;">${danskDatoFormat}</div>`;
             currentDato = vagt.Dato;
         }
         
-        // font-size: 17px til navnet og 16px til tiden
         htmlString += `
         <div style="display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #dc5e11; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
             <div style="font-weight: bold; font-size: 17px; color: #333;">${vagt.Navn}</div>
@@ -2230,7 +2277,6 @@ window.onload = function() {
             const techM = document.getElementById('techModal');
             if (techM && techM.style.display === 'block') erForstyrret = true;
 
-            // Tjekker også om MCR-vagterne er åbne, før den opdaterer i baggrunden
             const mcrM = document.getElementById('mcrModal');
             if (mcrM && mcrM.style.display === 'flex') erForstyrret = true;
 
@@ -2243,8 +2289,13 @@ window.onload = function() {
     document.getElementById('Kanal').addEventListener('input', function() {
         if (this.value === 'Optagelse') {
             document.getElementById('group-Premieredato').style.display = 'flex';
+            const txGroup = document.getElementById('group-TX');
+            if(txGroup) txGroup.style.display = 'none';
+            document.getElementById('TX').value = ''; 
         } else {
             document.getElementById('group-Premieredato').style.display = 'none';
+            const txGroup = document.getElementById('group-TX');
+            if(txGroup) txGroup.style.display = 'flex';
         }
     });
     
