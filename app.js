@@ -2233,6 +2233,56 @@ function renderMcrVagter(vagter) {
     container.innerHTML = htmlString;
 }
 
+// --- AUTO-UDFYLD EST. SLUTTID ---
+function autoUdfyldSluttid() {
+    const sluttidFelt = document.getElementById('Sluttid');
+    // Stop hvis feltet 'Sluttid' slet ikke findes (f.eks. på login-skærmen) eller allerede er udfyldt
+    if (!sluttidFelt || sluttidFelt.value.trim() !== "") return;
+
+    const sportsgrenInput = document.getElementById('Sportsgren').value.trim().toLowerCase();
+    const titelInput = document.getElementById('Programtitel').value.trim().toLowerCase();
+    const tidInput = document.getElementById('Tid').value;
+
+    // Stop hvis vi mangler enten Sportsgren eller starttid (Tid) for at kunne regne
+    if (!sportsgrenInput || !tidInput) return;
+
+    let varighed = 0;
+
+    // Tjek sportsgrenen og definer varigheden (minutter)
+    if (sportsgrenInput === "fodbold") {
+        varighed = 105;
+    } else if (sportsgrenInput === "basketball" || sportsgrenInput === "basket") {
+        // Tjek om titlen indeholder ordet "overtime"
+        if (titelInput.includes("overtime")) {
+            varighed = 60;
+        } else {
+            varighed = 135;
+        }
+    } else if (sportsgrenInput === "volleyball" || sportsgrenInput === "volley") {
+        varighed = 120;
+    } else if (sportsgrenInput === "floorball") {
+        varighed = 120;
+    } else if (sportsgrenInput === "futsal") {
+        varighed = 135;
+    } else if (sportsgrenInput === "amr. fodbold" || sportsgrenInput.includes("amerikansk fodbold")) {
+        varighed = 140;
+    } else if (sportsgrenInput === "ishockey") {
+        varighed = 140;
+    }
+
+    // Hvis vi har fundet en matchende varighed, udregner og indsætter vi sluttiden
+    if (varighed > 0) {
+        let [timer, minutter] = tidInput.split(':').map(Number);
+        let totalMinutter = (timer * 60) + minutter + varighed;
+        
+        let nyTimer = Math.floor(totalMinutter / 60) % 24; // % 24 sikrer korrekt format over midnat
+        let nyMinutter = totalMinutter % 60;
+        
+        sluttidFelt.value = String(nyTimer).padStart(2, '0') + ':' + String(nyMinutter).padStart(2, '0');
+    }
+}
+
+
 // -----------------------------------------------------------------
 
 window.onload = function() {
@@ -2286,6 +2336,12 @@ window.onload = function() {
         }
     }, 600000);
     
+// Lyt efter ændringer til brug for auto-udregning af sluttid
+
+    document.getElementById('Sportsgren').addEventListener('input', autoUdfyldSluttid);
+    document.getElementById('Sportsgren').addEventListener('change', autoUdfyldSluttid);
+    document.getElementById('Programtitel').addEventListener('input', autoUdfyldSluttid);
+    document.getElementById('Tid').addEventListener('input', autoUdfyldSluttid);
     document.getElementById('Kanal').addEventListener('input', function() {
         if (this.value === 'Optagelse') {
             document.getElementById('group-Premieredato').style.display = 'flex';
