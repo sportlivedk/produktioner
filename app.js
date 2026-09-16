@@ -1952,7 +1952,16 @@ function tegnTabel(programmer) {
         trMain.onclick = function(e) { toggleDetailsFromRow(e, this); };
         
         // Lav HTML for den røde firkant, HVIS programmet har et overlap
-        let overlapHTML = program._harOverlap ? `<span class="overlap-indicator" title="Dette program overlapper tidsmæssigt med et andet program på dagen!"></span>` : '';
+        let overlapHTML = '';
+        if (program._harOverlap) {
+            // Tjekker om programmet er i dag eller i morgen (blinker)
+            if (erIdag || erImorgen) {
+                overlapHTML = `<span class="overlap-indicator" title="Dette program overlapper tidsmæssigt med et andet program på dagen!"></span>`;
+            } else {
+                // Stationær rød firkant til alle andre fremtidige dage
+                overlapHTML = `<span class="overlap-indicator" style="animation: none;" title="Dette program overlapper tidsmæssigt med et andet program på dagen!"></span>`;
+            }
+        }
         
         trMain.innerHTML = `
             <td style="${datoCelleStyle}">${pDatoFormat}</td>
