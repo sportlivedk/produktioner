@@ -1661,14 +1661,14 @@ function tegnTabel(programmer) {
     } else {
         table.style.display = 'table';
         ingenResultater.style.display = 'none';
-if (programmer.length === 0) {
-        table.style.display = 'none';
-        ingenResultater.style.display = 'block';
-        return;
-    } else {
-        table.style.display = 'table';
-        ingenResultater.style.display = 'none';
     }
+
+    // Vi definerer dags dato heroppe, så vi kan bruge den til overlap-tjekket
+    const sysDato = new Date();
+    const idagStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
+    const dImorgen = new Date(sysDato);
+    dImorgen.setDate(dImorgen.getDate() + 1);
+    const imorgenStr = dImorgen.getFullYear() + "-" + String(dImorgen.getMonth() + 1).padStart(2, '0') + "-" + String(dImorgen.getDate()).padStart(2, '0');
 
     // --- OVERLAP BEREGNING START ---
     function parseToMinutes(tStr) {
@@ -1702,43 +1702,36 @@ if (programmer.length === 0) {
 
     // Tjek for overlap på kryds og tværs internt på hver dato
     for (let dato in byDate) {
-        let dagensProg = byDate[dato];
-        for (let i = 0; i < dagensProg.length; i++) {
-            for (let j = i + 1; j < dagensProg.length; j++) {
-                let pA = dagensProg[i];
-                let pB = dagensProg[j];
+        // Udfør KUN overlap-tjekket, hvis datoen er i dag eller i fremtiden
+        if (dato >= idagStr) {
+            let dagensProg = byDate[dato];
+            for (let i = 0; i < dagensProg.length; i++) {
+                for (let j = i + 1; j < dagensProg.length; j++) {
+                    let pA = dagensProg[i];
+                    let pB = dagensProg[j];
 
-                // Starttid: Brug i første omgang TX, ellers Tid
-                let startA = parseToMinutes(pA["TX"] ? pA["TX"] : pA["Tid"]);
-                let slutA = parseToMinutes(pA["Sluttid"]);
-                let startB = parseToMinutes(pB["TX"] ? pB["TX"] : pB["Tid"]);
-                let slutB = parseToMinutes(pB["Sluttid"]);
+                    // Starttid: Brug i første omgang TX, ellers Tid
+                    let startA = parseToMinutes(pA["TX"] ? pA["TX"] : pA["Tid"]);
+                    let slutA = parseToMinutes(pA["Sluttid"]);
+                    let startB = parseToMinutes(pB["TX"] ? pB["TX"] : pB["Tid"]);
+                    let slutB = parseToMinutes(pB["Sluttid"]);
 
-                if (startA !== null && slutA !== null && startB !== null && slutB !== null) {
-                    // Tag højde for midnatkrydsning (f.eks. 23:00 - 01:00)
-                    let calcSlutA = slutA < startA ? slutA + 24 * 60 : slutA;
-                    let calcSlutB = slutB < startB ? slutB + 24 * 60 : slutB;
+                    if (startA !== null && slutA !== null && startB !== null && slutB !== null) {
+                        // Tag højde for midnatkrydsning (f.eks. 23:00 - 01:00)
+                        let calcSlutA = slutA < startA ? slutA + 24 * 60 : slutA;
+                        let calcSlutB = slutB < startB ? slutB + 24 * 60 : slutB;
 
-                    // Hvis program A starter før B slutter, OG program B starter før A slutter = Overlap!
-                    if (startA < calcSlutB && startB < calcSlutA) {
-                        pA._harOverlap = true;
-                        pB._harOverlap = true;
+                        // Hvis program A starter før B slutter, OG program B starter før A slutter = Overlap!
+                        if (startA < calcSlutB && startB < calcSlutA) {
+                            pA._harOverlap = true;
+                            pB._harOverlap = true;
+                        }
                     }
                 }
             }
         }
     }
     // --- OVERLAP BEREGNING SLUT ---
-
-    const sysDato = new Date();
-
-    }
-
-    const sysDato = new Date();
-    const idagStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
-    const dImorgen = new Date(sysDato);
-    dImorgen.setDate(dImorgen.getDate() + 1);
-    const imorgenStr = dImorgen.getFullYear() + "-" + String(dImorgen.getMonth() + 1).padStart(2, '0') + "-" + String(dImorgen.getDate()).padStart(2, '0');
 
     let forrigeDatoFormat = '';
     let isLightBg = true;
