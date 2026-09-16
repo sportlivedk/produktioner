@@ -153,6 +153,8 @@
             -webkit-line-clamp: 2; 
             -webkit-box-orient: vertical;
             overflow: hidden;
+
+            /* Magien, der balancerer linjerne og forhindrer enlige ord: */
             text-wrap: balance;
         }
 
@@ -315,22 +317,41 @@
         .empty-day { border-bottom: 1px solid transparent; }
 
         /* --- DAGS DATO MARKERING (SKARPT KLIP-BLINK 50/50) --- */
+        
+        /* Almindelige hverdage skifter hårdt mellem grøn og normal */
         .day-row.idag:not(.weekend) .date-circle {
             animation: blink-hverdag 2s infinite;
         }
 
         @keyframes blink-hverdag {
-            0%, 49.9% { background-color: #7ab87a; color: #ffffff; font-weight: 600; }
-            50%, 100% { background-color: transparent; color: #1a1a1a; font-weight: 700; }
+            0%, 49.9% {
+                background-color: #7ab87a; /* Grøn */
+                color: #ffffff;
+                font-weight: 600;
+            }
+            50%, 100% {
+                background-color: transparent; /* Normal hverdags-visning */
+                color: #1a1a1a;
+                font-weight: 700;
+            }
         }
 
+        /* Weekender og helligdage skifter hårdt mellem grøn og rød */
         .day-row.idag.weekend .date-circle {
             animation: blink-weekend 2s infinite;
         }
 
         @keyframes blink-weekend {
-            0%, 49.9% { background-color: #7ab87a; color: #ffffff; font-weight: 600; }
-            50%, 100% { background-color: #e68a8a; color: #ffffff; font-weight: 600; }
+            0%, 49.9% {
+                background-color: #7ab87a; /* Grøn */
+                color: #ffffff;
+                font-weight: 600;
+            }
+            50%, 100% {
+                background-color: #e68a8a; /* Rød weekend/helligdags-visning */
+                color: #ffffff;
+                font-weight: 600;
+            }
         }
 
         #loader {
@@ -361,7 +382,25 @@
         
         <!-- MIDT: Nedtælling -->
         <div id="countdown-display" class="countdown-wrapper">
-            <!-- Indhold genereres af JS -->
+            <div class="cd-box">
+                <div class="cd-num" id="cd-days">00</div>
+                <div class="cd-label" id="cd-days-label">DAGE</div>
+            </div>
+            <div class="cd-colon">:</div>
+            <div class="cd-box">
+                <div class="cd-num" id="cd-hours">00</div>
+                <div class="cd-label" id="cd-hours-label">TIMER</div>
+            </div>
+            <div class="cd-colon">:</div>
+            <div class="cd-box">
+                <div class="cd-num" id="cd-minutes">00</div>
+                <div class="cd-label">MIN</div>
+            </div>
+            <div class="cd-colon">:</div>
+            <div class="cd-box">
+                <div class="cd-num" id="cd-seconds">00</div>
+                <div class="cd-label">SEK</div>
+            </div>
         </div>
         
         <!-- BUND: Sportsgren, Programtitel og Lokation -->
@@ -414,7 +453,7 @@
         
         // --- SKUDSIKKER DATO- OG TIDS-LOGIK ---
         let nextProgramDateObj = null;
-        let nextProgramEndDateObj = null; // NY variabel til at holde sluttiden
+        let nextProgramEndDateObj = null;
 
         function extractTimeFromStr(tStr) {
             if (!tStr) return null;
@@ -422,7 +461,6 @@
             return m ? { h: parseInt(m[1], 10), m: parseInt(m[2], 10) } : null;
         }
 
-        // Parse funktion - nu justeret til også at kunne håndtere sluttid, hvis vi vil genbruge den
         function parseDateTimeForCountdown(datoRaw, txRaw, rxRaw, tidRaw) {
             if (!datoRaw || String(datoRaw).trim() === "" || String(datoRaw).trim() === "-") return null;
             
@@ -451,21 +489,18 @@
             return d;
         }
 
-        // Ny funktion specifikt til at beregne et præcist sluttidspunkt som et Date-objekt
+        // Beregner et præcist sluttidspunkt som Date-objekt baseret på startdato
         function parseEndDateObj(startDatoObj, sluttidRaw) {
-            if (!startDatoObj || !sluttidRaw) return null;
+            if (!startDatoObj || !sluttidRaw || String(sluttidRaw).trim() === "" || String(sluttidRaw).trim() === "-") return null;
             
             let tMatch = extractTimeFromStr(sluttidRaw);
             if (!tMatch) return null;
             
-            // Opret et nyt date-objekt baseret på startdatoen
             let endDatoObj = new Date(startDatoObj.getTime());
             endDatoObj.setHours(tMatch.h, tMatch.m, 0, 0);
             
-            // Hvis sluttiden er numerisk *mindre* end starttiden (fx start 23:00, slut 01:00), 
-            // krydser vi midnat, og vi lægger en dag til slutdatoen.
             if (endDatoObj < startDatoObj) {
-                endDatoObj.setDate(endDatoObj.getDate() + 1);
+                endDatoObj.setDate(endDatoObj.getDate() + 1); // Tilføj en dag hvis den krydser midnat
             }
             
             return endDatoObj;
@@ -509,7 +544,6 @@
             let now = new Date();
             let futureLive = [];
 
-            // Gennemgår alle programmer
             produktioner.forEach(p => {
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
                 let erTBC = (p.TBC && String(p.TBC).trim().toUpperCase() === "X");
@@ -520,12 +554,12 @@
                     if (pDato) {
                         let pSlutDato = parseEndDateObj(pDato, p.Sluttid);
                         
-                        // Hvis vi ikke har en sluttid fra regnearket, falder vi tilbage til reglen om starttid + 30 min.
+                        // Hvis Sluttid mangler i regnearket, sættes den automatisk til start + 30 min.
                         if (!pSlutDato) {
                             pSlutDato = new Date(pDato.getTime() + (30 * 60 * 1000));
                         }
 
-                        // Vi tilføjer programmet, hvis *sluttiden* ligger i fremtiden
+                        // Viser KUN programmet, hvis *sluttiden* ligger i fremtiden
                         if (pSlutDato > now) {
                             futureLive.push({ program: p, dateObj: pDato, endDateObj: pSlutDato });
                         }
@@ -533,18 +567,15 @@
                 }
             });
 
-            // Sorterer kronologisk baseret på starttid
             futureLive.sort((a, b) => a.dateObj - b.dateObj);
 
-            // Filtreringslogik for programmer der ligger tæt på hinanden
             while (futureLive.length > 1) {
                 let p0 = futureLive[0];
                 let p1 = futureLive[1];
                 
                 // Hvis program 0 allerede er i gang...
                 if (now >= p0.dateObj) {
-                    // ...og program 1 starter lynhurtigt efter (eller overlapper) program 0, 
-                    // sletter vi program 0 for at gøre klar til at vise program 1.
+                    // ...og program 1 starter lynhurtigt efter program 0, skifter vi til program 1
                     if (p1.dateObj.getTime() - p0.dateObj.getTime() < 0.5 * 60 * 60 * 1000) {
                         futureLive.shift();
                         continue;
@@ -556,7 +587,7 @@
             if (futureLive.length > 0) {
                 let next = futureLive[0];
                 nextProgramDateObj = next.dateObj;
-                nextProgramEndDateObj = next.endDateObj; // Gemmer sluttiden til visningen
+                nextProgramEndDateObj = next.endDateObj;
                 
                 let vasket = vaskTekstSplit(next.program.Sportsgren, next.program.Programtitel);
                 const sportEl = document.getElementById('nl-sport');
@@ -601,8 +632,6 @@
 
         function tickCountdown() {
             let cdDisplay = document.getElementById('countdown-display');
-            
-            // Hvis der ikke er noget program, så skjul tælleren
             if (!nextProgramDateObj) {
                 cdDisplay.style.display = 'none';
                 return;
@@ -610,16 +639,15 @@
             
             let now = new Date();
             
-            // Hvis sluttiden for det viste program overskrides...
+            // Tjekker om SENDER NU perioden (sluttidspunktet) er overskredet
             if (nextProgramEndDateObj && now > nextProgramEndDateObj) {
-                // ... så gentænk hele oversigten og find det næste program
                 findNextLiveProgram();
                 return;
             }
 
             let diff = nextProgramDateObj - now;
 
-            // Hvis programmet er i gang (men endnu ikke afsluttet)
+            // Viser SENDER NU så længe vi er mellem start og sluttid
             if (diff <= 0) {
                 cdDisplay.style.display = 'flex';
                 if (!cdDisplay.querySelector('.sender-nu')) {
@@ -628,10 +656,9 @@
                 return;
             }
             
-            // Tæller ned til start
             cdDisplay.style.display = 'flex';
 
-            // Gendan urets HTML, hvis det forrige var SENDER NU
+            // Gendan selve uret, hvis forrige visning var SENDER NU
             if (cdDisplay.querySelector('.sender-nu')) {
                 cdDisplay.innerHTML = `
                     <div class="cd-box">
@@ -835,6 +862,7 @@
                         if (dateObj.getDay() === 0 || dateObj.getDay() === 6 || isHoliday(y, m, d)) row.classList.add('weekend');
                         if (getWeekNumber(dateObj) % 2 === 0) row.classList.add('even-week');
 
+                        // Tilføjer "idag" class, hvis det er dags dato
                         if (y === currentDate.getFullYear() && m === currentDate.getMonth() && d === currentDate.getDate()) {
                             row.classList.add('idag');
                         }
