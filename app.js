@@ -2010,7 +2010,7 @@ function tegnTabel(programmer) {
                         <h4>Ekstra information</h4>
                         <div class="detail-list">
                             <div class="detail-list-item"><span class="detail-label">Lokation:</span> <span class="detail-value">${pSted}</span></div>
-                            <div class="detail-list-item"><span class="detail-label">Estimeret sendetidsrum:</span> <span class="detail-value">${sendetidsrumDisplay}</span></div>
+                            <div class="detail-list-item"><span class="detail-label">Estimeret varighed:</span> <span class="detail-value">${sendetidsrumDisplay}</span></div>
                             <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
                             <div class="detail-list-item"><span class="detail-label">Noter:</span> <span class="detail-value" style="color: #000000; text-align: right; max-width: 75%; word-break: break-word;">${formateretNoter}</span></div>
                         </div>
