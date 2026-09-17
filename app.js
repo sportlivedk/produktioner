@@ -1721,10 +1721,29 @@ function tegnTabel(programmer) {
                         let calcSlutA = slutA < startA ? slutA + 24 * 60 : slutA;
                         let calcSlutB = slutB < startB ? slutB + 24 * 60 : slutB;
 
-                        // Hvis program A starter før B slutter, OG program B starter før A slutter = Overlap!
+                        // Tjekker om programmerne overlapper tidsmæssigt
                         if (startA < calcSlutB && startB < calcSlutA) {
-                            pA._harOverlap = true;
-                            pB._harOverlap = true;
+                            
+                            // Hent Kanal og Unit, og gør teksten stor for at undgå slåfejl (fx "Boks 1" vs "BOKS 1")
+                            let kanalA = String(pA["Kanal"] || "").trim().toUpperCase();
+                            let kanalB = String(pB["Kanal"] || "").trim().toUpperCase();
+                            let unitA = String(pA["Unit"] || "").trim().toUpperCase();
+                            let unitB = String(pB["Unit"] || "").trim().toUpperCase();
+
+                            // SCENARIE 1: Overlap, og begge er SPORT LIVE
+                            let rule1 = (kanalA === "SPORT LIVE" && kanalB === "SPORT LIVE");
+
+                            // SCENARIE 2: Overlap, og begge har samme Unit (f.eks. BOKS 1 og BOKS 1) - ignorer tomme units
+                            let rule2 = (unitA !== "" && unitA === unitB);
+
+                            // SCENARIE 3: Overlap, og den ene er BOKS 3 og den anden er BOKS 4 (eller omvendt)
+                            let rule3 = (unitA === "BOKS 3" || unitA === "BOKS 4") && (unitB === "BOKS 3" || unitB === "BOKS 4");
+
+                            // Hvis bare ét af scenarierne er opfyldt, slår den røde alarm til
+                            if (rule1 || rule2 || rule3) {
+                                pA._harOverlap = true;
+                                pB._harOverlap = true;
+                            }
                         }
                     }
                 }
@@ -1945,7 +1964,7 @@ function tegnTabel(programmer) {
                 sendetidsrumDisplay = `Kl. ${startTidBeregning.substring(0,5).replace(':', '.')} - (sluttid mangler)`;
             }
         }
-        // -- NY KODE TIL ESTimeret SENDETIDSRUM SLUT --
+        // -- EST. SENDETIDSRUM SLUT --
 
         const trMain = document.createElement('tr');
         trMain.className = 'main-row';
@@ -1956,10 +1975,10 @@ function tegnTabel(programmer) {
         if (program._harOverlap) {
             // Tjekker om programmet er i dag eller i morgen (blinker)
             if (erIdag || erImorgen) {
-                overlapHTML = `<span class="overlap-indicator" title="Dette program overlapper tidsmæssigt med et andet program på dagen!"></span>`;
+                overlapHTML = `<span class="overlap-indicator" title="Dette program overlapper kritisk med et andet program på dagen!"></span>`;
             } else {
                 // Stationær rød firkant til alle andre fremtidige dage
-                overlapHTML = `<span class="overlap-indicator" style="animation: none;" title="Dette program overlapper tidsmæssigt med et andet program på dagen!"></span>`;
+                overlapHTML = `<span class="overlap-indicator" style="animation: none;" title="Dette program overlapper kritisk med et andet program på dagen!"></span>`;
             }
         }
         
@@ -2010,7 +2029,7 @@ function tegnTabel(programmer) {
                         <h4>Ekstra information</h4>
                         <div class="detail-list">
                             <div class="detail-list-item"><span class="detail-label">Lokation:</span> <span class="detail-value">${pSted}</span></div>
-                            <div class="detail-list-item"><span class="detail-label">Estimeret varighed:</span> <span class="detail-value">${sendetidsrumDisplay}</span></div>
+                            <div class="detail-list-item"><span class="detail-label">Estimeret sendetidsrum:</span> <span class="detail-value">${sendetidsrumDisplay}</span></div>
                             <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
                             <div class="detail-list-item"><span class="detail-label">Noter:</span> <span class="detail-value" style="color: #000000; text-align: right; max-width: 75%; word-break: break-word;">${formateretNoter}</span></div>
                         </div>
