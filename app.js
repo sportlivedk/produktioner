@@ -1733,8 +1733,9 @@ function tegnTabel(programmer) {
                             // SCENARIE 1: Overlap, og begge er SPORT LIVE
                             let rule1 = (kanalA === "SPORT LIVE" && kanalB === "SPORT LIVE");
 
-                            // SCENARIE 2: Overlap, og begge har samme Unit (f.eks. BOKS 1 og BOKS 1) - ignorer tomme units
-                            let rule2 = (unitA !== "" && unitA === unitB);
+                            // SCENARIE 2: Overlap, og begge har samme Unit (f.eks. BOKS 1 og BOKS 1)
+                            // - ignorer tomme units, samt "BOKS" og "OB" (da de blot er placeholders)
+                            let rule2 = (unitA !== "" && unitA !== "BOKS" && unitA !== "OB" && unitA === unitB);
 
                             // SCENARIE 3: Overlap, og den ene er BOKS 3 og den anden er BOKS 4 (eller omvendt)
                             let rule3 = (unitA === "BOKS 3" || unitA === "BOKS 4") && (unitB === "BOKS 3" || unitB === "BOKS 4");
@@ -1928,7 +1929,6 @@ function tegnTabel(programmer) {
         let pSluttidRaw = program["Sluttid"] ? String(program["Sluttid"]).trim() : '';
         let pSluttid = '';
         
-        // Vi bruger et skudsikkert tjek for at trække klokkeslættet ud
         let slutMatch = pSluttidRaw.match(/(\d{1,2})\s*[:.]+\s*(\d{2})/);
         if (slutMatch) {
             pSluttid = String(slutMatch[1]).padStart(2, '0') + ':' + String(slutMatch[2]).padStart(2, '0');
@@ -1970,17 +1970,8 @@ function tegnTabel(programmer) {
         trMain.className = 'main-row';
         trMain.onclick = function(e) { toggleDetailsFromRow(e, this); };
         
-        // Lav HTML for den røde firkant, HVIS programmet har et overlap
-        let overlapHTML = '';
-        if (program._harOverlap) {
-            // Tjekker om programmet er i dag eller i morgen (blinker)
-            if (erIdag || erImorgen) {
-                overlapHTML = `<span class="overlap-indicator" title="Dette program overlapper kritisk med et andet program på dagen!"></span>`;
-            } else {
-                // Stationær rød firkant til alle andre fremtidige dage
-                overlapHTML = `<span class="overlap-indicator" style="animation: none;" title="Dette program overlapper kritisk med et andet program på dagen!"></span>`;
-            }
-        }
+        // Lav HTML for den røde firkant, HVIS programmet har et kritisk overlap (blinker altid)
+        let overlapHTML = program._harOverlap ? `<span class="overlap-indicator" title="Dette program overlapper kritisk med et andet program på dagen!"></span>` : '';
         
         trMain.innerHTML = `
             <td style="${datoCelleStyle}">${pDatoFormat}</td>
@@ -2029,7 +2020,7 @@ function tegnTabel(programmer) {
                         <h4>Ekstra information</h4>
                         <div class="detail-list">
                             <div class="detail-list-item"><span class="detail-label">Lokation:</span> <span class="detail-value">${pSted}</span></div>
-                            <div class="detail-list-item"><span class="detail-label">Estimeret sendetidsrum:</span> <span class="detail-value">${sendetidsrumDisplay}</span></div>
+                            <div class="detail-list-item"><span class="detail-label">Estimeret varighed:</span> <span class="detail-value">${sendetidsrumDisplay}</span></div>
                             <div class="detail-list-item"><span class="detail-label">Produktionsplan:</span> <span class="detail-value">${pPlanDisplay}</span></div>
                             <div class="detail-list-item"><span class="detail-label">Noter:</span> <span class="detail-value" style="color: #000000; text-align: right; max-width: 75%; word-break: break-word;">${formateretNoter}</span></div>
                         </div>
