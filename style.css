@@ -353,3 +353,14 @@
             0%, 49.9% { opacity: 1; }
             50%, 100% { opacity: 0; }
         }
+
+.overlap-indicator-yellow {
+            display: inline-block;
+            width: 8px; 
+            height: 8px; 
+            background-color: #ffb300; /* Varm, tydelig gul farve */
+            margin-left: 8px;
+            vertical-align: 1px;
+            border-radius: 2px;
+            animation: blink-overlap 2s infinite; 
+        }

@@ -1688,8 +1688,11 @@ function tegnTabel(programmer) {
         return null;
     }
 
-    // Nulstil overlap-status for alle for en sikkerheds skyld
-    programmer.forEach(p => p._harOverlap = false);
+    // Nulstil overlap-status og farve for alle programmer for en sikkerheds skyld
+    programmer.forEach(p => {
+        p._harOverlap = false;
+        p._overlapType = ''; // Kan være 'red' eller 'yellow'
+    });
 
     // Grupper programmer pr. dato, så vi kun sammenligner programmer på samme dag
     let byDate = {};
@@ -1724,7 +1727,7 @@ function tegnTabel(programmer) {
                         // Tjekker om programmerne overlapper tidsmæssigt
                         if (startA < calcSlutB && startB < calcSlutA) {
                             
-                            // Hent Kanal og Unit, og gør teksten stor for at undgå slåfejl (fx "Boks 1" vs "BOKS 1")
+                            // Hent Kanal og Unit, og gør teksten stor for at undgå slåfejl
                             let kanalA = String(pA["Kanal"] || "").trim().toUpperCase();
                             let kanalB = String(pB["Kanal"] || "").trim().toUpperCase();
                             let unitA = String(pA["Unit"] || "").trim().toUpperCase();
@@ -1733,17 +1736,30 @@ function tegnTabel(programmer) {
                             // SCENARIE 1: Overlap, og begge er SPORT LIVE
                             let rule1 = (kanalA === "SPORT LIVE" && kanalB === "SPORT LIVE");
 
-                            // SCENARIE 2: Overlap, og begge har samme Unit (f.eks. BOKS 1 og BOKS 1)
-                            // - ignorer tomme units, samt "BOKS" og "OB" (da de blot er placeholders)
+                            // SCENARIE 2: Overlap, og begge har samme Unit - ignorer tomme units, samt "BOKS" og "OB"
                             let rule2 = (unitA !== "" && unitA !== "BOKS" && unitA !== "OB" && unitA === unitB);
 
                             // SCENARIE 3: Overlap, og den ene er BOKS 3 og den anden er BOKS 4 (eller omvendt)
                             let rule3 = (unitA === "BOKS 3" || unitA === "BOKS 4") && (unitB === "BOKS 3" || unitB === "BOKS 4");
 
-                            // Hvis bare ét af scenarierne er opfyldt, slår den røde alarm til
+                            // Hvis bare ét af scenarierne er opfyldt, er der et overlap
                             if (rule1 || rule2 || rule3) {
                                 pA._harOverlap = true;
                                 pB._harOverlap = true;
+
+                                // Tjekker om et (eller begge) af de to programmer er TBC
+                                let pA_TBC = (pA["TBC"] && String(pA["TBC"]).toUpperCase() === 'X');
+                                let pB_TBC = (pB["TBC"] && String(pB["TBC"]).toUpperCase() === 'X');
+
+                                if (pA_TBC || pB_TBC) {
+                                    // Sæt farven til gul, MEDMINDRE programmet allerede har en rød advarsel
+                                    if (pA._overlapType !== 'red') pA._overlapType = 'yellow';
+                                    if (pB._overlapType !== 'red') pB._overlapType = 'yellow';
+                                } else {
+                                    // Hvis ingen af dem er TBC, er overlappet garanteret (Rød)
+                                    pA._overlapType = 'red';
+                                    pB._overlapType = 'red';
+                                }
                             }
                         }
                     }
@@ -1970,8 +1986,15 @@ function tegnTabel(programmer) {
         trMain.className = 'main-row';
         trMain.onclick = function(e) { toggleDetailsFromRow(e, this); };
         
-        // Lav HTML for den røde firkant, HVIS programmet har et kritisk overlap (blinker altid)
-        let overlapHTML = program._harOverlap ? `<span class="overlap-indicator" title="Dette program overlapper kritisk med et andet program på dagen!"></span>` : '';
+        // Lav HTML for den røde/gule firkant, HVIS programmet har et overlap
+        let overlapHTML = '';
+        if (program._harOverlap) {
+            if (program._overlapType === 'yellow') {
+                overlapHTML = `<span class="overlap-indicator-yellow" title="Dette program overlapper potentielt med et andet program på dagen (TBC)!"></span>`;
+            } else {
+                overlapHTML = `<span class="overlap-indicator" title="Dette program overlapper kritisk med et andet program på dagen!"></span>`;
+            }
+        }
         
         trMain.innerHTML = `
             <td style="${datoCelleStyle}">${pDatoFormat}</td>
