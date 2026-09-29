@@ -540,15 +540,19 @@
             };
         }
 
-        function findNextLiveProgram() {
+function findNextLiveProgram() {
             let now = new Date();
             let futureLive = [];
 
             produktioner.forEach(p => {
                 let kanal = String(p.Kanal || "").trim().toUpperCase();
                 let erTBC = (p.TBC && String(p.TBC).trim().toUpperCase() === "X");
+                // Tjekker om "forskudt" optræder i noter (ignorerer store/små bogstaver)
+                let noterTxt = String(p["Link / Noter"] || "").toLowerCase();
+                let erForskudt = noterTxt.includes("forskudt");
                 
-                if (kanal === "SPORT LIVE" && !erTBC) {
+                // Tilføjer programmet HVIS: Det er SPORT LIVE, IKKE TBC, og IKKE forskudt
+                if (kanal === "SPORT LIVE" && !erTBC && !erForskudt) {
                     let pDato = parseDateTimeForCountdown(p.Dato, p.TX, p.RX, p.Tid);
                     
                     if (pDato) {
