@@ -2434,7 +2434,7 @@ function autoUdfyldSluttid() {
         if (sport === "volleyball" || sport === "volley") return 120;
         if (sport === "floorball") return 120;
         if (sport === "futsal") return 120;
-        if (sport === "amr. fodbold" || sport.includes("amerikansk fodbold")) return 140;
+        if (sport === "amr. fodbold" || sport.includes("amerikansk fodbold")) return 180;
         if (sport === "ishockey") return 140;
         if (sport === "håndbold") return 90;
         return 0; // Ikke genkendt
