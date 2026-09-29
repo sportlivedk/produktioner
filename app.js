@@ -1357,9 +1357,16 @@ async function opretNytProgram() {
     const notifCheck = document.getElementById('SendNotifNyt');
     if (notifCheck) notifCheck.checked = true; 
 
-    formInitialState = hentFormularState();
+formInitialState = hentFormularState();
     pendingTechInfoForNewProgram = null;
-    lastAutoSluttidContext = null; // Tilføjet
+    
+    // Nulstil og sæt hukommelse for auto-sluttid
+    lastAutoSluttidContext = {
+        tid: document.getElementById('Tid').value.trim(),
+        sportsgren: document.getElementById('Sportsgren').value.trim().toLowerCase(),
+        titel: document.getElementById('Programtitel').value.trim().toLowerCase()
+    };
+    
     openModal();
 }
 
@@ -1487,7 +1494,14 @@ async function redigerProgram(rowId) {
 
     formInitialState = hentFormularState();
     pendingTechInfoForNewProgram = null;
-    lastAutoSluttidContext = null; // Tilføjet
+    
+    // Sæt hukommelse for auto-sluttid med programmets oprindelige værdier
+    lastAutoSluttidContext = {
+        tid: document.getElementById('Tid').value.trim(),
+        sportsgren: document.getElementById('Sportsgren').value.trim().toLowerCase(),
+        titel: document.getElementById('Programtitel').value.trim().toLowerCase()
+    };
+
     openModal();
 }
 
@@ -1608,7 +1622,14 @@ async function kopierProgram(rowId) {
     if (notifCheck) notifCheck.checked = true; 
 
     formInitialState = hentFormularState();
-    lastAutoSluttidContext = null; // Tilføjet
+    
+    // Sæt hukommelse for auto-sluttid
+    lastAutoSluttidContext = {
+        tid: document.getElementById('Tid').value.trim(),
+        sportsgren: document.getElementById('Sportsgren').value.trim().toLowerCase(),
+        titel: document.getElementById('Programtitel').value.trim().toLowerCase()
+    };
+
     openModal();
 }
 
@@ -2382,7 +2403,8 @@ function autoUdfyldSluttid() {
     // REGEL 5: Slet Sluttid, hvis Tid gøres tom
     if (tidInput === "") {
         sluttidFelt.value = "";
-        lastAutoSluttidContext = null;
+        // Vi nulstiller kun tiden i hukommelsen, ikke hele objektet, så den overlever sletning
+        if (lastAutoSluttidContext) lastAutoSluttidContext.tid = ""; 
         return;
     }
 
