@@ -2429,13 +2429,14 @@ function autoUdfyldSluttid() {
 
     // Hjælpefunktion til at udregne varighed
     function hentVarighed(sport, titel) {
-        if (sport === "fodbold") return 105;
+        if (sport === "fodbold") return 120;
         if (sport === "basketball" || sport === "basket") return titel.includes("overtime") ? 60 : 135;
         if (sport === "volleyball" || sport === "volley") return 120;
         if (sport === "floorball") return 120;
-        if (sport === "futsal") return 135;
+        if (sport === "futsal") return 120;
         if (sport === "amr. fodbold" || sport.includes("amerikansk fodbold")) return 140;
         if (sport === "ishockey") return 140;
+        if (sport === "håndbold") return 90;
         return 0; // Ikke genkendt
     }
 
