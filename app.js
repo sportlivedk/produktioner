@@ -19,6 +19,8 @@ let techFormInitialState = "";
 let kopieretTechOpsaetning = null;
 let pendingTechInfoForNewProgram = null;
 
+let lastAutoSluttidContext = null; // Tilføjet: Holder styr på forrige værdier for auto-sluttid
+
 function hentFormularState() {
     const data = {};
     const fieldsToCheck = ['Dato', 'Tid', 'TX', 'Sluttid', 'Kanal', 'Premieredato', 'Sportsgren', 'Programtitel', 'Lokation', 'Unit', 'Format', 'RX', 'P-plan', 'Noter', 'Producer', 'Kommentator', 'Ekspert', 'Reporter'];
@@ -1357,6 +1359,7 @@ async function opretNytProgram() {
 
     formInitialState = hentFormularState();
     pendingTechInfoForNewProgram = null;
+    lastAutoSluttidContext = null; // Tilføjet
     openModal();
 }
 
@@ -1484,6 +1487,7 @@ async function redigerProgram(rowId) {
 
     formInitialState = hentFormularState();
     pendingTechInfoForNewProgram = null;
+    lastAutoSluttidContext = null; // Tilføjet
     openModal();
 }
 
@@ -1604,6 +1608,7 @@ async function kopierProgram(rowId) {
     if (notifCheck) notifCheck.checked = true; 
 
     formInitialState = hentFormularState();
+    lastAutoSluttidContext = null; // Tilføjet
     openModal();
 }
 
@@ -2363,50 +2368,96 @@ function renderMcrVagter(vagter) {
 // --- AUTO-UDFYLD EST. SLUTTID ---
 function autoUdfyldSluttid() {
     const sluttidFelt = document.getElementById('Sluttid');
-    // Stop hvis feltet 'Sluttid' slet ikke findes (f.eks. på login-skærmen) eller allerede er udfyldt
-    if (!sluttidFelt || sluttidFelt.value.trim() !== "") return;
+    const sportsgrenFelt = document.getElementById('Sportsgren');
+    const tidFelt = document.getElementById('Tid');
+    const titelFelt = document.getElementById('Programtitel');
 
-    const sportsgrenInput = document.getElementById('Sportsgren').value.trim().toLowerCase();
-    const titelInput = document.getElementById('Programtitel').value.trim().toLowerCase();
-    const tidInput = document.getElementById('Tid').value;
+    if (!sluttidFelt || !sportsgrenFelt || !tidFelt) return;
 
-    // Stop hvis vi mangler enten Sportsgren eller starttid (Tid) for at kunne regne
-    if (!sportsgrenInput || !tidInput) return;
+    const sportsgrenInput = sportsgrenFelt.value.trim().toLowerCase();
+    const tidInput = tidFelt.value.trim();
+    const titelInput = titelFelt ? titelFelt.value.trim().toLowerCase() : "";
+    const nuvaerendeSluttid = sluttidFelt.value.trim();
 
-    let varighed = 0;
+    // REGEL 5: Slet Sluttid, hvis Tid gøres tom
+    if (tidInput === "") {
+        sluttidFelt.value = "";
+        lastAutoSluttidContext = null;
+        return;
+    }
 
-    // Tjek sportsgrenen og definer varigheden (minutter)
-    if (sportsgrenInput === "fodbold") {
-        varighed = 105;
-    } else if (sportsgrenInput === "basketball" || sportsgrenInput === "basket") {
-        // Tjek om titlen indeholder ordet "overtime"
-        if (titelInput.includes("overtime")) {
-            varighed = 60;
-        } else {
-            varighed = 135;
+    // Hvis vi ikke har en context, forsøg at bygge den (fx når vinduet lige er åbnet)
+    if (!lastAutoSluttidContext) {
+        lastAutoSluttidContext = {
+            tid: tidInput,
+            sportsgren: sportsgrenInput,
+            titel: titelInput
+        };
+    }
+
+    // Tjek om der rent faktisk er sket en ændring, vi skal reagere på
+    const tidAendret = tidInput !== lastAutoSluttidContext.tid;
+    const sportAendret = sportsgrenInput !== lastAutoSluttidContext.sportsgren || titelInput !== lastAutoSluttidContext.titel;
+
+    if (!tidAendret && !sportAendret) {
+        // REGEL 2 & 3: Hvis intet er ændret, og der allerede står noget (evt. manuelt), gør ingenting.
+        // Hvis der IKKE står noget, og vi har de nødvendige data, så udregn for første gang.
+        if (nuvaerendeSluttid !== "") return; 
+    }
+
+    // Hjælpefunktion til at udregne varighed
+    function hentVarighed(sport, titel) {
+        if (sport === "fodbold") return 105;
+        if (sport === "basketball" || sport === "basket") return titel.includes("overtime") ? 60 : 135;
+        if (sport === "volleyball" || sport === "volley") return 120;
+        if (sport === "floorball") return 120;
+        if (sport === "futsal") return 135;
+        if (sport === "amr. fodbold" || sport.includes("amerikansk fodbold")) return 140;
+        if (sport === "ishockey") return 140;
+        return 0; // Ikke genkendt
+    }
+
+    const varighed = hentVarighed(sportsgrenInput, titelInput);
+
+    // REGEL 4: Hvis KUN Tid er ændret, og vi allerede har en Sluttid, forskyder vi Sluttiden tilsvarende
+    if (tidAendret && !sportAendret && nuvaerendeSluttid !== "" && lastAutoSluttidContext.tid !== "") {
+        let [gammelTh, gammelTm] = lastAutoSluttidContext.tid.split(':').map(Number);
+        let [nyTh, nyTm] = tidInput.split(':').map(Number);
+        let [slutTh, slutTm] = nuvaerendeSluttid.split(':').map(Number);
+
+        if (!isNaN(gammelTh) && !isNaN(nyTh) && !isNaN(slutTh)) {
+            let gammelTidMins = (gammelTh * 60) + gammelTm;
+            let nyTidMins = (nyTh * 60) + nyTm;
+            let forskelMins = nyTidMins - gammelTidMins;
+
+            let slutMins = (slutTh * 60) + slutTm;
+            let nySlutMins = slutMins + forskelMins;
+
+            if (nySlutMins < 0) nySlutMins += 24 * 60; // Håndter negativ tid over midnat
+            
+            let nyTimer = Math.floor(nySlutMins / 60) % 24;
+            let nyMinutter = nySlutMins % 60;
+
+            sluttidFelt.value = String(nyTimer).padStart(2, '0') + ':' + String(nyMinutter).padStart(2, '0');
         }
-    } else if (sportsgrenInput === "volleyball" || sportsgrenInput === "volley") {
-        varighed = 120;
-    } else if (sportsgrenInput === "floorball") {
-        varighed = 120;
-    } else if (sportsgrenInput === "futsal") {
-        varighed = 135;
-    } else if (sportsgrenInput === "amr. fodbold" || sportsgrenInput.includes("amerikansk fodbold")) {
-        varighed = 140;
-    } else if (sportsgrenInput === "ishockey") {
-        varighed = 140;
+    } 
+    // REGEL 2 & 4: Hvis Sportsgren er ændret (eller det er første indtastning) OG vi har en gyldig sport
+    else if (varighed > 0) {
+        let [timer, minutter] = tidInput.split(':').map(Number);
+        if (!isNaN(timer) && !isNaN(minutter)) {
+            let totalMinutter = (timer * 60) + minutter + varighed;
+            let nyTimer = Math.floor(totalMinutter / 60) % 24;
+            let nyMinutter = totalMinutter % 60;
+            sluttidFelt.value = String(nyTimer).padStart(2, '0') + ':' + String(nyMinutter).padStart(2, '0');
+        }
     }
 
-    // Hvis vi har fundet en matchende varighed, udregner og indsætter vi sluttiden
-    if (varighed > 0) {
-        let [timer, minutter] = tidInput.split(':').map(Number);
-        let totalMinutter = (timer * 60) + minutter + varighed;
-        
-        let nyTimer = Math.floor(totalMinutter / 60) % 24; // % 24 sikrer korrekt format over midnat
-        let nyMinutter = totalMinutter % 60;
-        
-        sluttidFelt.value = String(nyTimer).padStart(2, '0') + ':' + String(nyMinutter).padStart(2, '0');
-    }
+    // Opdater hukommelsen til næste gang der tastes i et felt
+    lastAutoSluttidContext = {
+        tid: tidInput,
+        sportsgren: sportsgrenInput,
+        titel: titelInput
+    };
 }
 
 
