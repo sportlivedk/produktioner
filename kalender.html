@@ -318,15 +318,15 @@
 
         /* --- DAGS DATO MARKERING (SKARPT KLIP-BLINK 50/50) --- */
         
-/* Almindelige hverdage skifter hårdt mellem støvet gul og normal */
+/* Almindelige hverdage skifter hårdt mellem transparent pastelgul og normal */
         .day-row.idag:not(.weekend) .date-circle {
             animation: blink-hverdag 2s infinite;
         }
 
         @keyframes blink-hverdag {
             0%, 49.9% {
-                background-color: #fce38a; /* Støvet guld/sennepsgul */
-                color: #000000; 
+                background-color: rgba(252, 227, 138, 0.6); /* 40% transparent pastelgul */
+                color: #1a1a1a; 
                 font-weight: 700;
             }
             50%, 100% {
@@ -336,15 +336,15 @@
             }
         }
 
-        /* Weekender og helligdage skifter hårdt mellem støvet gul og rød */
+        /* Weekender og helligdage skifter hårdt mellem transparent pastelgul og rød */
         .day-row.idag.weekend .date-circle {
             animation: blink-weekend 2s infinite;
         }
 
         @keyframes blink-weekend {
             0%, 49.9% {
-                background-color: #fce38a; /* Støvet guld/sennepsgul */
-                color: #000000; 
+                background-color: rgba(252, 227, 138, 0.6); /* 40% transparent pastelgul */
+                color: #1a1a1a; 
                 font-weight: 700;
             }
             50%, 100% {
