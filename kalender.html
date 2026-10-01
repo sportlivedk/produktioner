@@ -313,19 +313,19 @@
         .even-week { background-color: #f5f7f9; }
         .even-week .date-number { background-color: #ebedf0; }
 
-        .empty-day .date-number { background-color: transparent; border-right: 1px solid transparent; }
-        .empty-day { border-bottom: 1px solid transparent; }
+        .empty-day .date-number { background-color: transparent; border-right: 1px solid #c0c0c0; }
+        .empty-day { border-bottom: 1px solid #c0c0c0; }
 
         /* --- DAGS DATO MARKERING (SKARPT KLIP-BLINK 50/50) --- */
         
-        /* Almindelige hverdage skifter hårdt mellem grøn og normal */
+        /* Almindelige hverdage skifter hårdt mellem grå og normal */
         .day-row.idag:not(.weekend) .date-circle {
             animation: blink-hverdag 2s infinite;
         }
 
         @keyframes blink-hverdag {
             0%, 49.9% {
-                background-color: #606060; /* Grøn */
+                background-color: #606060; /* Grå */
                 color: #ffffff;
                 font-weight: 600;
             }
@@ -336,14 +336,14 @@
             }
         }
 
-        /* Weekender og helligdage skifter hårdt mellem grøn og rød */
+        /* Weekender og helligdage skifter hårdt mellem grå og rød */
         .day-row.idag.weekend .date-circle {
             animation: blink-weekend 2s infinite;
         }
 
         @keyframes blink-weekend {
             0%, 49.9% {
-                background-color: #606060; /* Grøn */
+                background-color: #606060; /* Grå */
                 color: #ffffff;
                 font-weight: 600;
             }
