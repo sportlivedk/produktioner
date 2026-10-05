@@ -1382,10 +1382,17 @@ function skalViseAdvarsel(program) {
     
     if (pDato < sysDato) return false;
     
-    const slutNæsteMaaned = new Date(sysDato.getFullYear(), sysDato.getMonth() + 2, 0);
-    slutNæsteMaaned.setHours(23, 59, 59, 999);
+    const startNaesteMaaned = new Date(sysDato.getFullYear(), sysDato.getMonth() + 1, 1);
+    const slutNaesteMaaned = new Date(sysDato.getFullYear(), sysDato.getMonth() + 2, 0);
+    slutNaesteMaaned.setHours(23, 59, 59, 999);
     
-    if (pDato > slutNæsteMaaned) return false;
+    if (pDato > slutNaesteMaaned) return false;
+    
+    // NY LOGIK: Hvis programmet ligger i næste måned, tjek at vi er maks 14 dage fra månedsskiftet
+    if (pDato >= startNaesteMaaned) {
+        const dageTilNaesteMaaned = (startNaesteMaaned - sysDato) / (1000 * 60 * 60 * 24);
+        if (dageTilNaesteMaaned > 14) return false;
+    }
 
     if (program["TBC"] && String(program["TBC"]).toUpperCase() === 'X') {
         return false;
