@@ -834,7 +834,7 @@ function findNextLiveProgram() {
             const currentYear = currentDate.getFullYear();
             const colorBlueUnits = ["minitech", "nowtek ob1", "nowtek ob2", "ob", "ob 7", "ob 9", "ob 7+9", "sam ob"];
 
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 6; i++) {
                 let m = (currentMonthIndex + i) % 12;
                 let y = currentYear + Math.floor((currentMonthIndex + i) / 12);
                 let daysInMonth = new Date(y, m + 1, 0).getDate();
