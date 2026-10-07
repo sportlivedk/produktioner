@@ -421,20 +421,23 @@
 // --- ROTATIONS-LOGIK (TIDSSTYRET SYNKRONISERING) ---
         let isShowingCalendar = true;
         
-        function tjekSynkroniseretVisning() {
+function tjekSynkroniseretVisning() {
             const now = new Date();
+            const currentMonth = now.getMonth();
             const minutter = now.getMinutes();
             const sekunder = now.getSeconds();
             
-            // Logik: Vis nedtælling hvis minuttallet er deleligt med 5, og vi er i de første 20 sekunder.
-            // (F.eks. kl. 14:00:00 - 14:00:19, kl. 14:05:00 - 14:05:19 osv.)
-            const skalViseNedtælling = (minutter % 5 === 0 && sekunder < 20);
+            // H2 (Juli-December skærm) skal KUN vise nedtælling, 
+            // hvis det er 1. halvår (januar-juni) lige nu.
+            const erIModsatHalvaar = (currentMonth < 6);
+            const tidTilNedtaelling = (minutter % 5 === 0 && sekunder < 20);
+            
+            const skalViseNedtælling = erIModsatHalvaar && tidTilNedtaelling;
             
             const cal = document.getElementById('calendar-container');
             const nl = document.getElementById('next-live-container');
 
             if (skalViseNedtælling && isShowingCalendar) {
-                // Skift til Næste Live
                 cal.style.opacity = '0';
                 cal.style.pointerEvents = 'none';
                 setTimeout(() => { 
@@ -443,7 +446,6 @@
                 }, 800);
                 isShowingCalendar = false;
             } else if (!skalViseNedtælling && !isShowingCalendar) {
-                // Skift tilbage til Kalender
                 nl.style.opacity = '0';
                 nl.style.pointerEvents = 'none';
                 setTimeout(() => { 
