@@ -418,34 +418,36 @@
         let produktioner = [];
         let globalTick = 0; 
         
-// --- ROTATIONS-LOGIK (TIDSSTYRET SYNKRONISERING) ---
+// --- ROTATIONS-LOGIK (SKÆRMSPECIFIK) ---
         let isShowingCalendar = true;
-        
-function tjekSynkroniseretVisning() {
+
+        function switchViews() {
             const now = new Date();
             const currentMonth = now.getMonth();
-            const minutter = now.getMinutes();
-            const sekunder = now.getSeconds();
-            
-            // H2 (Juli-December skærm) skal KUN vise nedtælling, 
-            // hvis det er 1. halvår (januar-juni) lige nu.
+
+            // H2 viser Juli-December. Vis KUN nedtælling, hvis vi er i Januar-Juni (måned 0-5)
             const erIModsatHalvaar = (currentMonth < 6);
-            const tidTilNedtaelling = (minutter % 5 === 0 && sekunder < 20);
-            
-            const skalViseNedtælling = erIModsatHalvaar && tidTilNedtaelling;
-            
+
             const cal = document.getElementById('calendar-container');
             const nl = document.getElementById('next-live-container');
 
-            if (skalViseNedtælling && isShowingCalendar) {
-                cal.style.opacity = '0';
-                cal.style.pointerEvents = 'none';
-                setTimeout(() => { 
-                    nl.style.opacity = '1'; 
-                    nl.style.pointerEvents = 'auto'; 
-                }, 800);
-                isShowingCalendar = false;
-            } else if (!skalViseNedtælling && !isShowingCalendar) {
+            if (isShowingCalendar) {
+                if (erIModsatHalvaar) {
+                    // Skift til nedtælling
+                    cal.style.opacity = '0';
+                    cal.style.pointerEvents = 'none';
+                    setTimeout(() => { 
+                        nl.style.opacity = '1'; 
+                        nl.style.pointerEvents = 'auto'; 
+                    }, 800);
+                    isShowingCalendar = false;
+                    setTimeout(switchViews, 20000); // Vis i præcis 20 sekunder
+                } else {
+                    // Bliv på kalenderen, tjek igen om 5 minutter
+                    setTimeout(switchViews, 300000);
+                }
+            } else {
+                // Skift altid tilbage til kalender
                 nl.style.opacity = '0';
                 nl.style.pointerEvents = 'none';
                 setTimeout(() => { 
@@ -453,6 +455,7 @@ function tjekSynkroniseretVisning() {
                     cal.style.pointerEvents = 'auto'; 
                 }, 800);
                 isShowingCalendar = true;
+                setTimeout(switchViews, 300000); // Vis i 5 minutter
             }
         }
         
@@ -1015,7 +1018,7 @@ function tegnKalender() {
         setInterval(opdaterAnimationer, 7000);
         setInterval(tickCountdown, 1000); 
         
-        setInterval(tjekSynkroniseretVisning, 1000);
+        setTimeout(switchViews, 300000);
 
     </script>
 </body>
