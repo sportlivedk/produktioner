@@ -443,11 +443,11 @@
                     isShowingCalendar = false;
                     setTimeout(switchViews, 20000); // Vis i præcis 20 sekunder
                 } else {
-                    // Bliv på kalenderen, tjek igen om 5 minutter
+                    // Hvis H2 IKKE skal vise nedtælling, gør vi INTET visuelt, men tjekker igen om 5 minutter
                     setTimeout(switchViews, 300000);
                 }
             } else {
-                // Skift altid tilbage til kalender
+                // Skift tilbage til kalender
                 nl.style.opacity = '0';
                 nl.style.pointerEvents = 'none';
                 setTimeout(() => { 
@@ -455,7 +455,7 @@
                     cal.style.pointerEvents = 'auto'; 
                 }, 800);
                 isShowingCalendar = true;
-                setTimeout(switchViews, 300000); // Vis i 5 minutter
+                setTimeout(switchViews, 300000); // Vis kalenderen i 5 minutter
             }
         }
         
