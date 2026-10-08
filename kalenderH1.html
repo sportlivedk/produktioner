@@ -418,7 +418,7 @@
         let produktioner = [];
         let globalTick = 0; 
         
-// --- ROTATIONS-LOGIK (STANDARD) ---
+// --- ROTATIONS-LOGIK ---
         let isShowingCalendar = true;
         
         function switchViews() {
@@ -1015,7 +1015,10 @@ function tegnKalender() {
         setInterval(opdaterAnimationer, 7000);
         setInterval(tickCountdown, 1000); 
         
-        setTimeout(switchViews, 300000);
+        // H1: Start KUN nedtællings-rotationen, hvis aktuel måned er juli-december (måned 6 eller mere)
+        if (new Date().getMonth() >= 6) {
+            setTimeout(switchViews, 300000);
+        }
 
     </script>
 </body>

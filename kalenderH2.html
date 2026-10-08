@@ -418,7 +418,7 @@
         let produktioner = [];
         let globalTick = 0; 
         
-// --- ROTATIONS-LOGIK (STANDARD) ---
+// --- ROTATIONS-LOGIK ---
         let isShowingCalendar = true;
         
         function switchViews() {
@@ -1003,13 +1003,16 @@ function tegnKalender() {
             });
         }
 
-        // KICK-OFF
+// KICK-OFF
         fetchProductionData();
         setInterval(fetchProductionData, 1200000); 
         setInterval(opdaterAnimationer, 7000);
         setInterval(tickCountdown, 1000); 
         
-        setTimeout(switchViews, 300000);
+        // H2: Start KUN nedtællings-rotationen, hvis aktuel måned er januar-juni (mindre end 6)
+        if (new Date().getMonth() < 6) {
+            setTimeout(switchViews, 300000);
+        }
 
     </script>
 </body>
