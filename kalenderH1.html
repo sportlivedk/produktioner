@@ -418,44 +418,35 @@
         let produktioner = [];
         let globalTick = 0; 
         
-// --- ROTATIONS-LOGIK (SKÆRMSPECIFIK) ---
+// --- ROTATIONS-LOGIK (STANDARD) ---
         let isShowingCalendar = true;
-
+        
         function switchViews() {
-            const now = new Date();
-            const currentMonth = now.getMonth();
-
-            // H1 viser Januar-Juni. Vis KUN nedtælling, hvis vi er i Juli-December (måned 6-11)
-            const erIModsatHalvaar = (currentMonth >= 6);
-
             const cal = document.getElementById('calendar-container');
             const nl = document.getElementById('next-live-container');
-
+            
             if (isShowingCalendar) {
-                if (erIModsatHalvaar) {
-                    // Skift til nedtælling
-                    cal.style.opacity = '0';
-                    cal.style.pointerEvents = 'none';
-                    setTimeout(() => { 
-                        nl.style.opacity = '1'; 
-                        nl.style.pointerEvents = 'auto'; 
-                    }, 800);
-                    isShowingCalendar = false;
-                    setTimeout(switchViews, 20000); // Vis i præcis 20 sekunder
-                } else {
-                    // Hvis H1 IKKE skal vise nedtælling, gør vi INTET visuelt, men tjekker igen om 5 minutter
-                    setTimeout(switchViews, 300000);
-                }
+                cal.style.opacity = '0';
+                cal.style.pointerEvents = 'none';
+                
+                setTimeout(() => { 
+                    nl.style.opacity = '1'; 
+                    nl.style.pointerEvents = 'auto'; 
+                }, 800);
+                
+                isShowingCalendar = false;
+                setTimeout(switchViews, 20000); // Vises i 20 sekunder
             } else {
-                // Skift tilbage til kalender
                 nl.style.opacity = '0';
                 nl.style.pointerEvents = 'none';
+                
                 setTimeout(() => { 
                     cal.style.opacity = '1'; 
                     cal.style.pointerEvents = 'auto'; 
                 }, 800);
+                
                 isShowingCalendar = true;
-                setTimeout(switchViews, 300000); // Vis kalenderen i 5 minutter
+                setTimeout(switchViews, 300000); // Vises i 5 minutter
             }
         }
         
@@ -1018,7 +1009,7 @@ function tegnKalender() {
             });
         }
 
-        // KICK-OFF
+       // KICK-OFF
         fetchProductionData();
         setInterval(fetchProductionData, 1200000); 
         setInterval(opdaterAnimationer, 7000);
