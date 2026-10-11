@@ -723,10 +723,12 @@ function findNextLiveProgram() {
             const kanalNavn = String(p.Kanal || "").trim().toUpperCase();
             const unitLower = String(p.Unit || "").toLowerCase().trim();
 
-            if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
+if (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === "")) {
                 return { color: 'color-blue', prio: 1 };
             } else if (kanalNavn === "SPORT LIVE" && boksUnits.includes(unitLower)) {
                 return { color: 'color-green', prio: 2 };
+            } else if (kanalNavn === "OPTAGELSE") {
+                return { color: 'color-black', prio: 3 }; // NY REGEL: Optagelse er altid sort
             } else if (unitLower === "efp") {
                 return { color: 'color-black', prio: 3 };
             } else if (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower)) {
@@ -898,7 +900,7 @@ function findNextLiveProgram() {
                                 let kanalNavn = String(p.Kanal || "").trim().toUpperCase();
 
                                 let isSportLiveOB = (kanalNavn === "SPORT LIVE" && (colorBlueUnits.includes(unitLower) || unitLower === ""));
-                                let isExternalOB = (kanalNavn !== "SPORT LIVE" && colorBlueUnits.includes(unitLower));
+                                let isExternalOB = (kanalNavn !== "SPORT LIVE" && kanalNavn !== "OPTAGELSE" && colorBlueUnits.includes(unitLower));
 
                                 if (!titleMap.has(titel)) {
                                     titleMap.set(titel, { 
