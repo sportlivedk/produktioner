@@ -2497,8 +2497,8 @@ window.onload = function() {
     const yearContainer = document.getElementById('yearFilterContainer');
     const aktueltAar = new Date().getFullYear();
     
-    for (let i = -1; i <= 2; i++) {
-        let a = aktueltAar + i;
+    // Nyt loop: Starter ALTID i 2026 og fortsætter til og med det aktuelle år + 2
+    for (let a = 2026; a <= aktueltAar + 2; a++) {
         yearContainer.innerHTML += `<span class="year-option" id="year-${a}" onclick="filtrerAar(${a})">${a}</span>`;
     }
 
