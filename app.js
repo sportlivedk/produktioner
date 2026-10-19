@@ -970,6 +970,7 @@ function opdaterVisning() {
         }
 
         if (kategoriFilter === 'tbc' && (!program["TBC"] || String(program["TBC"]).toUpperCase() !== 'X')) return false;
+        if (kategoriFilter === 'bemanding' && !skalViseAdvarsel(program)) return false;
         
         if (searchTerm !== '') {
             const alleFelterTekst = Object.values(program).map(v => String(v)).join(' ').toLowerCase();
