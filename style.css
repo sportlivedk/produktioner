@@ -102,18 +102,19 @@
         .btn:disabled { background-color: #a0c4e8; cursor: not-allowed; }
         
         #btnExportPDF { 
-            background-color: #eb1200; 
+            background-color: #b30b00; 
             color: white;
             margin-right: 5px; 
-            padding: 0 16px; 
+            padding: 0 12px; 
             height: 36px; 
             box-sizing: border-box;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 6px;
             font-weight: 500;
         }
-        #btnExportPDF:hover { background-color: #c91000 !important; }
+        #btnExportPDF:hover { background-color: #8f0900 !important; }
 
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #000000; }
