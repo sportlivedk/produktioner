@@ -102,7 +102,7 @@
         .btn:disabled { background-color: #a0c4e8; cursor: not-allowed; }
         
         #btnExportPDF { 
-            background-color: #b30b00; 
+            background-color: #c91000; /* <-- Ret knappens farve her */
             color: white;
             margin-right: 5px; 
             padding: 0 12px; 
@@ -114,7 +114,7 @@
             gap: 6px;
             font-weight: 500;
         }
-        #btnExportPDF:hover { background-color: #8f0900 !important; }
+        #btnExportPDF:hover { background-color: #a60d00 !important; } /* <-- Ret hover-farven her */
 
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #000000; }
