@@ -103,8 +103,7 @@
         
         #btnExportPDF { 
             background-color: #dc3545; /* <-- Ret knappens farve her */
-            color: white;
-            margin-right: 5px; 
+            color: white; 
             padding: 0 12px; 
             height: 36px; 
             box-sizing: border-box;
