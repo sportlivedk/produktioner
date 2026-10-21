@@ -48,16 +48,25 @@ function truncateText(text, maxLength) {
 }
 
 async function genererPDF() { 
-    if (valgtMaaned === -1 || !valgtAar) return;
+    if (!valgtAar) return;
 
     const pdfBtn = document.getElementById('btnExportPDF');
     const orgTekst = pdfBtn.innerHTML;
     pdfBtn.innerHTML = '⏳';
     pdfBtn.disabled = true;
 
+    const kategoriFilter = document.getElementById('typeFilter').value;
+    const erSportLiveFilter = (kategoriFilter === 'sportlive');
+
     const maanedNavne = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"];
-    const maanedNavn = maanedNavne[valgtMaaned];
-    const overskrift = `Produktioner, ${maanedNavn} ${valgtAar}`;
+    let periodeTekst = `${valgtAar}`;
+    if (visKunIdag) {
+        const d = new Date();
+        periodeTekst = `${d.getDate()}. ${maanedNavne[d.getMonth()]} ${d.getFullYear()}`;
+    } else if (valgtMaaned !== -1) {
+        periodeTekst = `${maanedNavne[valgtMaaned]} ${valgtAar}`;
+    }
+    const overskrift = `Produktioner, ${periodeTekst}`;
 
     let logoData = null;
     try {
@@ -71,56 +80,81 @@ async function genererPDF() {
     } catch(e) { console.log('Kunne ikke hente logo', e); }
 
     const tableBody = [];
-    tableBody.push([
-        { text: 'Dato', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
-        { text: 'Sportsgren', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
-        { text: 'Produktion', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
-        { text: 'Sted', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
-        { text: 'Tid', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }, 
-        { text: 'Kommentator/vært', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
-        { text: 'Ekspert/gæst', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }
-    ]);
+    let tableWidths = [];
+
+    if (erSportLiveFilter) {
+        // Skabelon 1: Vis kun SPORT LIVE (Tid flyttet hen som kolonne 2)
+        tableWidths = [50, 35, 65, '*', 140, 95, 95];
+        tableBody.push([
+            { text: 'Dato', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Tid', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Sportsgren', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Produktion', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Sted', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Kommentator/vært', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Ekspert/gæst', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }
+        ]);
+    } else {
+        // Skabelon 2: Alle andre filtreringer (med Kanal i stedet for Ekspert/gæst)
+        tableWidths = [50, 35, 95, 65, '*', 140, 95];
+        tableBody.push([
+            { text: 'Dato', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Tid', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Kanal', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Sportsgren', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Produktion', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Sted', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Kommentator/vært', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }
+        ]);
+    }
 
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+    let programmerTilPDF = [];
 
-    let programmerTilPDF = alleProgrammerGlobal.filter(p => {
-        const kanalNavn = String(p["Kanal"] || '');
-        if (kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
+    if (erSportLiveFilter && valgtMaaned !== -1 && !visKunIdag) {
+        // Bevarer den eksisterende SPORT LIVE-logik (hvor Optagelse bruger Premieredato)
+        programmerTilPDF = alleProgrammerGlobal.filter(p => {
+            const kanalNavn = String(p["Kanal"] || '');
+            if (kanalNavn !== 'SPORT LIVE' && kanalNavn !== 'Optagelse') return false;
 
-        let pdfDato = p["NormDato"] || "";
-        if (kanalNavn === 'Optagelse' && p["Premieredato"]) {
-            pdfDato = p["Premieredato"];
-        }
-        
-        if (!pdfDato) return false;
+            let pdfDato = p["NormDato"] || "";
+            if (kanalNavn === 'Optagelse' && p["Premieredato"]) {
+                pdfDato = p["Premieredato"];
+            }
+            
+            if (!pdfDato) return false;
 
-        const parts = String(pdfDato).split('-');
-        if (parts.length !== 3) return false;
-        const pAar = parseInt(parts[0], 10);
-        const pMaaned = parseInt(parts[1], 10) - 1;
+            const parts = String(pdfDato).split('-');
+            if (parts.length !== 3) return false;
+            const pAar = parseInt(parts[0], 10);
+            const pMaaned = parseInt(parts[1], 10) - 1;
 
-        if (pAar !== valgtAar || pMaaned !== valgtMaaned) return false;
+            if (pAar !== valgtAar || pMaaned !== valgtMaaned) return false;
 
-        if (searchTerm !== '') {
-            const alleFelterTekst = Object.values(p).map(v => String(v)).join(' ').toLowerCase();
-            if (!alleFelterTekst.includes(searchTerm)) { return false; }
-        }
+            if (searchTerm !== '') {
+                const alleFelterTekst = Object.values(p).map(v => String(v)).join(' ').toLowerCase();
+                if (!alleFelterTekst.includes(searchTerm)) { return false; }
+            }
 
-        return true;
-    });
+            return true;
+        });
 
-    programmerTilPDF.sort((a, b) => {
-        const datoA = (String(a["Kanal"]) === 'Optagelse' && a["Premieredato"]) ? String(a["Premieredato"]) : String(a["NormDato"] || "");
-        const datoB = (String(b["Kanal"]) === 'Optagelse' && b["Premieredato"]) ? String(b["Premieredato"]) : String(b["NormDato"] || "");
-        if (datoA !== datoB) return datoA.localeCompare(datoB);
-        const tidA = String(a["Tid"] || "23:59");
-        const tidB = String(b["Tid"] || "23:59");
-        return tidA.localeCompare(tidB);
-    });
+        programmerTilPDF.sort((a, b) => {
+            const datoA = (String(a["Kanal"]) === 'Optagelse' && a["Premieredato"]) ? String(a["Premieredato"]) : String(a["NormDato"] || "");
+            const datoB = (String(b["Kanal"]) === 'Optagelse' && b["Premieredato"]) ? String(b["Premieredato"]) : String(b["NormDato"] || "");
+            if (datoA !== datoB) return datoA.localeCompare(datoB);
+            const tidA = String(a["Tid"] || "23:59");
+            const tidB = String(b["Tid"] || "23:59");
+            return tidA.localeCompare(tidB);
+        });
+    } else {
+        // For alle andre filtreringer bruges de aktuelt filtrerede programmer fra visningen
+        programmerTilPDF = [...aktuelleProgrammerVist];
+    }
 
     programmerTilPDF.forEach(p => {
         let rawDato = p["NormDato"];
-        if (String(p["Kanal"]) === 'Optagelse' && p["Premieredato"]) {
+        if (erSportLiveFilter && String(p["Kanal"]) === 'Optagelse' && p["Premieredato"]) {
             rawDato = p["Premieredato"];
         }
         let datoStr = "";
@@ -132,7 +166,7 @@ async function genererPDF() {
         let pTid = String(p["Tid"] || '-');
         let pTX = String(p["TX"] || '-');
         
-        if (String(p["Kanal"]) === 'Optagelse') {
+        if (erSportLiveFilter && String(p["Kanal"]) === 'Optagelse') {
             pTid = '-';
             pTX = '-';
         } else {
@@ -142,6 +176,8 @@ async function genererPDF() {
             if (pTX !== '-' && pTX.includes('T')) pTX = new Date(pTX).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
             else if (pTX !== '-') pTX = pTX.substring(0, 5);
         }
+
+        let visTid = erSportLiveFilter ? pTX : (pTX !== '-' ? pTX : pTid);
 
         let pSted = p["Lokation"] && String(p["Lokation"]).trim() !== '' ? String(p["Lokation"]).trim() : 'TBA';
         let truncSted = truncateText(pSted, 30);
@@ -170,15 +206,27 @@ async function genererPDF() {
             }
         }
 
-        tableBody.push([
-            { text: datoStr, fontSize: 9 },
-            { text: String(p["Sportsgren"] || ''), fontSize: 9 },
-            { ...produktionCelle, fontSize: 9 },
-            { text: truncSted, fontSize: 9, noWrap: true },
-            { text: pTX, fontSize: 9, bold: true }, 
-            { text: kommTxt, fontSize: 9 },
-            { text: String(p["Ekspert"] || ''), fontSize: 9 }
-        ]);
+        if (erSportLiveFilter) {
+            tableBody.push([
+                { text: datoStr, fontSize: 9 },
+                { text: visTid, fontSize: 9, bold: true },
+                { text: String(p["Sportsgren"] || ''), fontSize: 9 },
+                { ...produktionCelle, fontSize: 9 },
+                { text: truncSted, fontSize: 9, noWrap: true },
+                { text: kommTxt, fontSize: 9 },
+                { text: String(p["Ekspert"] || ''), fontSize: 9 }
+            ]);
+        } else {
+            tableBody.push([
+                { text: datoStr, fontSize: 9 },
+                { text: visTid, fontSize: 9, bold: true },
+                { text: String(p["Kanal"] || ''), fontSize: 9, noWrap: true },
+                { text: String(p["Sportsgren"] || ''), fontSize: 9 },
+                { ...produktionCelle, fontSize: 9 },
+                { text: truncSted, fontSize: 9, noWrap: true },
+                { text: kommTxt, fontSize: 9 }
+            ]);
+        }
     });
 
     const docDefinition = {
@@ -211,7 +259,7 @@ async function genererPDF() {
             {
                 table: {
                     headerRows: 1,
-                    widths: [50, 65, '*', 140, 35, 95, 95],
+                    widths: tableWidths,
                     body: tableBody
                 },
                 layout: {
@@ -227,7 +275,7 @@ async function genererPDF() {
     };
 
     try {
-        pdfMake.createPdf(docDefinition).download(`SPORT LIVE (${maanedNavn} ${valgtAar}).pdf`);
+        pdfMake.createPdf(docDefinition).download(`SPORT LIVE (${periodeTekst}).pdf`);
     } catch(e) {
         alert('Der skete en fejl ved generering af PDF.');
         console.error(e);
@@ -932,11 +980,7 @@ function opdaterVisning() {
     
     const pdfBtn = document.getElementById('btnExportPDF');
     if (pdfBtn) {
-        if (valgtMaaned !== -1 && kategoriFilter === 'sportlive' && !visKunIdag) {
-            pdfBtn.style.display = 'inline-flex';
-        } else {
-            pdfBtn.style.display = 'none';
-        }
+        pdfBtn.style.display = 'inline-flex';
     }
 
     const sysDato = new Date();
