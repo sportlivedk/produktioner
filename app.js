@@ -229,6 +229,21 @@ async function genererPDF() {
         }
     });
 
+    let headerLinje2 = 'Oversigten viser både SPORT LIVE og eksterne modtagere.';
+    if (kategoriFilter === 'sportlive') {
+        headerLinje2 = 'Se detaljeret programoversigt på sport-live.dk/programoversigt.';
+    } else if (kategoriFilter === 'fremtidige') {
+        headerLinje2 = 'Oversigten viser kun fremtidige programmer.';
+    } else if (kategoriFilter === 'ekstern') {
+        headerLinje2 = 'Oversigten viser kun programmer til eksterne modtagere.';
+    } else if (kategoriFilter === 'ob') {
+        headerLinje2 = 'Oversigten viser alle OB-produktioner.';
+    } else if (kategoriFilter === 'tbc') {
+        headerLinje2 = 'Oversigten viser programmer, som ikke er bekræftede.';
+    } else if (kategoriFilter === 'bemanding') {
+        headerLinje2 = 'Oversigten viser programmer, som mangler bemanding.';
+    }
+
     const docDefinition = {
         pageOrientation: 'landscape',
         pageMargins: [40, 115, 40, 30], 
@@ -247,7 +262,7 @@ async function genererPDF() {
                     {
                         stack: [
                             { text: 'Tid indikerer start på programmet eller transmissionen inkl. optakt.', italics: true, fontSize: 10, alignment: 'right', color: '#000000' },
-                            { text: 'Se detaljeret programoversigt på sport-live.dk/programoversigt.', italics: true, fontSize: 10, alignment: 'right', color: '#000000', margin: [0, 6, 0, 0] }
+                            { text: headerLinje2, italics: true, fontSize: 10, alignment: 'right', color: '#000000', margin: [0, 6, 0, 0] }
                         ],
                         width: 'auto',
                         margin: [0, 42, 10, 0] 
