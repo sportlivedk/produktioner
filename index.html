@@ -48,8 +48,6 @@
             
             <div class="header-right">
                 <div class="controls-wrapper">
-                    <button id="btnExportPDF" class="btn" style="display: none;" onclick="genererPDF()"><svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v13"></path><path d="m6 12 6 6 6-6"></path></svg>PDF</button>
-
                     <div style="position: relative;">
                         <select id="typeFilter" class="filter-select" onchange="handterFilterSkift()">
                             <option value="alle">Vis alle programmer</option>
@@ -68,6 +66,8 @@
                         <button id="clearSearchBtn" class="search-clear-btn" onclick="rydSogning()" title="Ryd søgning">✕</button>
                     </div>
                     
+                    <button id="btnExportPDF" class="btn" onclick="genererPDF()"><svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v13"></path><path d="m6 12 6 6 6-6"></path></svg>PDF</button>
+
                     <!-- TILFØJET: MCR Vagtplan knap -->
                     <button id="btnMcrVagtplan" class="btn" style="background-color: #dc5e11;" onclick="aabenMcrModal()">MCR</button>
                     <button id="btnTilfoejProgram" class="btn" onclick="opretNytProgram()">+ Tilf&oslash;j nyt program</button>

@@ -993,11 +993,6 @@ function opdaterVisning() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
     const kategoriFilter = document.getElementById('typeFilter').value;
     
-    const pdfBtn = document.getElementById('btnExportPDF');
-    if (pdfBtn) {
-        pdfBtn.style.display = 'inline-flex';
-    }
-
     const sysDato = new Date();
     const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
 
