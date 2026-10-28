@@ -2501,7 +2501,7 @@ async function sendMaanedsVagtplan() {
         return (pAar === valgtAar && pMaaned === valgtMaaned);
     });
 
-    // Indsaml unikke navne fra Kommentator og Reporter
+    // Indsaml unikke navne fra Kommentator og Reporter (ignorer "Engelsk fra feed")
     const fundneNavneMap = new Map();
     maanedsProgrammer.forEach(p => {
         ['Kommentator', 'Reporter'].forEach(felt => {
@@ -2510,7 +2510,7 @@ async function sendMaanedsVagtplan() {
                 raaVal.split(/[,\/]/).forEach(del => {
                     const navn = del.trim();
                     const lower = navn.toLowerCase();
-                    if (navn !== '' && lower !== '-' && lower !== 'tba' && lower !== 'tbc' && lower !== 'ingen') {
+                    if (navn !== '' && lower !== '-' && lower !== 'tba' && lower !== 'tbc' && lower !== 'ingen' && lower !== 'engelsk fra feed') {
                         if (!fundneNavneMap.has(lower)) {
                             fundneNavneMap.set(lower, navn);
                         }
@@ -2539,17 +2539,17 @@ async function sendMaanedsVagtplan() {
     });
 
     if (modtagereFundet.length === 0) {
-        await visCustomDialog(`Ingen af de tilknyttede personer i ${maanedNavn} ${valgtAar} (${ukendteNavne.join(', ')}) blev fundet i arket 'Brugere'.\n\nDer kan derfor ikke sendes nogen e-mails.`, "alert");
+        await visCustomDialog(`Ingen af de tilknyttede personer i ${maanedNavn} ${valgtAar} (${ukendteNavne.join(', ')}) blev fundet i systemet.\n\nDer kan derfor ikke sendes nogen e-mails.`, "alert");
         return;
     }
 
-    let dialogTekst = `Du er ved at sende vagtplanen for ${maanedNavn} ${valgtAar} til ${modtagereFundet.length} ${modtagereFundet.length === 1 ? 'person' : 'kommentatorer/værter og reportere'}.`;
+    let dialogTekst = `Du er ved at sende vagtplanen for ${maanedNavn} ${valgtAar} til\n${modtagereFundet.length} ${modtagereFundet.length === 1 ? 'person' : 'kommentatorer/værter og reportere'}.`;
     
     if (ukendteNavne.length > 0) {
-        dialogTekst += `\n\nBemærk: Følgende personer findes ikke i arket 'Brugere' og modtager derfor IKKE en e-mail:\n• ${ukendteNavne.join('\n• ')}`;
+        dialogTekst += `\n\nFølgende personer findes ikke i systemet\nog vil derfor IKKE modtage en e-mail:\n\n• ${ukendteNavne.join('\n• ')}`;
     }
 
-    dialogTekst += `\n\nDette kan kun gøres én gang for måneden. Vil du fortsætte?`;
+    dialogTekst += `\n\nØnsker du at fortsætte?`;
 
     const bekraeft = await visCustomDialog(dialogTekst, "confirm");
     if (!bekraeft) return;
@@ -2578,9 +2578,11 @@ async function sendMaanedsVagtplan() {
             }
             opdaterFiltreUI();
 
+            const filtreredeMissing = (result.missingNames || []).filter(n => String(n).trim().toLowerCase() !== 'engelsk fra feed');
+
             let succesTekst = `Vagtplanen for ${maanedNavn} ${valgtAar} er nu sendt ud til ${result.sentCount} ${result.sentCount === 1 ? 'modtager' : 'modtagere'}.`;
-            if (result.missingNames && result.missingNames.length > 0) {
-                succesTekst += `\n\nSprunget over (findes ikke i 'Brugere'):\n• ${result.missingNames.join('\n• ')}`;
+            if (filtreredeMissing.length > 0) {
+                succesTekst += `\n\nSprunget over (findes ikke i systemet):\n• ${filtreredeMissing.join('\n• ')}`;
             }
             await visCustomDialog(succesTekst, "alert");
         } else {
