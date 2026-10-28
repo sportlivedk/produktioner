@@ -2705,6 +2705,23 @@ window.onload = function() {
         yearContainer.innerHTML += `<span class="year-option" id="year-${a}" onclick="filtrerAar(${a})">${a}</span>`;
     }
 
+// Aflæs evt. måned (periode) og søgeord (sog) direkte fra link i e-mail
+    const urlParams = new URLSearchParams(window.location.search);
+    const periodeParam = urlParams.get('periode');
+    if (periodeParam && /^\d{4}-\d{2}$/.test(periodeParam)) {
+        const [pAar, pMaaned] = periodeParam.split('-').map(Number);
+        valgtAar = pAar;
+        valgtMaaned = pMaaned - 1;
+        visKunIdag = false;
+    }
+    const sogParam = urlParams.get('sog');
+    if (sogParam) {
+        const sInput = document.getElementById('searchInput');
+        const cBtn = document.getElementById('clearSearchBtn');
+        if (sInput) sInput.value = sogParam;
+        if (cBtn) cBtn.style.display = 'block';
+    }
+
     const gemtBruger = localStorage.getItem('sportlive_user');
     const gemtRolle = localStorage.getItem('sportlive_role');
     const gemtNavn = localStorage.getItem('sportlive_navn');
