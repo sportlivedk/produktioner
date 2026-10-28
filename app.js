@@ -2543,10 +2543,10 @@ async function sendMaanedsVagtplan() {
         return;
     }
 
-    let dialogTekst = `Du er ved at sende vagtplanen for ${maanedNavn} ${valgtAar} til\n${modtagereFundet.length} ${modtagereFundet.length === 1 ? 'person' : 'kommentatorer/værter og reportere'}.`;
+    let dialogTekst = `Du er ved at sende vagtplanen for ${maanedNavn} ${valgtAar}\ntil ${modtagereFundet.length} ${modtagereFundet.length === 1 ? 'person' : 'kommentatorer/værter og reportere'}.`;
     
     if (ukendteNavne.length > 0) {
-        dialogTekst += `\n\nFølgende personer findes ikke i systemet\nog vil derfor IKKE modtage en e-mail:\n\n• ${ukendteNavne.join('\n• ')}`;
+        dialogTekst += `\n\nFølgende personer findes ikke i systemet\nog vil derfor ikke modtage en e-mail:\n\n• ${ukendteNavne.join('\n• ')}`;
     }
 
     dialogTekst += `\n\nØnsker du at fortsætte?`;
