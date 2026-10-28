@@ -131,6 +131,26 @@
         .btn-idag { border: 1px solid #28a745; color: #28a745; margin-left: 0; }
         .btn-idag:hover { background-color: #e8f5e9; }
         .btn-idag.active { background-color: #28a745; color: white; border-color: #28a745; }
+.btn-vagtplan {
+            margin-left: auto;
+            background-color: #0056b3;
+            color: white;
+            border: 1px solid #0056b3;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-vagtplan:hover:not(:disabled) {
+            background-color: #004494;
+            border-color: #004494;
+        }
+        .btn-vagtplan:disabled {
+            background-color: #e9ecef !important;
+            color: #999999 !important;
+            border-color: #cccccc !important;
+            cursor: not-allowed !important;
+            opacity: 0.75;
+        }
 
         .mobile-month-select { display: none; }
 

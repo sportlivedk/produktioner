@@ -1,6 +1,8 @@
 const scriptURL = 'https://script.google.com/macros/s/AKfycbwDWxdFBq4WeKLBUZCXA5Ores39RPk4Miz0RXMy7SuvqNmxZMq-yv3-IhqcuPy8qFVG/exec';
         
 let alleProgrammerGlobal = [];
+let kendteBrugereGlobal = [];
+let sendteVagtplanerGlobal = [];
 let aktuelleProgrammerVist = []; 
 let aktuelDato = new Date();
 let valgtAar = aktuelDato.getFullYear();
@@ -356,7 +358,8 @@ async function logInd() {
 }
 
 function afslutLogin() {
-    document.getElementById('loginOverlay').style.display = "none";
+    if (document.getElementById('btnSendVagtplan')) document.getElementById('btnSendVagtplan').style.display = "none";
+document.getElementById('loginOverlay').style.display = "none";
     document.getElementById('userInfoContainer').style.display = "block";
     document.getElementById('displayUsername').textContent = aktueltNavn;
     loadProgrammer();
@@ -592,7 +595,7 @@ function opdaterFiltreUI() {
         if(aktivtAarEl) aktivtAarEl.classList.add('active');
     }
 
-    document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.month-btn:not(.btn-vagtplan)').forEach(btn => btn.classList.remove('active'));
     if (!visKunIdag) {
         let aktivMaanedEl = document.getElementById('btn-month-' + valgtMaaned);
         if(aktivMaanedEl) aktivMaanedEl.classList.add('active');
@@ -608,6 +611,42 @@ function opdaterFiltreUI() {
             mobileSelect.value = 'idag';
         } else {
             mobileSelect.value = valgtMaaned.toString();
+        }
+    }
+
+    // Styr synlighed og aktiv/nedtonet tilstand for "SEND VAGTPLAN"-knappen
+    const vagtplanBtn = document.getElementById('btnSendVagtplan');
+    if (vagtplanBtn) {
+        if (brugerRolle === "Admin") {
+            vagtplanBtn.style.display = 'inline-flex';
+            
+            const sysNu = new Date();
+            const aktueltAarNu = sysNu.getFullYear();
+            const aktuelMaanedNu = sysNu.getMonth();
+            const erSpecifikMaaned = (!visKunIdag && valgtMaaned !== -1);
+            const erAktuelEllerFremtid = (valgtAar > aktueltAarNu) || (valgtAar === aktueltAarNu && valgtMaaned >= aktuelMaanedNu);
+            const maanedKey = `${valgtAar}-${String(valgtMaaned + 1).padStart(2, '0')}`;
+            const erAlleredeSendt = sendteVagtplanerGlobal.includes(maanedKey);
+
+            if (!erSpecifikMaaned) {
+                vagtplanBtn.disabled = true;
+                vagtplanBtn.textContent = "SEND VAGTPLAN";
+                vagtplanBtn.title = "Vælg en specifik måned for at udsende vagtplan";
+            } else if (!erAktuelEllerFremtid) {
+                vagtplanBtn.disabled = true;
+                vagtplanBtn.textContent = "SEND VAGTPLAN";
+                vagtplanBtn.title = "Kan ikke udsendes for afsluttede måneder";
+            } else if (erAlleredeSendt) {
+                vagtplanBtn.disabled = true;
+                vagtplanBtn.textContent = "SEND VAGTPLAN";
+                vagtplanBtn.title = "Vagtplanen er allerede udsendt for denne måned";
+            } else {
+                vagtplanBtn.disabled = false;
+                vagtplanBtn.textContent = "SEND VAGTPLAN";
+                vagtplanBtn.title = "Send e-mail om vagtplan til månedens kommentatorer/værter og reportere";
+            }
+        } else {
+            vagtplanBtn.style.display = 'none';
         }
     }
 }
@@ -926,7 +965,9 @@ async function loadProgrammer(silent = false) {
         // -----------------------------------------------------------------
         // Her kalder vi MCR-vagterne og fodrer dem direkte til din nye popup
         // -----------------------------------------------------------------
-        renderMcrVagter(jsonData.mcrVagter);
+kendteBrugereGlobal = jsonData.brugereNavne || [];
+sendteVagtplanerGlobal = jsonData.sendteVagtplaner || [];        
+renderMcrVagter(jsonData.mcrVagter);
 
         opdaterFiltreUI();
         opdaterVisning();
@@ -2446,6 +2487,126 @@ function renderMcrVagter(vagter) {
     });
 
     container.innerHTML = htmlString;
+}
+
+// -----------------------------------------------------------------
+// UDSENDELSE AF MÅNEDSVAGTPLAN TIL KOMMENTATORER/VÆRTER OG REPORTERE
+// -----------------------------------------------------------------
+async function sendMaanedsVagtplan() {
+    if (brugerRolle !== "Admin") return;
+    if (visKunIdag || valgtMaaned === -1) return;
+
+    const maanedNavne = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"];
+    const maanedNavn = maanedNavne[valgtMaaned];
+    const maanedKey = `${valgtAar}-${String(valgtMaaned + 1).padStart(2, '0')}`;
+
+    if (sendteVagtplanerGlobal.includes(maanedKey)) {
+        await visCustomDialog(`Vagtplanen for ${maanedNavn} ${valgtAar} er allerede blevet sendt ud.`, "alert");
+        return;
+    }
+
+    // Find alle produktioner i den valgte måned (baseret på Dato / NormDato)
+    const maanedsProgrammer = alleProgrammerGlobal.filter(p => {
+        const normDato = p["NormDato"] || "";
+        if (!normDato) return false;
+        const parts = normDato.split('-');
+        if (parts.length !== 3) return false;
+        const pAar = parseInt(parts[0], 10);
+        const pMaaned = parseInt(parts[1], 10) - 1;
+        return (pAar === valgtAar && pMaaned === valgtMaaned);
+    });
+
+    // Indsaml unikke navne fra Kommentator og Reporter
+    const fundneNavneMap = new Map();
+    maanedsProgrammer.forEach(p => {
+        ['Kommentator', 'Reporter'].forEach(felt => {
+            const raaVal = String(p[felt] || '').trim();
+            if (raaVal !== '' && raaVal !== '-') {
+                raaVal.split(/[,\/]/).forEach(del => {
+                    const navn = del.trim();
+                    const lower = navn.toLowerCase();
+                    if (navn !== '' && lower !== '-' && lower !== 'tba' && lower !== 'tbc' && lower !== 'ingen') {
+                        if (!fundneNavneMap.has(lower)) {
+                            fundneNavneMap.set(lower, navn);
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    if (fundneNavneMap.size === 0) {
+        await visCustomDialog(`Der er endnu ikke tilknyttet nogen kommentatorer/værter eller reportere til programmerne i ${maanedNavn} ${valgtAar}.`, "alert");
+        return;
+    }
+
+    // Tjek hvem der findes i arket 'Brugere'
+    const kendteLower = kendteBrugereGlobal.map(n => String(n).trim().toLowerCase());
+    const modtagereFundet = [];
+    const ukendteNavne = [];
+
+    fundneNavneMap.forEach((originalNavn, lowerNavn) => {
+        if (kendteLower.includes(lowerNavn)) {
+            modtagereFundet.push(originalNavn);
+        } else {
+            ukendteNavne.push(originalNavn);
+        }
+    });
+
+    if (modtagereFundet.length === 0) {
+        await visCustomDialog(`Ingen af de tilknyttede personer i ${maanedNavn} ${valgtAar} (${ukendteNavne.join(', ')}) blev fundet i arket 'Brugere'.\n\nDer kan derfor ikke sendes nogen e-mails.`, "alert");
+        return;
+    }
+
+    let dialogTekst = `Du er ved at sende vagtplanen for ${maanedNavn} ${valgtAar} til ${modtagereFundet.length} ${modtagereFundet.length === 1 ? 'person' : 'kommentatorer/værter og reportere'}.`;
+    
+    if (ukendteNavne.length > 0) {
+        dialogTekst += `\n\nBemærk: Følgende personer findes ikke i arket 'Brugere' og modtager derfor IKKE en e-mail:\n• ${ukendteNavne.join('\n• ')}`;
+    }
+
+    dialogTekst += `\n\nDette kan kun gøres én gang for måneden. Vil du fortsætte?`;
+
+    const bekraeft = await visCustomDialog(dialogTekst, "confirm");
+    if (!bekraeft) return;
+
+    const btn = document.getElementById('btnSendVagtplan');
+    btn.disabled = true;
+    btn.textContent = "SENDER...";
+
+    try {
+        const response = await fetch(scriptURL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: "send_vagtplan",
+                aar: valgtAar,
+                maaned: valgtMaaned,
+                maanedKey: maanedKey
+            }),
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            if (!sendteVagtplanerGlobal.includes(maanedKey)) {
+                sendteVagtplanerGlobal.push(maanedKey);
+            }
+            opdaterFiltreUI();
+
+            let succesTekst = `Vagtplanen for ${maanedNavn} ${valgtAar} er nu sendt ud til ${result.sentCount} ${result.sentCount === 1 ? 'modtager' : 'modtagere'}.`;
+            if (result.missingNames && result.missingNames.length > 0) {
+                succesTekst += `\n\nSprunget over (findes ikke i 'Brugere'):\n• ${result.missingNames.join('\n• ')}`;
+            }
+            await visCustomDialog(succesTekst, "alert");
+        } else {
+            await visCustomDialog(result.message || "Der opstod en fejl ved udsendelse af vagtplanen.", "alert");
+            opdaterFiltreUI();
+        }
+    } catch (error) {
+        console.error("Fejl ved udsendelse af vagtplan:", error);
+        await visCustomDialog("Der opstod en netværksfejl. Prøv igen.", "alert");
+        opdaterFiltreUI();
+    }
 }
 
 // --- AUTO-UDFYLD EST. SLUTTID ---
