@@ -617,7 +617,7 @@ function opdaterFiltreUI() {
     // Styr synlighed og aktiv/nedtonet tilstand for "Send vagtplan"-knappen
     const vagtplanBtn = document.getElementById('btnSendVagtplan');
     if (vagtplanBtn) {
-        if (brugerRolle === "Admin") {
+        if (brugerRolle === "Superadmin") {
             vagtplanBtn.style.display = 'inline-flex';
             vagtplanBtn.innerHTML = 'Send vagtplan<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"></path><path d="m12 6 6 6-6 6"></path></svg>';
             
@@ -1224,7 +1224,7 @@ function calcE2ETime() {
 
 async function aabenTechModal(event, rowId) {
     event.preventDefault();
-    if (brugerRolle !== "Admin") {
+    if (brugerRolle !== "Admin" && brugerRolle !== "Superadmin") {
         await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
         return;
     }
@@ -1404,7 +1404,7 @@ async function gemTechInfo() {
 }
 
 async function opretNytProgram() {
-    if (brugerRolle !== "Admin") {
+    if (brugerRolle !== "Admin" && brugerRolle !== "Superadmin") {
         await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
         return;
     }
@@ -1506,7 +1506,7 @@ function skalViseAdvarsel(program) {
 }
 
 async function redigerProgram(rowId) {
-    if (brugerRolle !== "Admin") {
+    if (brugerRolle !== "Admin" && brugerRolle !== "Superadmin") {
         await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
         return;
     }
@@ -1594,7 +1594,7 @@ async function redigerProgram(rowId) {
 }
 
 async function kopierProgram(rowId) {
-    if (brugerRolle !== "Admin") {
+    if (brugerRolle !== "Admin" && brugerRolle !== "Superadmin") {
         await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
         return;
     }
@@ -1722,7 +1722,7 @@ async function kopierProgram(rowId) {
 }
 
 async function bekraeftSlet(rowId) {
-    if (brugerRolle !== "Admin") {
+    if (brugerRolle !== "Admin" && brugerRolle !== "Superadmin") {
         await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
         return;
     }
@@ -2173,7 +2173,7 @@ function tegnTabel(programmer) {
 }
 
 async function gemProgram() {
-    if (brugerRolle !== "Admin") {
+    if (brugerRolle !== "Admin" && brugerRolle !== "Superadmin") {
         await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
         return;
     }
@@ -2478,7 +2478,7 @@ function renderMcrVagter(vagter) {
 // UDSENDELSE AF MÅNEDSVAGTPLAN TIL KOMMENTATORER/VÆRTER OG REPORTERE
 // -----------------------------------------------------------------
 async function sendMaanedsVagtplan() {
-    if (brugerRolle !== "Admin") return;
+    if (brugerRolle !== "Superadmin") return;
     if (visKunIdag || valgtMaaned === -1) return;
 
     const maanedNavne = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"];
