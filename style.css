@@ -133,21 +133,21 @@
         .btn-idag.active { background-color: #28a745; color: white; border-color: #28a745; }
 .btn-vagtplan {
             margin-left: auto;
-            background-color: #f7d774;
+            background-color: #b88b00;
             color: #ffffff;
-            border: 1px solid #dfb948;
+            border: 1px solid #9e7700;
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
         .btn-vagtplan:hover:not(:disabled) {
-            background-color: #efc854;
-            border-color: #d1aa36;
+            background-color: #9e7700;
+            border-color: #856400;
         }
         .btn-vagtplan:disabled {
-            background-color: #fbf6e4 !important;
+            background-color: #f7f2dc !important;
             color: #000000 !important;
-            border-color: #e8dfc2 !important;
+            border-color: #e2d8b5 !important;
             cursor: not-allowed !important;
         }
 
