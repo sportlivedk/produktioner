@@ -136,7 +136,9 @@
             background-color: #cc9900;
             color: #ffffff;
             border: 1px solid #b38600;
+            font-size: 14px;
             font-weight: 500;
+            padding: 7px 12px;
             display: inline-flex;
             align-items: center;
             gap: 6px;

@@ -629,19 +629,7 @@ function opdaterFiltreUI() {
             const maanedKey = `${valgtAar}-${String(valgtMaaned + 1).padStart(2, '0')}`;
             const erAlleredeSendt = sendteVagtplanerGlobal.includes(maanedKey);
 
-            if (!erSpecifikMaaned) {
-                vagtplanBtn.disabled = true;
-                vagtplanBtn.title = "Vælg en specifik måned for at udsende vagtplan";
-            } else if (!erAktuelEllerFremtid) {
-                vagtplanBtn.disabled = true;
-                vagtplanBtn.title = "Kan ikke udsendes for afsluttede måneder";
-            } else if (erAlleredeSendt) {
-                vagtplanBtn.disabled = true;
-                vagtplanBtn.title = "Vagtplanen er allerede udsendt for denne måned";
-            } else {
-                vagtplanBtn.disabled = false;
-                vagtplanBtn.title = "Udsend månedens vagtplan via e-mail";
-            }
+            vagtplanBtn.disabled = (!erSpecifikMaaned || !erAktuelEllerFremtid || erAlleredeSendt);
         } else {
             vagtplanBtn.style.display = 'none';
         }
