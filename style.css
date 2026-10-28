@@ -134,7 +134,7 @@
 .btn-vagtplan {
             margin-left: auto;
             background-color: #f7d774;
-            color: #000000;
+            color: #ffffff;
             border: 1px solid #dfb948;
             display: inline-flex;
             align-items: center;
@@ -146,7 +146,7 @@
         }
         .btn-vagtplan:disabled {
             background-color: #fbf6e4 !important;
-            color: #a69f88 !important;
+            color: #000000 !important;
             border-color: #e8dfc2 !important;
             cursor: not-allowed !important;
         }
