@@ -614,12 +614,12 @@ function opdaterFiltreUI() {
         }
     }
 
-    // Styr synlighed og aktiv/nedtonet tilstand for "SEND VAGTPLAN"-knappen
+    // Styr synlighed og aktiv/nedtonet tilstand for "Send vagtplan"-knappen
     const vagtplanBtn = document.getElementById('btnSendVagtplan');
     if (vagtplanBtn) {
         if (brugerRolle === "Admin") {
             vagtplanBtn.style.display = 'inline-flex';
-            vagtplanBtn.innerHTML = 'SEND VAGTPLAN<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"></path><path d="m12 6 6 6-6 6"></path></svg>';
+            vagtplanBtn.innerHTML = 'Send vagtplan<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"></path><path d="m12 6 6 6-6 6"></path></svg>';
             
             const sysNu = new Date();
             const aktueltAarNu = sysNu.getFullYear();
@@ -640,7 +640,7 @@ function opdaterFiltreUI() {
                 vagtplanBtn.title = "Vagtplanen er allerede udsendt for denne måned";
             } else {
                 vagtplanBtn.disabled = false;
-                vagtplanBtn.title = "Send e-mail om vagtplan til månedens kommentatorer/værter og reportere";
+                vagtplanBtn.title = "Udsend månedens vagtplan via e-mail";
             }
         } else {
             vagtplanBtn.style.display = 'none';
@@ -2568,7 +2568,7 @@ async function sendMaanedsVagtplan() {
 
     const btn = document.getElementById('btnSendVagtplan');
     btn.disabled = true;
-    btn.textContent = "SENDER...";
+    btn.textContent = "Sender vagtplan...";
 
     try {
         const response = await fetch(scriptURL, {
