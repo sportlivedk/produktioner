@@ -188,7 +188,7 @@ async function genererPDF() {
             text: visUgeTekst,
             fontSize: 8.5,
             bold: true,
-            color: '#cccccc',
+            color: '#b8b8b8',
             alignment: 'right',
             noWrap: true,
             border: [false, false, false, false]
