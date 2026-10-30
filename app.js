@@ -661,7 +661,6 @@ function opdaterFiltreUI() {
     if (vagtplanBtn) {
         if (brugerRolle === "Superadmin") {
             vagtplanBtn.style.display = 'inline-flex';
-            vagtplanBtn.innerHTML = 'Send vagtplan<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"></path><path d="m12 6 6 6-6 6"></path></svg>';
             
             const sysNu = new Date();
             const aktueltAarNu = sysNu.getFullYear();
@@ -671,7 +670,13 @@ function opdaterFiltreUI() {
             const maanedKey = `${valgtAar}-${String(valgtMaaned + 1).padStart(2, '0')}`;
             const erAlleredeSendt = sendteVagtplanerGlobal.includes(maanedKey);
 
-            vagtplanBtn.disabled = (!erSpecifikMaaned || !erAktuelEllerFremtid || erAlleredeSendt);
+            const erInaktiv = (!erSpecifikMaaned || !erAktuelEllerFremtid || erAlleredeSendt);
+            vagtplanBtn.disabled = erInaktiv;
+
+            const pilSvg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"></path><path d="m12 6 6 6-6 6"></path></svg>';
+            const fluebenSvg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+            vagtplanBtn.innerHTML = 'Send vagtplan' + (erInaktiv ? fluebenSvg : pilSvg);
         } else {
             vagtplanBtn.style.display = 'none';
         }
