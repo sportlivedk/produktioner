@@ -49,6 +49,18 @@ function truncateText(text, maxLength) {
     return text;
 }
 
+function hentUgenummer(datoStr) {
+    if (!datoStr) return null;
+    const parts = String(datoStr).split('-');
+    if (parts.length !== 3) return null;
+    const d = new Date(Date.UTC(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10)));
+    if (isNaN(d.getTime())) return null;
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
 async function genererPDF() { 
     if (!valgtAar) return;
 
@@ -85,9 +97,10 @@ async function genererPDF() {
     let tableWidths = [];
 
     if (erSportLiveFilter) {
-        // Skabelon 1: Vis kun SPORT LIVE (Tid flyttet hen som kolonne 2)
-        tableWidths = [50, 35, 65, '*', 140, 95, 95];
+        // Skabelon 1: Vis kun SPORT LIVE (med usynlig uge-kolonne yderst til venstre)
+        tableWidths = [26, 50, 35, 65, '*', 140, 95, 95];
         tableBody.push([
+            { text: '', border: [false, false, false, false] },
             { text: 'Dato', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Tid', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Sportsgren', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
@@ -97,9 +110,10 @@ async function genererPDF() {
             { text: 'Ekspert/gæst', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] }
         ]);
     } else {
-        // Skabelon 2: Alle andre filtreringer (med Kanal i stedet for Ekspert/gæst)
-        tableWidths = [50, 35, 95, 65, '*', 140, 95];
+        // Skabelon 2: Alle andre filtreringer (med usynlig uge-kolonne yderst til venstre)
+        tableWidths = [26, 50, 35, 95, 65, '*', 140, 95];
         tableBody.push([
+            { text: '', border: [false, false, false, false] },
             { text: 'Dato', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Tid', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Kanal', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
@@ -154,11 +168,32 @@ async function genererPDF() {
         programmerTilPDF = [...aktuelleProgrammerVist];
     }
 
+    let aktuelUge = null;
+
     programmerTilPDF.forEach(p => {
         let rawDato = p["NormDato"];
         if (erSportLiveFilter && String(p["Kanal"]) === 'Optagelse' && p["Premieredato"]) {
             rawDato = p["Premieredato"];
         }
+
+        // Vis kun ugenummer ud for det første program i en ny uge
+        const ugeNr = hentUgenummer(rawDato);
+        let visUgeTekst = '';
+        if (ugeNr !== null && ugeNr !== aktuelUge) {
+            aktuelUge = ugeNr;
+            visUgeTekst = `${ugeNr}`; // Ret evt. til `Uge ${ugeNr}`, hvis du vil have ordet "Uge" med
+        }
+
+        const ugeCelle = {
+            text: visUgeTekst,
+            fontSize: 8.5,
+            bold: true,
+            color: '#888888',
+            alignment: 'right',
+            noWrap: true,
+            border: [false, false, false, false]
+        };
+
         let datoStr = "";
         if (rawDato) {
             const parts = String(rawDato).split('-');
@@ -210,6 +245,7 @@ async function genererPDF() {
 
         if (erSportLiveFilter) {
             tableBody.push([
+                ugeCelle,
                 { text: datoStr, fontSize: 9 },
                 { text: visTid, fontSize: 9, bold: true },
                 { text: String(p["Sportsgren"] || ''), fontSize: 9 },
@@ -220,6 +256,7 @@ async function genererPDF() {
             ]);
         } else {
             tableBody.push([
+                ugeCelle,
                 { text: datoStr, fontSize: 9 },
                 { text: visTid, fontSize: 9, bold: true },
                 { text: String(p["Kanal"] || ''), fontSize: 9, noWrap: true },
@@ -248,7 +285,7 @@ async function genererPDF() {
 
     const docDefinition = {
         pageOrientation: 'landscape',
-        pageMargins: [40, 115, 40, 30], 
+        pageMargins: [8, 115, 40, 30], 
         defaultStyle: { color: '#000000' },
         header: function() {
             return {
@@ -280,10 +317,15 @@ async function genererPDF() {
                     body: tableBody
                 },
                 layout: {
-                    fillColor: function (rowIndex) { return (rowIndex > 0 && rowIndex % 2 === 0) ? '#f8f9fa' : null; },
+                    fillColor: function (rowIndex, node, columnIndex) {
+                        if (columnIndex === 0) return null;
+                        return (rowIndex > 0 && rowIndex % 2 === 0) ? '#f8f9fa' : null;
+                    },
                     hLineWidth: function (i, node) { return (i === 0 || i === node.table.body.length) ? 0 : 0.5; },
                     vLineWidth: function (i, node) { return 0; },
                     hLineColor: function (i, node) { return '#e1e4e8'; },
+                    paddingLeft: function(i, node) { return i === 0 ? 0 : 4; },
+                    paddingRight: function(i, node) { return i === 0 ? 6 : 4; },
                     paddingTop: function(i, node) { return 6; },
                     paddingBottom: function(i, node) { return 6; }
                 }
