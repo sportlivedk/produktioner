@@ -49,6 +49,18 @@ function truncateText(text, maxLength) {
     return text;
 }
 
+function hentUgenummer(datoStr) {
+    if (!datoStr) return null;
+    const parts = String(datoStr).split('-');
+    if (parts.length !== 3) return null;
+    const d = new Date(Date.UTC(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10)));
+    if (isNaN(d.getTime())) return null;
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
 async function genererPDF() { 
     if (!valgtAar) return;
 
@@ -154,11 +166,37 @@ async function genererPDF() {
         programmerTilPDF = [...aktuelleProgrammerVist];
     }
 
+    let aktuelUge = null;
+    let raekkeIndeksIUge = 0;
+
     programmerTilPDF.forEach(p => {
         let rawDato = p["NormDato"];
         if (erSportLiveFilter && String(p["Kanal"]) === 'Optagelse' && p["Premieredato"]) {
             rawDato = p["Premieredato"];
         }
+
+        // Indsæt uge-skillelinje, når ugenummeret skifter
+        const ugeNr = hentUgenummer(rawDato);
+        if (ugeNr !== null && ugeNr !== aktuelUge) {
+            aktuelUge = ugeNr;
+            raekkeIndeksIUge = 0;
+            tableBody.push([
+                {
+                    text: `Uge ${ugeNr}`,
+                    colSpan: 7,
+                    bold: true,
+                    fontSize: 8.5,
+                    color: '#333333',
+                    fillColor: '#e9ecef',
+                    _erUgeRaekke: true
+                },
+                {}, {}, {}, {}, {}, {}
+            ]);
+        }
+
+        raekkeIndeksIUge++;
+        const rowBg = (raekkeIndeksIUge % 2 === 0) ? '#f8f9fa' : null;
+
         let datoStr = "";
         if (rawDato) {
             const parts = String(rawDato).split('-');
@@ -210,23 +248,23 @@ async function genererPDF() {
 
         if (erSportLiveFilter) {
             tableBody.push([
-                { text: datoStr, fontSize: 9 },
-                { text: visTid, fontSize: 9, bold: true },
-                { text: String(p["Sportsgren"] || ''), fontSize: 9 },
-                { ...produktionCelle, fontSize: 9 },
-                { text: truncSted, fontSize: 9, noWrap: true },
-                { text: kommTxt, fontSize: 9 },
-                { text: String(p["Ekspert"] || ''), fontSize: 9 }
+                { text: datoStr, fontSize: 9, fillColor: rowBg },
+                { text: visTid, fontSize: 9, bold: true, fillColor: rowBg },
+                { text: String(p["Sportsgren"] || ''), fontSize: 9, fillColor: rowBg },
+                { ...produktionCelle, fontSize: 9, fillColor: rowBg },
+                { text: truncSted, fontSize: 9, noWrap: true, fillColor: rowBg },
+                { text: kommTxt, fontSize: 9, fillColor: rowBg },
+                { text: String(p["Ekspert"] || ''), fontSize: 9, fillColor: rowBg }
             ]);
         } else {
             tableBody.push([
-                { text: datoStr, fontSize: 9 },
-                { text: visTid, fontSize: 9, bold: true },
-                { text: String(p["Kanal"] || ''), fontSize: 9, noWrap: true },
-                { text: String(p["Sportsgren"] || ''), fontSize: 9 },
-                { ...produktionCelle, fontSize: 9 },
-                { text: truncSted, fontSize: 9, noWrap: true },
-                { text: kommTxt, fontSize: 9 }
+                { text: datoStr, fontSize: 9, fillColor: rowBg },
+                { text: visTid, fontSize: 9, bold: true, fillColor: rowBg },
+                { text: String(p["Kanal"] || ''), fontSize: 9, noWrap: true, fillColor: rowBg },
+                { text: String(p["Sportsgren"] || ''), fontSize: 9, fillColor: rowBg },
+                { ...produktionCelle, fontSize: 9, fillColor: rowBg },
+                { text: truncSted, fontSize: 9, noWrap: true, fillColor: rowBg },
+                { text: kommTxt, fontSize: 9, fillColor: rowBg }
             ]);
         }
     });
@@ -280,12 +318,15 @@ async function genererPDF() {
                     body: tableBody
                 },
                 layout: {
-                    fillColor: function (rowIndex) { return (rowIndex > 0 && rowIndex % 2 === 0) ? '#f8f9fa' : null; },
                     hLineWidth: function (i, node) { return (i === 0 || i === node.table.body.length) ? 0 : 0.5; },
                     vLineWidth: function (i, node) { return 0; },
                     hLineColor: function (i, node) { return '#e1e4e8'; },
-                    paddingTop: function(i, node) { return 6; },
-                    paddingBottom: function(i, node) { return 6; }
+                    paddingTop: function(i, node) {
+                        return (node.table.body[i] && node.table.body[i][0] && node.table.body[i][0]._erUgeRaekke) ? 3 : 6;
+                    },
+                    paddingBottom: function(i, node) {
+                        return (node.table.body[i] && node.table.body[i][0] && node.table.body[i][0]._erUgeRaekke) ? 3 : 6;
+                    }
                 }
             }
         ]
