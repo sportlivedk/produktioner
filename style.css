@@ -133,9 +133,9 @@
         .btn-idag.active { background-color: #28a745; color: white; border-color: #28a745; }
 .btn-vagtplan {
             margin-left: auto;
-            background-color: #cc9900;
+            background-color: #b38600;
             color: #ffffff;
-            border: 1px solid #b38600;
+            border: 1px solid #997300;
             font-size: 14px;
             font-weight: 500;
             padding: 7px 12px;
@@ -144,8 +144,8 @@
             gap: 6px;
         }
         .btn-vagtplan:hover:not(:disabled) {
-            background-color: #b38600;
-            border-color: #997300;
+            background-color: #997300;
+            border-color: #806000;
         }
         .btn-vagtplan:disabled {
             background-color: #f7f2dc !important;
