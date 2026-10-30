@@ -186,8 +186,8 @@ async function genererPDF() {
                     colSpan: 7,
                     bold: true,
                     fontSize: 8.5,
-                    color: '#333333',
-                    fillColor: '#e9ecef',
+                    color: '#555555',
+                    fillColor: '#f2f4f6',
                     _erUgeRaekke: true
                 },
                 {}, {}, {}, {}, {}, {}
