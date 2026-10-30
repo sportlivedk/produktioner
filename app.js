@@ -659,18 +659,19 @@ function opdaterFiltreUI() {
     // Styr synlighed og aktiv/nedtonet tilstand for "Send vagtplan"-knappen
     const vagtplanBtn = document.getElementById('btnSendVagtplan');
     if (vagtplanBtn) {
-        if (brugerRolle === "Superadmin") {
+        const erSpecifikMaaned = (!visKunIdag && valgtMaaned !== -1);
+
+        if (brugerRolle === "Superadmin" && erSpecifikMaaned) {
             vagtplanBtn.style.display = 'inline-flex';
             
             const sysNu = new Date();
             const aktueltAarNu = sysNu.getFullYear();
             const aktuelMaanedNu = sysNu.getMonth();
-            const erSpecifikMaaned = (!visKunIdag && valgtMaaned !== -1);
             const erAktuelEllerFremtid = (valgtAar > aktueltAarNu) || (valgtAar === aktueltAarNu && valgtMaaned >= aktuelMaanedNu);
             const maanedKey = `${valgtAar}-${String(valgtMaaned + 1).padStart(2, '0')}`;
             const erAlleredeSendt = sendteVagtplanerGlobal.includes(maanedKey);
 
-            const erInaktiv = (!erSpecifikMaaned || !erAktuelEllerFremtid || erAlleredeSendt);
+            const erInaktiv = (!erAktuelEllerFremtid || erAlleredeSendt);
             vagtplanBtn.disabled = erInaktiv;
 
             const pilSvg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"></path><path d="m12 6 6 6-6 6"></path></svg>';
