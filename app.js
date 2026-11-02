@@ -656,28 +656,28 @@ function opdaterFiltreUI() {
         }
     }
 
-    // Styr synlighed og aktiv/nedtonet tilstand for "Send vagtplan"-knappen
+// Styr synlighed og aktiv/nedtonet tilstand for "Send vagtplan"-knappen
     const vagtplanBtn = document.getElementById('btnSendVagtplan');
     if (vagtplanBtn) {
-        const erSpecifikMaaned = (!visKunIdag && valgtMaaned !== -1);
-
-        if (brugerRolle === "Superadmin" && erSpecifikMaaned) {
+        if (brugerRolle === "Superadmin") {
             vagtplanBtn.style.display = 'inline-flex';
             
             const sysNu = new Date();
             const aktueltAarNu = sysNu.getFullYear();
             const aktuelMaanedNu = sysNu.getMonth();
+            const erSpecifikMaaned = (!visKunIdag && valgtMaaned !== -1);
             const erAktuelEllerFremtid = (valgtAar > aktueltAarNu) || (valgtAar === aktueltAarNu && valgtMaaned >= aktuelMaanedNu);
             const maanedKey = `${valgtAar}-${String(valgtMaaned + 1).padStart(2, '0')}`;
             const erAlleredeSendt = sendteVagtplanerGlobal.includes(maanedKey);
 
-            const erInaktiv = (!erAktuelEllerFremtid || erAlleredeSendt);
+            const erInaktiv = (!erSpecifikMaaned || !erAktuelEllerFremtid || erAlleredeSendt);
+            const visFlueben = (erSpecifikMaaned && (!erAktuelEllerFremtid || erAlleredeSendt));
             vagtplanBtn.disabled = erInaktiv;
 
             const pilSvg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"></path><path d="m12 6 6 6-6 6"></path></svg>';
             const fluebenSvg = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
-            vagtplanBtn.innerHTML = 'Send vagtplan' + (erInaktiv ? fluebenSvg : pilSvg);
+            vagtplanBtn.innerHTML = 'Send vagtplan' + (visFlueben ? fluebenSvg : pilSvg);
         } else {
             vagtplanBtn.style.display = 'none';
         }
