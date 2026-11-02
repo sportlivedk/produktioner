@@ -114,6 +114,8 @@
             font-weight: 500;
         }
         #btnExportPDF:hover { background-color: #c82333 !important; } /* <-- Ret hover-farven her */
+#btnMcrVagtplan { background-color: #dc5e11; }
+        #btnMcrVagtplan:hover { background-color: #be4f0e !important; }
 
         .user-info-text { font-size: 13px; color: #666; display: none; margin-top: 5px; } 
         .user-info-text strong { color: #000000; }
