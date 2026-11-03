@@ -2782,7 +2782,9 @@ async function downloadRapport() {
     let sumKommentator = 0, sumReporter = 0;
     let sumSportLive = 0, sumEkstern = 0, sumMinutter = 0;
 
-    if (erAarsrapport) {
+    const visOpdelingAatd = (erAarsrapport && valgtAar >= aktueltAarNu);
+
+    if (visOpdelingAatd) {
         mainTableWidths = ['*', 92, 68, 62, 65, 55, 65, 55, 76];
         mainTableBody.push([
             { text: 'Medarbejder', bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
@@ -2883,9 +2885,12 @@ async function downloadRapport() {
     ];
 
     const overskrift = `Vagtrapport, ${periodeTekst}`;
-    const undertekst1 = erAarsrapport
-        ? 'Årsoversigt for kommentatorer, værter og reportere (afviklede og planlagte vagter).'
-        : 'Månedsoversigt over tildelte vagter for kommentatorer, værter og reportere.';
+    let undertekst1 = 'Månedsoversigt over tildelte vagter for kommentatorer, værter og reportere.';
+    if (erAarsrapport) {
+        undertekst1 = (valgtAar < aktueltAarNu)
+            ? 'Årsoversigt over afviklede vagter for kommentatorer, værter og reportere.'
+            : 'Årsoversigt for kommentatorer, værter og reportere (afviklede og planlagte vagter).';
+    }
     const undertekst2 = 'Estimeret tidsforbrug er baseret på gennemsnitlige/anslåede varigheder.';
 
     const genDatoTekst = `${sysNu.getDate()}. ${maanedNavne[sysNu.getMonth()]} ${sysNu.getFullYear()} kl. ${String(sysNu.getHours()).padStart(2, '0')}.${String(sysNu.getMinutes()).padStart(2, '0')}`;
