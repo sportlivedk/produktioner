@@ -2606,6 +2606,10 @@ async function downloadRapport() {
         return `${m} min.`;
     }
 
+    function formaterVagtTekst(antal) {
+        return `${antal} ${antal === 1 ? 'vagt' : 'vagter'}`;
+    }
+
     function udtraekNavne(raaTekst) {
         const resultat = new Map();
         const str = String(raaTekst || '').trim();
@@ -2625,8 +2629,8 @@ async function downloadRapport() {
         'SPORT LIVE': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
         'Ekstra Bladet+': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
         'Bold+': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
-        'Feltet+': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
-        'Pluto TV': { aatd: 0, planlagt: 0, total: 0, tbc: 0 }
+        'Pluto TV': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
+        'Øvrige': { aatd: 0, planlagt: 0, total: 0, tbc: 0 }
     };
 
     periodeProgrammer.forEach(p => {
@@ -2650,7 +2654,6 @@ async function downloadRapport() {
         const kanalNavn = String(p["Kanal"] || '').trim();
         const erSportLiveKanal = (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse');
         const erPlutoKanal = kanalNavn.includes('Pluto TV');
-        const erEksternKanal = (kanalNavn === 'Ekstra Bladet+' || kanalNavn === 'Bold+' || kanalNavn === 'Feltet+' || erPlutoKanal);
         const varighedMins = beregnVarighedMinutter(p);
 
         vagterPaaProduktion.forEach((info, lower) => {
@@ -2681,19 +2684,25 @@ async function downloadRapport() {
                 m.kommentator++;
             }
 
-            if (erSportLiveKanal) m.sportLive++;
-            else if (erEksternKanal) m.ekstern++;
+            if (erSportLiveKanal) {
+                m.sportLive++;
+            } else {
+                m.ekstern++;
+            }
 
             m.minutter += varighedMins;
 
-            // Opdater kanaltæller for SPORT LIVE (inkl. Optagelse) og de 4 eksterne kanalgrupper
-            const statKey = erSportLiveKanal ? 'SPORT LIVE' : (erPlutoKanal ? 'Pluto TV' : kanalNavn);
-            if (kanalStats[statKey]) {
-                kanalStats[statKey].total++;
-                if (erTBC) kanalStats[statKey].tbc++;
-                if (erAfviklet) kanalStats[statKey].aatd++;
-                else kanalStats[statKey].planlagt++;
-            }
+            // Opdater kanaltæller for SPORT LIVE (inkl. Optagelse) og de 4 eksterne kategorier
+            let statKey = 'Øvrige';
+            if (erSportLiveKanal) statKey = 'SPORT LIVE';
+            else if (kanalNavn === 'Ekstra Bladet+') statKey = 'Ekstra Bladet+';
+            else if (kanalNavn === 'Bold+') statKey = 'Bold+';
+            else if (erPlutoKanal) statKey = 'Pluto TV';
+
+            kanalStats[statKey].total++;
+            if (erTBC) kanalStats[statKey].tbc++;
+            if (erAfviklet) kanalStats[statKey].aatd++;
+            else kanalStats[statKey].planlagt++;
         });
     });
 
@@ -2750,17 +2759,17 @@ async function downloadRapport() {
     let sumSportLive = 0, sumEkstern = 0, sumMinutter = 0;
 
     if (erAarsrapport) {
-        mainTableWidths = ['*', 96, 75, 70, 75, 68, 75, 68, 95];
+        mainTableWidths = ['*', 92, 68, 62, 65, 55, 65, 55, 76];
         mainTableBody.push([
-            { text: 'Medarbejder', bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Afviklet (år til dato)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Planlagt', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Vagter i alt', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Komm./vært', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Reporter', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'SPORT LIVE', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Eksterne', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Est. tidsforbrug', bold: true, fontSize: 9.5, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true] }
+            { text: 'Medarbejder', bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Afviklet (år til dato)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Planlagt', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Vagter i alt', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Komm./vært', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Reporter', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'SPORT LIVE', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Eksterne', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Est. tidsforbrug', bold: true, fontSize: 9.5, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true }
         ]);
 
         medarbejderListe.forEach(m => {
@@ -2777,12 +2786,12 @@ async function downloadRapport() {
                 { text: m.reporter > 0 ? `${m.reporter}` : '-', fontSize: 9.5, alignment: 'center' },
                 { text: m.sportLive > 0 ? `${m.sportLive}` : '-', fontSize: 9.5, alignment: 'center' },
                 { text: m.ekstern > 0 ? `${m.ekstern}` : '-', fontSize: 9.5, alignment: 'center' },
-                { text: formaterMinutter(m.minutter), fontSize: 9.5, alignment: 'right' }
+                { text: formaterMinutter(m.minutter), fontSize: 9.5, alignment: 'right', noWrap: true }
             ]);
         });
 
         mainTableBody.push([
-            { text: `I alt (${medarbejderListe.length} medarbejdere)`, bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `I alt (${medarbejderListe.length} medarbejdere)`, bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
             { text: `${sumAatd}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { ...formaterAntalMedTBC(sumPlanlagt, sumTbc, true), fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumTotal}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
@@ -2790,18 +2799,18 @@ async function downloadRapport() {
             { text: `${sumReporter}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumSportLive}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumEkstern}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: formaterMinutter(sumMinutter), bold: true, fontSize: 9.5, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true] }
+            { text: formaterMinutter(sumMinutter), bold: true, fontSize: 9.5, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true }
         ]);
     } else {
-        mainTableWidths = ['*', 90, 90, 85, 90, 85, 110];
+        mainTableWidths = ['*', 85, 85, 75, 85, 75, 85];
         mainTableBody.push([
-            { text: 'Medarbejder', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Vagter i alt', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Komm./vært', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Reporter', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'SPORT LIVE', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Eksterne', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Est. tidsforbrug', bold: true, fontSize: 10, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true] }
+            { text: 'Medarbejder', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Vagter i alt', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Komm./vært', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Reporter', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'SPORT LIVE', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Eksterne', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
+            { text: 'Est. tidsforbrug', bold: true, fontSize: 10, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true }
         ]);
 
         medarbejderListe.forEach(m => {
@@ -2816,43 +2825,43 @@ async function downloadRapport() {
                 { text: m.reporter > 0 ? `${m.reporter}` : '-', fontSize: 9.5, alignment: 'center' },
                 { text: m.sportLive > 0 ? `${m.sportLive}` : '-', fontSize: 9.5, alignment: 'center' },
                 { text: m.ekstern > 0 ? `${m.ekstern}` : '-', fontSize: 9.5, alignment: 'center' },
-                { text: formaterMinutter(m.minutter), fontSize: 9.5, alignment: 'right' }
+                { text: formaterMinutter(m.minutter), fontSize: 9.5, alignment: 'right', noWrap: true }
             ]);
         });
 
         mainTableBody.push([
-            { text: `I alt (${medarbejderListe.length} medarbejdere)`, bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `I alt (${medarbejderListe.length} medarbejdere)`, bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
             { ...formaterAntalMedTBC(sumTotal, sumTbc, true), fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumKommentator}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumReporter}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumSportLive}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumEkstern}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: formaterMinutter(sumMinutter), bold: true, fontSize: 10, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true] }
+            { text: formaterMinutter(sumMinutter), bold: true, fontSize: 10, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true }
         ]);
     }
 
-    // Selvstændig sektion for SPORT LIVE og de 4 eksterne kanaler
+    // Selvstændig sektion for SPORT LIVE og eksterne modtagere (inkl. Øvrige)
     const kanalTableBody = [
         [
             { text: 'SPORT LIVE', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Ekstra Bladet+', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Bold+', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Feltet+', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Pluto TV', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] }
+            { text: 'Pluto TV', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Øvrige', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] }
         ],
         [
-            { text: `${kanalStats['SPORT LIVE'].total} vagter`, fontSize: 9.5, alignment: 'center' },
-            { text: `${kanalStats['Ekstra Bladet+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
-            { text: `${kanalStats['Bold+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
-            { text: `${kanalStats['Feltet+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
-            { text: `${kanalStats['Pluto TV'].total} vagter`, fontSize: 9.5, alignment: 'center' }
+            { text: formaterVagtTekst(kanalStats['SPORT LIVE'].total), fontSize: 9.5, alignment: 'center' },
+            { text: formaterVagtTekst(kanalStats['Ekstra Bladet+'].total), fontSize: 9.5, alignment: 'center' },
+            { text: formaterVagtTekst(kanalStats['Bold+'].total), fontSize: 9.5, alignment: 'center' },
+            { text: formaterVagtTekst(kanalStats['Pluto TV'].total), fontSize: 9.5, alignment: 'center' },
+            { text: formaterVagtTekst(kanalStats['Øvrige'].total), fontSize: 9.5, alignment: 'center' }
         ]
     ];
 
     const overskrift = `Vagtrapport, ${periodeTekst}`;
     const undertekst1 = erAarsrapport
-        ? 'Årsoversigt for kommentatorer/værter og reportere (opdelt i afviklede vagter år til dato og planlagte vagter).'
-        : 'Månedsoversigt over tildelte vagter for kommentatorer/værter og reportere.';
+        ? 'Årsoversigt for kommentatorer, værter og reportere (opdelt i afviklede vagter år til dato og planlagte vagter).'
+        : 'Månedsoversigt over tildelte vagter for kommentatorer, værter og reportere.';
     const undertekst2 = 'Estimeret tidsforbrug er baseret på gennemsnitlige/anslåede varigheder.';
 
     const genDatoTekst = `${sysNu.getDate()}. ${maanedNavne[sysNu.getMonth()]} ${sysNu.getFullYear()} kl. ${String(sysNu.getHours()).padStart(2, '0')}.${String(sysNu.getMinutes()).padStart(2, '0')}`;
