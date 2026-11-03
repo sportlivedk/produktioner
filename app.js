@@ -2860,7 +2860,7 @@ async function downloadRapport() {
 
     const overskrift = `Vagtrapport, ${periodeTekst}`;
     const undertekst1 = erAarsrapport
-        ? 'Årsoversigt for kommentatorer, værter og reportere (opdelt i afviklede vagter år til dato og planlagte vagter).'
+        ? 'Årsoversigt for kommentatorer, værter og reportere (afviklede og planlagte vagter).'
         : 'Månedsoversigt over tildelte vagter for kommentatorer, værter og reportere.';
     const undertekst2 = 'Estimeret tidsforbrug er baseret på gennemsnitlige/anslåede varigheder.';
 
