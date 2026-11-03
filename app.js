@@ -2750,10 +2750,10 @@ async function downloadRapport() {
     let sumSportLive = 0, sumEkstern = 0, sumMinutter = 0;
 
     if (erAarsrapport) {
-        mainTableWidths = ['*', 75, 80, 75, 80, 75, 80, 75, 100];
+        mainTableWidths = ['*', 96, 75, 70, 75, 68, 75, 68, 95];
         mainTableBody.push([
             { text: 'Medarbejder', bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Afviklet (ÅTD)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Afviklet (år til dato)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Planlagt', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Vagter i alt', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Komm./vært', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
@@ -2841,7 +2841,7 @@ async function downloadRapport() {
             { text: 'Pluto TV', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] }
         ],
         [
-            { text: `${kanalStats['SPORT LIVE'].total} vagter`, bold: true, fontSize: 9.5, alignment: 'center' },
+            { text: `${kanalStats['SPORT LIVE'].total} vagter`, fontSize: 9.5, alignment: 'center' },
             { text: `${kanalStats['Ekstra Bladet+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
             { text: `${kanalStats['Bold+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
             { text: `${kanalStats['Feltet+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
@@ -2851,8 +2851,8 @@ async function downloadRapport() {
 
     const overskrift = `Vagtrapport, ${periodeTekst}`;
     const undertekst1 = erAarsrapport
-        ? 'Årsoversigt for kommentatorer, værter og reportere (opdelt i afviklede vagter år til dato og planlagte vagter).'
-        : 'Månedsoversigt over tildelte vagter for kommentatorer, værter og reportere.';
+        ? 'Årsoversigt for kommentatorer/værter og reportere (opdelt i afviklede vagter år til dato og planlagte vagter).'
+        : 'Månedsoversigt over tildelte vagter for kommentatorer/værter og reportere.';
     const undertekst2 = 'Estimeret tidsforbrug er baseret på gennemsnitlige/anslåede varigheder.';
 
     const genDatoTekst = `${sysNu.getDate()}. ${maanedNavne[sysNu.getMonth()]} ${sysNu.getFullYear()} kl. ${String(sysNu.getHours()).padStart(2, '0')}.${String(sysNu.getMinutes()).padStart(2, '0')}`;
@@ -2860,7 +2860,7 @@ async function downloadRapport() {
 
     const docDefinition = {
         pageOrientation: 'landscape',
-        pageMargins: [40, 115, 40, 35],
+        pageMargins: [40, 115, 40, 44],
         defaultStyle: { color: '#000000' },
         header: function() {
             return {
@@ -2890,7 +2890,7 @@ async function downloadRapport() {
                 italics: true,
                 fontSize: 8.5,
                 color: '#666666',
-                margin: [40, 10, 40, 0]
+                margin: [40, 0, 40, 0]
             };
         },
         content: [
