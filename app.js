@@ -3036,6 +3036,7 @@ async function sendMaanedsVagtplan() {
                 });
             }
         });
+});
 
     if (fundneNavneMap.size === 0) {
         await visCustomDialog(`Der er endnu ikke tilknyttet nogen kommentatorer/værter eller reportere til programmerne i ${maanedNavn} ${valgtAar}.`, "alert");
