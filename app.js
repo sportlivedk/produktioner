@@ -400,8 +400,9 @@ async function logInd() {
 }
 
 function afslutLogin() {
+    if (document.getElementById('btnDownloadRapport')) document.getElementById('btnDownloadRapport').style.display = "none";
     if (document.getElementById('btnSendVagtplan')) document.getElementById('btnSendVagtplan').style.display = "none";
-document.getElementById('loginOverlay').style.display = "none";
+    document.getElementById('loginOverlay').style.display = "none";
     document.getElementById('userInfoContainer').style.display = "block";
     document.getElementById('displayUsername').textContent = aktueltNavn;
     loadProgrammer();
@@ -637,7 +638,7 @@ function opdaterFiltreUI() {
         if(aktivtAarEl) aktivtAarEl.classList.add('active');
     }
 
-    document.querySelectorAll('.month-btn:not(.btn-vagtplan)').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.month-btn:not(.btn-vagtplan):not(.btn-rapport)').forEach(btn => btn.classList.remove('active'));
     if (!visKunIdag) {
         let aktivMaanedEl = document.getElementById('btn-month-' + valgtMaaned);
         if(aktivMaanedEl) aktivMaanedEl.classList.add('active');
@@ -656,7 +657,18 @@ function opdaterFiltreUI() {
         }
     }
 
-// Styr synlighed og aktiv/nedtonet tilstand for "Send vagtplan"-knappen
+    // Styr synlighed og aktiv/nedtonet tilstand for "Rapport"-knappen
+    const rapportBtn = document.getElementById('btnDownloadRapport');
+    if (rapportBtn) {
+        if (brugerRolle === "Superadmin") {
+            rapportBtn.style.display = 'inline-flex';
+            rapportBtn.disabled = visKunIdag;
+        } else {
+            rapportBtn.style.display = 'none';
+        }
+    }
+
+    // Styr synlighed og aktiv/nedtonet tilstand for "Send vagtplan"-knappen
     const vagtplanBtn = document.getElementById('btnSendVagtplan');
     if (vagtplanBtn) {
         if (brugerRolle === "Superadmin") {
@@ -2525,6 +2537,12 @@ function renderMcrVagter(vagter) {
 // -----------------------------------------------------------------
 // UDSENDELSE AF MÅNEDSVAGTPLAN TIL KOMMENTATORER/VÆRTER OG REPORTERE
 // -----------------------------------------------------------------
+
+async function downloadRapport() {
+    if (brugerRolle !== "Superadmin" || visKunIdag) return;
+    await visCustomDialog("Denne funktion er endnu ikke tilgængelig.", "alert");
+}
+
 async function sendMaanedsVagtplan() {
     if (brugerRolle !== "Superadmin") return;
     if (visKunIdag || valgtMaaned === -1) return;
