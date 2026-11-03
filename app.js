@@ -2613,11 +2613,35 @@ async function downloadRapport() {
     function udtraekNavne(raaTekst) {
         const resultat = new Map();
         const str = String(raaTekst || '').trim();
-        if (str === '' || str === '-') return resultat;
-        str.split(/[,\/]/).forEach(del => {
+        const strLower = str.toLowerCase();
+
+        // Ignorer tomme felter, N/A samt alt med "fra feed" eller "feed fra"
+        if (
+            str === '' ||
+            str === '-' ||
+            strLower === 'n/a' ||
+            strLower.includes('fra feed') ||
+            strLower.includes('feed fra')
+        ) {
+            return resultat;
+        }
+
+        // Fjern evt. "N/A", før der splittes ved komma og skråstreg
+        const rensetStr = str.replace(/\bn\/a\b/gi, '');
+
+        rensetStr.split(/[,\/]/).forEach(del => {
             const navn = del.trim();
             const lower = navn.toLowerCase();
-            if (navn !== '' && lower !== '-' && lower !== 'tba' && lower !== 'tbc' && lower !== 'ingen' && lower !== 'engelsk fra feed') {
+            if (
+                navn !== '' &&
+                lower !== '-' &&
+                lower !== 'tba' &&
+                lower !== 'tbc' &&
+                lower !== 'ingen' &&
+                lower !== 'n/a' &&
+                !lower.includes('fra feed') &&
+                !lower.includes('feed fra')
+            ) {
                 if (!resultat.has(lower)) resultat.set(lower, navn);
             }
         });
@@ -2990,12 +3014,21 @@ async function sendMaanedsVagtplan() {
     const fundneNavneMap = new Map();
     maanedsProgrammer.forEach(p => {
         ['Kommentator', 'Reporter'].forEach(felt => {
-            const raaVal = String(p[felt] || '').trim();
+            const raaVal = String(p[felt] || '').trim().replace(/\bn\/a\b/gi, '');
             if (raaVal !== '' && raaVal !== '-') {
                 raaVal.split(/[,\/]/).forEach(del => {
                     const navn = del.trim();
                     const lower = navn.toLowerCase();
-                    if (navn !== '' && lower !== '-' && lower !== 'tba' && lower !== 'tbc' && lower !== 'ingen' && lower !== 'engelsk fra feed') {
+                    if (
+                        navn !== '' &&
+                        lower !== '-' &&
+                        lower !== 'tba' &&
+                        lower !== 'tbc' &&
+                        lower !== 'ingen' &&
+                        lower !== 'n/a' &&
+                        !lower.includes('fra feed') &&
+                        !lower.includes('feed fra')
+                    ) {
                         if (!fundneNavneMap.has(lower)) {
                             fundneNavneMap.set(lower, navn);
                         }
@@ -3003,7 +3036,6 @@ async function sendMaanedsVagtplan() {
                 });
             }
         });
-    });
 
     if (fundneNavneMap.size === 0) {
         await visCustomDialog(`Der er endnu ikke tilknyttet nogen kommentatorer/værter eller reportere til programmerne i ${maanedNavn} ${valgtAar}.`, "alert");
@@ -3063,7 +3095,7 @@ async function sendMaanedsVagtplan() {
             }
             opdaterFiltreUI();
 
-            const filtreredeMissing = (result.missingNames || []).filter(n => String(n).trim().toLowerCase() !== 'engelsk fra feed');
+            const filtreredeMissing = (result.missingNames || []).filter(n => { const l = String(n).trim().toLowerCase(); return l !== 'n/a' && l !== 'n' && l !== 'a' && !l.includes('fra feed') && !l.includes('feed fra'); });
 
             let succesTekst = `Vagtplanen for ${maanedNavn} ${valgtAar} er nu sendt ud til ${result.sentCount} ${result.sentCount === 1 ? 'modtager' : 'modtagere'}.`;
             if (filtreredeMissing.length > 0) {
