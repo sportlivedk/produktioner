@@ -2539,8 +2539,414 @@ function renderMcrVagter(vagter) {
 // -----------------------------------------------------------------
 
 async function downloadRapport() {
-    if (brugerRolle !== "Superadmin" || visKunIdag) return;
-    await visCustomDialog("Denne funktion er endnu ikke tilgængelig.", "alert");
+    if (brugerRolle !== "Superadmin" || visKunIdag || !valgtAar) return;
+
+    const maanedNavne = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"];
+    const erAarsrapport = (valgtMaaned === -1);
+    const periodeTekst = erAarsrapport ? `${valgtAar}` : `${maanedNavne[valgtMaaned]} ${valgtAar}`;
+
+    const sysNu = new Date();
+    const aktueltAarNu = sysNu.getFullYear();
+    const aktuelMaanedNu = sysNu.getMonth();
+    const idagStr = aktueltAarNu + "-" + String(aktuelMaanedNu + 1).padStart(2, '0') + "-" + String(sysNu.getDate()).padStart(2, '0');
+
+    // Tjek om den valgte periode ligger i fortiden (til dynamisk popup-besked)
+    const erFortid = erAarsrapport
+        ? (valgtAar < aktueltAarNu)
+        : ((valgtAar < aktueltAarNu) || (valgtAar === aktueltAarNu && valgtMaaned < aktuelMaanedNu));
+
+    // Hent alle produktioner i den valgte måned eller det valgte år
+    const periodeProgrammer = alleProgrammerGlobal.filter(p => {
+        const normDato = p["NormDato"] || "";
+        if (!normDato) return false;
+        const parts = normDato.split('-');
+        if (parts.length !== 3) return false;
+        const pAar = parseInt(parts[0], 10);
+        const pMaaned = parseInt(parts[1], 10) - 1;
+        if (pAar !== valgtAar) return false;
+        if (!erAarsrapport && pMaaned !== valgtMaaned) return false;
+        return true;
+    });
+
+    // Hjælpefunktion til at udregne varighed i minutter ud fra TX/Tid og Sluttid
+    function beregnVarighedMinutter(p) {
+        let pTid = String(p["Tid"] || '').trim();
+        let pTX = String(p["TX"] || '').trim();
+        let pSluttidRaw = String(p["Sluttid"] || '').trim();
+
+        if (pTid.includes('T')) pTid = new Date(pTid).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+        else if (pTid !== '' && pTid !== '-') pTid = pTid.substring(0, 5);
+
+        if (pTX.includes('T')) pTX = new Date(pTX).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+        else if (pTX !== '' && pTX !== '-') pTX = pTX.substring(0, 5);
+
+        const startStr = (pTX !== '' && pTX !== '-') ? pTX : ((pTid !== '' && pTid !== '-') ? pTid : '');
+        const slutMatch = pSluttidRaw.match(/(\d{1,2})\s*[:.]+\s*(\d{2})/);
+        if (!startStr || !slutMatch) return 0;
+
+        const [sh, sm] = startStr.split(':').map(Number);
+        const eh = parseInt(slutMatch[1], 10);
+        const em = parseInt(slutMatch[2], 10);
+        if (isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) return 0;
+
+        let startMins = sh * 60 + sm;
+        let endMins = eh * 60 + em;
+        if (endMins < startMins) endMins += 24 * 60;
+
+        const diff = endMins - startMins;
+        return (diff > 0 && diff <= 16 * 60) ? diff : 0;
+    }
+
+    function formaterMinutter(totalMins) {
+        if (!totalMins || totalMins <= 0) return '-';
+        const t = Math.floor(totalMins / 60);
+        const m = totalMins % 60;
+        if (t > 0 && m > 0) return `${t} t. ${String(m).padStart(2, '0')} min.`;
+        if (t > 0) return `${t} t. 00 min.`;
+        return `${m} min.`;
+    }
+
+    function udtraekNavne(raaTekst) {
+        const resultat = new Map();
+        const str = String(raaTekst || '').trim();
+        if (str === '' || str === '-') return resultat;
+        str.split(/[,\/]/).forEach(del => {
+            const navn = del.trim();
+            const lower = navn.toLowerCase();
+            if (navn !== '' && lower !== '-' && lower !== 'tba' && lower !== 'tbc' && lower !== 'ingen' && lower !== 'engelsk fra feed') {
+                if (!resultat.has(lower)) resultat.set(lower, navn);
+            }
+        });
+        return resultat;
+    }
+
+    const medarbejderMap = new Map();
+    const kanalStats = {
+        'SPORT LIVE': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
+        'Ekstra Bladet+': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
+        'Bold+': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
+        'Feltet+': { aatd: 0, planlagt: 0, total: 0, tbc: 0 }
+    };
+
+    periodeProgrammer.forEach(p => {
+        const kommMap = udtraekNavne(p["Kommentator"]);
+        const repMap = udtraekNavne(p["Reporter"]);
+
+        // Kombiner pr. produktion: Hvis samme person er både kommentator og reporter på samme produktion, tæller det kun som 1 vagt (Kommentator)
+        const vagterPaaProduktion = new Map();
+        kommMap.forEach((navn, lower) => vagterPaaProduktion.set(lower, { navn: navn, rolle: 'kommentator' }));
+        repMap.forEach((navn, lower) => {
+            if (!vagterPaaProduktion.has(lower)) {
+                vagterPaaProduktion.set(lower, { navn: navn, rolle: 'reporter' });
+            }
+        });
+
+        if (vagterPaaProduktion.size === 0) return;
+
+        const normDato = String(p["NormDato"] || '');
+        const erAfviklet = (normDato <= idagStr);
+        const erTBC = (p["TBC"] && String(p["TBC"]).toUpperCase() === 'X');
+        const unitUpper = String(p["Unit"] || '').trim().toUpperCase();
+        const erHjemmeUnit = (unitUpper.startsWith('BOKS') || unitUpper.startsWith('STUDIE'));
+        const kanalNavn = String(p["Kanal"] || '').trim();
+        const erEksternKanal = (kanalNavn === 'Ekstra Bladet+' || kanalNavn === 'Bold+' || kanalNavn === 'Feltet+');
+        const varighedMins = beregnVarighedMinutter(p);
+
+        vagterPaaProduktion.forEach((info, lower) => {
+            if (!medarbejderMap.has(lower)) {
+                medarbejderMap.set(lower, {
+                    navn: info.navn,
+                    total: 0,
+                    tbc: 0,
+                    aatd: 0,
+                    planlagt: 0,
+                    kommUde: 0,
+                    kommHjemme: 0,
+                    reporter: 0,
+                    sportLive: 0,
+                    ekstern: 0,
+                    minutter: 0
+                });
+            }
+
+            const m = medarbejderMap.get(lower);
+            m.total++;
+            if (erTBC) m.tbc++;
+            if (erAfviklet) m.aatd++;
+            else m.planlagt++;
+
+            if (info.rolle === 'reporter') {
+                m.reporter++;
+            } else if (erHjemmeUnit) {
+                m.kommHjemme++;
+            } else {
+                m.kommUde++;
+            }
+
+            if (kanalNavn === 'SPORT LIVE') m.sportLive++;
+            else if (erEksternKanal) m.ekstern++;
+
+            m.minutter += varighedMins;
+
+            // Opdater kanaltæller for de 4 udvalgte kanaler
+            if (kanalStats[kanalNavn]) {
+                kanalStats[kanalNavn].total++;
+                if (erTBC) kanalStats[kanalNavn].tbc++;
+                if (erAfviklet) kanalStats[kanalNavn].aatd++;
+                else kanalStats[kanalNavn].planlagt++;
+            }
+        });
+    });
+
+    if (medarbejderMap.size === 0) {
+        const besked = erFortid
+            ? `Der er ikke tilknyttet nogen kommentatorer/værter eller reportere til programmerne i ${periodeTekst}.`
+            : `Der er endnu ikke tilknyttet nogen kommentatorer/værter eller reportere til programmerne i ${periodeTekst}.`;
+        await visCustomDialog(besked, "alert");
+        return;
+    }
+
+    const rapportBtn = document.getElementById('btnDownloadRapport');
+    const orgTekst = rapportBtn.innerHTML;
+    rapportBtn.innerHTML = '⏳';
+    rapportBtn.disabled = true;
+
+    let logoData = null;
+    try {
+        const imgEl = document.querySelector('.title-wrapper img');
+        const canvas = document.createElement('canvas');
+        canvas.width = imgEl.naturalWidth || imgEl.width || 200;
+        canvas.height = imgEl.naturalHeight || imgEl.height || 50;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(imgEl, 0, 0);
+        logoData = canvas.toDataURL('image/png');
+    } catch(e) { console.log('Kunne ikke hente logo', e); }
+
+    // Sorter medarbejdere efter flest vagter (og alfabetisk ved lige mange vagter)
+    const medarbejderListe = Array.from(medarbejderMap.values()).sort((a, b) => {
+        if (b.total !== a.total) return b.total - a.total;
+        return a.navn.localeCompare(b.navn, 'da');
+    });
+
+    // Hjælper til at formatere tal med evt. rød TBC-angivelse
+    function formaterAntalMedTBC(antal, tbcAntal, erFed = false) {
+        if (tbcAntal > 0) {
+            return {
+                text: [
+                    { text: `${antal} `, bold: erFed },
+                    { text: `(${tbcAntal} TBC)`, color: 'red', bold: true, fontSize: 8 }
+                ],
+                alignment: 'center'
+            };
+        }
+        return { text: `${antal}`, bold: erFed, alignment: 'center' };
+    }
+
+    const mainTableBody = [];
+    let mainTableWidths = [];
+
+    // Total-tællere til bundlinjen
+    let sumTotal = 0, sumTbc = 0, sumAatd = 0, sumPlanlagt = 0;
+    let sumKommUde = 0, sumKommHjemme = 0, sumReporter = 0;
+    let sumSportLive = 0, sumEkstern = 0, sumMinutter = 0;
+
+    if (erAarsrapport) {
+        mainTableWidths = ['*', 65, 75, 70, 85, 95, 70, 65, 65, 85];
+        mainTableBody.push([
+            { text: 'Medarbejder', bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Afviklet (ÅTD)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Planlagt', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Vagter i alt', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Komm./vært (OB/EFP)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Komm./vært (Boks/Studie)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Reporter (OB/EFP)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'SPORT LIVE', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Eksterne', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Est. sendetid', bold: true, fontSize: 9.5, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true] }
+        ]);
+
+        medarbejderListe.forEach(m => {
+            sumTotal += m.total; sumTbc += m.tbc; sumAatd += m.aatd; sumPlanlagt += m.planlagt;
+            sumKommUde += m.kommUde; sumKommHjemme += m.kommHjemme; sumReporter += m.reporter;
+            sumSportLive += m.sportLive; sumEkstern += m.ekstern; sumMinutter += m.minutter;
+
+            mainTableBody.push([
+                { text: m.navn, fontSize: 9, bold: true },
+                { text: `${m.aatd}`, fontSize: 9, alignment: 'center' },
+                { ...formaterAntalMedTBC(m.planlagt, m.tbc, false), fontSize: 9 },
+                { text: `${m.total}`, fontSize: 9, bold: true, alignment: 'center' },
+                { text: m.kommUde > 0 ? `${m.kommUde}` : '-', fontSize: 9, alignment: 'center' },
+                { text: m.kommHjemme > 0 ? `${m.kommHjemme}` : '-', fontSize: 9, alignment: 'center' },
+                { text: m.reporter > 0 ? `${m.reporter}` : '-', fontSize: 9, alignment: 'center' },
+                { text: m.sportLive > 0 ? `${m.sportLive}` : '-', fontSize: 9, alignment: 'center' },
+                { text: m.ekstern > 0 ? `${m.ekstern}` : '-', fontSize: 9, alignment: 'center' },
+                { text: formaterMinutter(m.minutter), fontSize: 9, alignment: 'right' }
+            ]);
+        });
+
+        mainTableBody.push([
+            { text: `I alt (${medarbejderListe.length} medarbejdere)`, bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumAatd}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { ...formaterAntalMedTBC(sumPlanlagt, sumTbc, true), fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumTotal}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumKommUde}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumKommHjemme}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumReporter}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumSportLive}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumEkstern}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: formaterMinutter(sumMinutter), bold: true, fontSize: 9.5, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true] }
+        ]);
+    } else {
+        mainTableWidths = ['*', 80, 100, 110, 85, 80, 80, 95];
+        mainTableBody.push([
+            { text: 'Medarbejder', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Vagter i alt', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Komm./vært (OB/EFP)', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Komm./vært (Boks/Studie)', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Reporter (OB/EFP)', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'SPORT LIVE', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Eksterne', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Est. sendetid', bold: true, fontSize: 10, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true] }
+        ]);
+
+        medarbejderListe.forEach(m => {
+            sumTotal += m.total; sumTbc += m.tbc;
+            sumKommUde += m.kommUde; sumKommHjemme += m.kommHjemme; sumReporter += m.reporter;
+            sumSportLive += m.sportLive; sumEkstern += m.ekstern; sumMinutter += m.minutter;
+
+            mainTableBody.push([
+                { text: m.navn, fontSize: 9.5, bold: true },
+                { ...formaterAntalMedTBC(m.total, m.tbc, true), fontSize: 9.5 },
+                { text: m.kommUde > 0 ? `${m.kommUde}` : '-', fontSize: 9.5, alignment: 'center' },
+                { text: m.kommHjemme > 0 ? `${m.kommHjemme}` : '-', fontSize: 9.5, alignment: 'center' },
+                { text: m.reporter > 0 ? `${m.reporter}` : '-', fontSize: 9.5, alignment: 'center' },
+                { text: m.sportLive > 0 ? `${m.sportLive}` : '-', fontSize: 9.5, alignment: 'center' },
+                { text: m.ekstern > 0 ? `${m.ekstern}` : '-', fontSize: 9.5, alignment: 'center' },
+                { text: formaterMinutter(m.minutter), fontSize: 9.5, alignment: 'right' }
+            ]);
+        });
+
+        mainTableBody.push([
+            { text: `I alt (${medarbejderListe.length} medarbejdere)`, bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { ...formaterAntalMedTBC(sumTotal, sumTbc, true), fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumKommUde}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumKommHjemme}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumReporter}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumSportLive}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumEkstern}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: formaterMinutter(sumMinutter), bold: true, fontSize: 10, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true] }
+        ]);
+    }
+
+    // Selvstændig sektion for de 4 kanaler (SPORT LIVE, Ekstra Bladet+, Bold+, Feltet+)
+    const eksterneTotal = kanalStats['Ekstra Bladet+'].total + kanalStats['Bold+'].total + kanalStats['Feltet+'].total;
+    const kanalTableBody = [
+        [
+            { text: 'SPORT LIVE', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Ekstra Bladet+', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Bold+', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Feltet+', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: 'Eksterne modtagere i alt', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] }
+        ],
+        [
+            { text: `${kanalStats['SPORT LIVE'].total} vagter`, bold: true, fontSize: 9.5, alignment: 'center' },
+            { text: `${kanalStats['Ekstra Bladet+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
+            { text: `${kanalStats['Bold+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
+            { text: `${kanalStats['Feltet+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
+            { text: `${eksterneTotal} vagter`, bold: true, fontSize: 9.5, alignment: 'center' }
+        ]
+    ];
+
+    const overskrift = `Vagtrapport, ${periodeTekst}`;
+    const undertekst1 = erAarsrapport
+        ? 'Årsoversigt for kommentatorer/værter og reportere (opdelt i afviklede vagter år til dato og planlagte vagter).'
+        : 'Månedsoversigt over tildelte vagter for kommentatorer/værter og reportere.';
+    const undertekst2 = 'Estimeret sendetid er et estimat baseret på gennemsnitlige varigheder. Eksterne dækker Ekstra Bladet+, Bold+ og Feltet+.';
+
+    const docDefinition = {
+        pageOrientation: 'landscape',
+        pageMargins: [40, 115, 40, 30],
+        defaultStyle: { color: '#000000' },
+        header: function() {
+            return {
+                margin: [32, 20, 40, 0],
+                columns: [
+                    {
+                        stack: [
+                            logoData ? { image: logoData, width: 270 } : { text: 'SPORT LIVE', fontSize: 36, bold: true, color: '#dc5e11' },
+                            { text: overskrift, fontSize: 19, bold: true, margin: [10, 6, 0, 0], color: '#000000' }
+                        ],
+                        width: '*'
+                    },
+                    {
+                        stack: [
+                            { text: undertekst1, italics: true, fontSize: 10, alignment: 'right', color: '#000000' },
+                            { text: undertekst2, italics: true, fontSize: 10, alignment: 'right', color: '#000000', margin: [0, 6, 0, 0] }
+                        ],
+                        width: 'auto',
+                        margin: [0, 42, 0, 0]
+                    }
+                ]
+            };
+        },
+        content: [
+            {
+                table: {
+                    headerRows: 1,
+                    widths: mainTableWidths,
+                    body: mainTableBody
+                },
+                layout: {
+                    fillColor: function (rowIndex, node) {
+                        if (rowIndex === 0 || rowIndex === node.table.body.length - 1) return '#e9ecef';
+                        return (rowIndex % 2 === 0) ? '#f8f9fa' : null;
+                    },
+                    hLineWidth: function (i, node) {
+                        if (i === 0 || i === node.table.body.length) return 0;
+                        if (i === 1 || i === node.table.body.length - 1) return 1;
+                        return 0.5;
+                    },
+                    vLineWidth: function () { return 0; },
+                    hLineColor: function (i, node) {
+                        return (i === 1 || i === node.table.body.length - 1) ? '#adb5bd' : '#e1e4e8';
+                    },
+                    paddingTop: function() { return 6; },
+                    paddingBottom: function() { return 6; }
+                }
+            },
+            {
+                text: 'Fordeling af vagter på SPORT LIVE og eksterne modtagere',
+                bold: true,
+                fontSize: 11,
+                margin: [0, 22, 0, 6]
+            },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: ['*', '*', '*', '*', '*'],
+                    body: kanalTableBody
+                },
+                layout: {
+                    fillColor: function (rowIndex) { return rowIndex === 0 ? '#e9ecef' : '#f8f9fa'; },
+                    hLineWidth: function (i, node) { return (i === 0 || i === node.table.body.length) ? 0 : 0.5; },
+                    vLineWidth: function () { return 0; },
+                    hLineColor: function () { return '#e1e4e8'; },
+                    paddingTop: function() { return 6; },
+                    paddingBottom: function() { return 6; }
+                }
+            }
+        ]
+    };
+
+    try {
+        pdfMake.createPdf(docDefinition).download(`SPORT LIVE - Vagtrapport (${periodeTekst}).pdf`);
+    } catch(e) {
+        alert('Der skete en fejl ved generering af vagtrapporten.');
+        console.error(e);
+    }
+
+    rapportBtn.innerHTML = orgTekst;
+    rapportBtn.disabled = false;
 }
 
 async function sendMaanedsVagtplan() {
