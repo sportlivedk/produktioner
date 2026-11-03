@@ -2625,7 +2625,8 @@ async function downloadRapport() {
         'SPORT LIVE': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
         'Ekstra Bladet+': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
         'Bold+': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
-        'Feltet+': { aatd: 0, planlagt: 0, total: 0, tbc: 0 }
+        'Feltet+': { aatd: 0, planlagt: 0, total: 0, tbc: 0 },
+        'Pluto TV': { aatd: 0, planlagt: 0, total: 0, tbc: 0 }
     };
 
     periodeProgrammer.forEach(p => {
@@ -2648,7 +2649,8 @@ async function downloadRapport() {
         const erTBC = (p["TBC"] && String(p["TBC"]).toUpperCase() === 'X');
         const kanalNavn = String(p["Kanal"] || '').trim();
         const erSportLiveKanal = (kanalNavn === 'SPORT LIVE' || kanalNavn === 'Optagelse');
-        const erEksternKanal = (kanalNavn === 'Ekstra Bladet+' || kanalNavn === 'Bold+' || kanalNavn === 'Feltet+');
+        const erPlutoKanal = kanalNavn.includes('Pluto TV');
+        const erEksternKanal = (kanalNavn === 'Ekstra Bladet+' || kanalNavn === 'Bold+' || kanalNavn === 'Feltet+' || erPlutoKanal);
         const varighedMins = beregnVarighedMinutter(p);
 
         vagterPaaProduktion.forEach((info, lower) => {
@@ -2684,8 +2686,8 @@ async function downloadRapport() {
 
             m.minutter += varighedMins;
 
-            // Opdater kanaltæller for SPORT LIVE (inkl. Optagelse) og de 3 eksterne kanaler
-            const statKey = erSportLiveKanal ? 'SPORT LIVE' : kanalNavn;
+            // Opdater kanaltæller for SPORT LIVE (inkl. Optagelse) og de 4 eksterne kanalgrupper
+            const statKey = erSportLiveKanal ? 'SPORT LIVE' : (erPlutoKanal ? 'Pluto TV' : kanalNavn);
             if (kanalStats[statKey]) {
                 kanalStats[statKey].total++;
                 if (erTBC) kanalStats[statKey].tbc++;
@@ -2829,34 +2831,36 @@ async function downloadRapport() {
         ]);
     }
 
-    // Selvstændig sektion for de 4 kanaler (SPORT LIVE, Ekstra Bladet+, Bold+, Feltet+)
-    const eksterneTotal = kanalStats['Ekstra Bladet+'].total + kanalStats['Bold+'].total + kanalStats['Feltet+'].total;
+    // Selvstændig sektion for SPORT LIVE og de 4 eksterne kanaler
     const kanalTableBody = [
         [
             { text: 'SPORT LIVE', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Ekstra Bladet+', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Bold+', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: 'Feltet+', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { text: 'Eksterne modtagere i alt', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] }
+            { text: 'Pluto TV', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] }
         ],
         [
             { text: `${kanalStats['SPORT LIVE'].total} vagter`, bold: true, fontSize: 9.5, alignment: 'center' },
             { text: `${kanalStats['Ekstra Bladet+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
             { text: `${kanalStats['Bold+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
             { text: `${kanalStats['Feltet+'].total} vagter`, fontSize: 9.5, alignment: 'center' },
-            { text: `${eksterneTotal} vagter`, bold: true, fontSize: 9.5, alignment: 'center' }
+            { text: `${kanalStats['Pluto TV'].total} vagter`, fontSize: 9.5, alignment: 'center' }
         ]
     ];
 
     const overskrift = `Vagtrapport, ${periodeTekst}`;
     const undertekst1 = erAarsrapport
-        ? 'Årsoversigt for kommentatorer/værter og reportere (opdelt i afviklede vagter år til dato og planlagte vagter).'
-        : 'Månedsoversigt over tildelte vagter for kommentatorer/værter og reportere.';
+        ? 'Årsoversigt for kommentatorer, værter og reportere (opdelt i afviklede vagter år til dato og planlagte vagter).'
+        : 'Månedsoversigt over tildelte vagter for kommentatorer, værter og reportere.';
     const undertekst2 = 'Estimeret tidsforbrug er baseret på gennemsnitlige/anslåede varigheder.';
+
+    const genDatoTekst = `${sysNu.getDate()}. ${maanedNavne[sysNu.getMonth()]} ${sysNu.getFullYear()} kl. ${String(sysNu.getHours()).padStart(2, '0')}.${String(sysNu.getMinutes()).padStart(2, '0')}`;
+    const genereretLinje = `Denne rapport er genereret d. ${genDatoTekst}`;
 
     const docDefinition = {
         pageOrientation: 'landscape',
-        pageMargins: [40, 115, 40, 30],
+        pageMargins: [40, 115, 40, 35],
         defaultStyle: { color: '#000000' },
         header: function() {
             return {
@@ -2878,6 +2882,15 @@ async function downloadRapport() {
                         margin: [0, 42, 0, 0]
                     }
                 ]
+            };
+        },
+        footer: function() {
+            return {
+                text: genereretLinje,
+                italics: true,
+                fontSize: 8.5,
+                color: '#666666',
+                margin: [40, 10, 40, 0]
             };
         },
         content: [
