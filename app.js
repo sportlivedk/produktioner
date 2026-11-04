@@ -1463,6 +1463,8 @@ async function gemTechInfo() {
     }
 }
 
+
+
 async function opretNytProgram() {
     if (brugerRolle !== "Admin" && brugerRolle !== "Superadmin") {
         await visCustomDialog("Du har ikke tilladelse til at udføre denne handling.", "alert");
@@ -1529,7 +1531,7 @@ function skalViseAdvarsel(program) {
     
     if (pDato > slutNaesteMaaned) return false;
     
-    // NY LOGIK: Hvis programmet ligger i næste måned, tjek at vi er maks 14 dage fra månedsskiftet
+    // Hvis programmet ligger i næste måned, tjek at vi er maks 14 dage fra månedsskiftet
     if (pDato >= startNaesteMaaned) {
         const dageTilNaesteMaaned = (startNaesteMaaned - sysDato) / (1000 * 60 * 60 * 24);
         if (dageTilNaesteMaaned > 14) return false;
@@ -1539,8 +1541,8 @@ function skalViseAdvarsel(program) {
         return false;
     }
 
-    const unit = String(program["Unit"] || "");
-    const kanal = String(program["Kanal"] || "");
+    const unit = String(program["Unit"] || "").trim();
+    const kanal = String(program["Kanal"] || "").trim();
     const manglerKommentator = (!program["Kommentator"] || String(program["Kommentator"]).trim() === "");
     const manglerReporter = (!program["Reporter"] || String(program["Reporter"]).trim() === "");
     const manglerProducer = (!program["Producer"] || String(program["Producer"]).trim() === "");
@@ -1549,12 +1551,11 @@ function skalViseAdvarsel(program) {
     const obUnitsArr = ["Minitech", "Nowtek OB1", "Nowtek OB2", "OB 7", "OB 9", "OB 7+9", "SAM OB", "OB"];
     const erOB = obUnitsArr.includes(unit);
     const unitLower = unit.toLowerCase();
+    const unitUpper = unit.toUpperCase();
 
-    if (kanal === "Optagelse" && unit === "EFP") {
-        if (manglerKommentator && manglerReporter) return true;
-    } else if (kanal === "Optagelse" && unitLower.startsWith("studie")) {
+    if (kanal === "Optagelse" && unitLower.startsWith("studie")) {
         if (manglerProducer || manglerKommentator) return true;
-    } else if (unit === "EFP" || kanal === "Optagelse") {
+    } else if (unitUpper === "EFP" || kanal === "Optagelse") {
         if (manglerProducer || (manglerKommentator && manglerReporter)) return true;
     } else if (erOB) {
         if (manglerKommentator || manglerProducer || manglerEkspert) return true;
@@ -2183,6 +2184,28 @@ function tegnTabel(programmer) {
             <td style="white-space: nowrap;">${handlingsKnapper}</td>
         `;
         
+const producerLabel = String(program["Unit"] || '').trim().toUpperCase() === 'EFP' ? 'Fotograf:' : 'Producer:';
+
+        const trDetail = document.createElement('tr');
+        trDetail.className = 'detail-row';
+        trDetail.innerHTML = `
+            <td colspan="10">
+                <div class="mobile-only-title">
+                    ${sportsgrenHtml}
+                    <div>${visProgramtitel}</div>
+                </div>
+                
+                <div class="detail-container">
+                    <div class="detail-card bemanding">
+                        <h4>Personale</h4>
+                        <div class="detail-list">
+                            <div class="detail-list-item"><span class="detail-label">${producerLabel}</span> <span class="detail-value">${program["Producer"] || '-'}</span></div>
+                            <div class="detail-list-item"><span class="detail-label">Kommentator/vært:</span> <span class="detail-value">${program["Kommentator"] || '-'}</span></div>
+                            <div class="detail-list-item"><span class="detail-label">Ekspert/gæst:</span> <span class="detail-value">${program["Ekspert"] || '-'}</span></div>
+                            <div class="detail-list-item"><span class="detail-label">Reporter:</span> <span class="detail-value">${program["Reporter"] || '-'}</span></div>
+                        </div>
+                    </div>
+
         const trDetail = document.createElement('tr');
         trDetail.className = 'detail-row';
         trDetail.innerHTML = `
@@ -3293,6 +3316,8 @@ window.onload = function() {
     document.getElementById('Sportsgren').addEventListener('change', autoUdfyldSluttid);
     document.getElementById('Programtitel').addEventListener('input', autoUdfyldSluttid);
     document.getElementById('Tid').addEventListener('input', autoUdfyldSluttid);
+    document.getElementById('Unit').addEventListener('input', opdaterProducerLabel);
+    document.getElementById('Unit').addEventListener('change', opdaterProducerLabel);
     document.getElementById('Kanal').addEventListener('input', function() {
         if (this.value === 'Optagelse') {
             document.getElementById('group-Premieredato').style.display = 'flex';
@@ -3311,7 +3336,18 @@ window.onload = function() {
 var modal = document.getElementById("programModal");
 var profilModal = document.getElementById("profileModal");
 
-function openModal() { modal.style.display = "block"; }
+function opdaterProducerLabel() {
+    const unitEl = document.getElementById('Unit');
+    const prodEl = document.getElementById('Producer');
+    if (!unitEl || !prodEl || !prodEl.previousElementSibling) return;
+    const erEFP = unitEl.value.trim().toUpperCase() === 'EFP';
+    prodEl.previousElementSibling.textContent = erEFP ? 'Fotograf' : 'Producer';
+}
+
+function openModal() {
+    opdaterProducerLabel();
+    modal.style.display = "block";
+}
 function closeModal() { modal.style.display = "none"; }
 
 let touchstartX = 0;
