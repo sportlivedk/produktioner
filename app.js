@@ -2205,26 +2205,6 @@ const producerLabel = String(program["Unit"] || '').trim().toUpperCase() === 'EF
                             <div class="detail-list-item"><span class="detail-label">Reporter:</span> <span class="detail-value">${program["Reporter"] || '-'}</span></div>
                         </div>
                     </div>
-
-        const trDetail = document.createElement('tr');
-        trDetail.className = 'detail-row';
-        trDetail.innerHTML = `
-            <td colspan="10">
-                <div class="mobile-only-title">
-                    ${sportsgrenHtml}
-                    <div>${visProgramtitel}</div>
-                </div>
-                
-                <div class="detail-container">
-                    <div class="detail-card bemanding">
-                        <h4>Personale</h4>
-                        <div class="detail-list">
-                            <div class="detail-list-item"><span class="detail-label">Producer:</span> <span class="detail-value">${program["Producer"] || '-'}</span></div>
-                            <div class="detail-list-item"><span class="detail-label">Kommentator/vært:</span> <span class="detail-value">${program["Kommentator"] || '-'}</span></div>
-                            <div class="detail-list-item"><span class="detail-label">Ekspert/gæst:</span> <span class="detail-value">${program["Ekspert"] || '-'}</span></div>
-                            <div class="detail-list-item"><span class="detail-label">Reporter:</span> <span class="detail-value">${program["Reporter"] || '-'}</span></div>
-                        </div>
-                    </div>
                     
                     <div class="detail-card teknik">
                         <h4>Tekniske specifikationer</h4>
