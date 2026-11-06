@@ -2807,11 +2807,9 @@ async function downloadRapport() {
         if (aftaltMaal !== null && aftaltMaal > 0) {
             const diff = antal - aftaltMaal;
             const mellemrum = suffixDele.length > 0 ? ' ' : '';
-            if (diff === 0) {
-                suffixDele.push({ text: `${mellemrum}OK`, bold: true, fontSize: 8.5, color: '#28a745' });
-            } else if (diff > 0) {
+            if (diff > 0) {
                 suffixDele.push({ text: `${mellemrum}+${diff}`, bold: true, fontSize: 8.5, color: '#28a745' });
-            } else {
+            } else if (diff < 0) {
                 suffixDele.push({ text: `${mellemrum}${diff}`, bold: true, fontSize: 8.5, color: '#dc3545' });
             }
         }
