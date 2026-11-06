@@ -2794,29 +2794,44 @@ async function downloadRapport() {
         return a.navn.localeCompare(b.navn, 'da');
     });
 
-    // Hjælper til at formatere tal med sort TBC-angivelse først og aftale-indikator (OK / +X / -X) til sidst
-    function formaterAntalMedStatus(antal, tbcAntal = 0, aftaltMaal = null, erFed = false) {
-        const dele = [{ text: `${antal}`, bold: erFed }];
+   // Hjælper til at låse selve vagttallet i midten af kolonnen med TBC og +/- lige til højre
+    function formaterAntalMedStatus(antal, tbcAntal = 0, aftaltMaal = null, erFed = false, venstreBredde = 52) {
+        const suffixDele = [];
 
         if (tbcAntal > 0) {
-            dele.push({ text: ` (${tbcAntal} TBC)`, color: '#000000', bold: true, fontSize: 8 });
+            suffixDele.push({ text: `(${tbcAntal} TBC)`, color: '#000000', bold: true, fontSize: 8 });
         }
 
         if (aftaltMaal !== null && aftaltMaal > 0) {
             const diff = antal - aftaltMaal;
+            const mellemrum = suffixDele.length > 0 ? ' ' : '';
             if (diff === 0) {
-                dele.push({ text: ' OK', bold: true, fontSize: 8.5, color: '#28a745' });
+                suffixDele.push({ text: `${mellemrum}OK`, bold: true, fontSize: 8.5, color: '#28a745' });
             } else if (diff > 0) {
-                dele.push({ text: ` +${diff}`, bold: true, fontSize: 8.5, color: '#28a745' });
+                suffixDele.push({ text: `${mellemrum}+${diff}`, bold: true, fontSize: 8.5, color: '#28a745' });
             } else {
-                dele.push({ text: ` ${diff}`, bold: true, fontSize: 8.5, color: '#dc3545' });
+                suffixDele.push({ text: `${mellemrum}${diff}`, bold: true, fontSize: 8.5, color: '#dc3545' });
             }
         }
 
         return {
-            text: dele,
-            alignment: 'center',
-            noWrap: true
+            columns: [
+                {
+                    width: venstreBredde,
+                    text: `${antal}`,
+                    bold: erFed,
+                    alignment: 'right',
+                    noWrap: true
+                },
+                {
+                    width: '*',
+                    text: suffixDele.length > 0 ? suffixDele : '',
+                    alignment: 'left',
+                    noWrap: true,
+                    margin: [0, 0.5, 0, 0]
+                }
+            ],
+            columnGap: 4
         };
     }
 
@@ -2831,7 +2846,7 @@ async function downloadRapport() {
     const visOpdelingAatd = (erAarsrapport && valgtAar >= aktueltAarNu);
 
     if (visOpdelingAatd) {
-        mainTableWidths = ['*', 96, 68, 62, 65, 55, 65, 55, 76];
+        mainTableWidths = ['*', 96, 76, 62, 65, 55, 65, 55, 76];
         mainTableBody.push([
             { text: 'Medarbejder', bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
             { text: 'Afviklet (år til dato)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
@@ -2859,8 +2874,8 @@ async function downloadRapport() {
 
             mainTableBody.push([
                 { text: m.navn, fontSize: 9.5, bold: true, noWrap: true },
-                { ...formaterAntalMedStatus(m.aatd, 0, aatdMaal, false), fontSize: 9.5 },
-                { ...formaterAntalMedStatus(m.planlagt, m.tbc, null, false), fontSize: 9.5 },
+                { ...formaterAntalMedStatus(m.aatd, 0, aatdMaal, false, 52), fontSize: 9.5 },
+                { ...formaterAntalMedStatus(m.planlagt, m.tbc, null, false, 40), fontSize: 9.5 },
                 { text: `${m.total}`, fontSize: 9.5, bold: true, alignment: 'center' },
                 { text: m.kommentator > 0 ? `${m.kommentator}` : '-', fontSize: 9.5, alignment: 'center' },
                 { text: m.reporter > 0 ? `${m.reporter}` : '-', fontSize: 9.5, alignment: 'center' },
@@ -2872,8 +2887,8 @@ async function downloadRapport() {
 
         mainTableBody.push([
             { text: `I alt (${medarbejderListe.length} medarbejdere)`, bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
-            { text: `${sumAatd}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
-            { ...formaterAntalMedStatus(sumPlanlagt, sumTbc, null, true), fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { ...formaterAntalMedStatus(sumAatd, 0, null, true, 52), fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { ...formaterAntalMedStatus(sumPlanlagt, sumTbc, null, true, 40), fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumTotal}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumKommentator}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumReporter}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
@@ -2882,7 +2897,7 @@ async function downloadRapport() {
             { text: formaterMinutter(sumMinutter), bold: true, fontSize: 9.5, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true }
         ]);
     } else {
-        mainTableWidths = ['*', 95, 85, 75, 85, 75, 85];
+        mainTableWidths = ['*', 120, 85, 75, 85, 75, 85];
         mainTableBody.push([
             { text: 'Medarbejder', bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
             { text: 'Vagter i alt', bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
@@ -2906,7 +2921,7 @@ async function downloadRapport() {
 
             mainTableBody.push([
                 { text: m.navn, fontSize: 9.5, bold: true, noWrap: true },
-                { ...formaterAntalMedStatus(m.total, m.tbc, periodeMaal, true), fontSize: 9.5 },
+                { ...formaterAntalMedStatus(m.total, m.tbc, periodeMaal, true, 63), fontSize: 9.5 },
                 { text: m.kommentator > 0 ? `${m.kommentator}` : '-', fontSize: 9.5, alignment: 'center' },
                 { text: m.reporter > 0 ? `${m.reporter}` : '-', fontSize: 9.5, alignment: 'center' },
                 { text: m.sportLive > 0 ? `${m.sportLive}` : '-', fontSize: 9.5, alignment: 'center' },
@@ -2917,7 +2932,7 @@ async function downloadRapport() {
 
         mainTableBody.push([
             { text: `I alt (${medarbejderListe.length} medarbejdere)`, bold: true, fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
-            { ...formaterAntalMedStatus(sumTotal, sumTbc, null, true), fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { ...formaterAntalMedStatus(sumTotal, sumTbc, null, true, 63), fontSize: 10, fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumKommentator}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumReporter}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumSportLive}`, bold: true, fontSize: 10, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
