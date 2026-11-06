@@ -2754,23 +2754,25 @@ async function downloadRapport() {
         return;
     }
 
-    // Tilføj faste medarbejdere med 0 vagter i perioden, så de også optræder i rapporten
-    aftaleMap.forEach((aftaleInfo, lower) => {
-        if (!medarbejderMap.has(lower)) {
-            medarbejderMap.set(lower, {
-                navn: aftaleInfo.navn,
-                total: 0,
-                tbc: 0,
-                aatd: 0,
-                planlagt: 0,
-                kommentator: 0,
-                reporter: 0,
-                sportLive: 0,
-                ekstern: 0,
-                minutter: 0
-            });
-        }
-    });
+// Tilføj kun faste medarbejdere med 0 vagter i månedsrapporterne
+    if (!erAarsrapport) {
+        aftaleMap.forEach((aftaleInfo, lower) => {
+            if (!medarbejderMap.has(lower)) {
+                medarbejderMap.set(lower, {
+                    navn: aftaleInfo.navn,
+                    total: 0,
+                    tbc: 0,
+                    aatd: 0,
+                    planlagt: 0,
+                    kommentator: 0,
+                    reporter: 0,
+                    sportLive: 0,
+                    ekstern: 0,
+                    minutter: 0
+                });
+            }
+        });
+    }
 
     const rapportBtn = document.getElementById('btnDownloadRapport');
     const orgTekst = rapportBtn.innerHTML;
@@ -2794,7 +2796,7 @@ async function downloadRapport() {
         return a.navn.localeCompare(b.navn, 'da');
     });
 
-   // Hjælper til at låse selve vagttallet i midten af kolonnen med TBC og +/- lige til højre
+    // Hjælper til at låse selve vagttallet i midten af kolonnen med TBC og +/- lige til højre
     function formaterAntalMedStatus(antal, tbcAntal = 0, aftaltMaal = null, erFed = false, venstreBredde = 52) {
         const suffixDele = [];
 
@@ -2846,7 +2848,7 @@ async function downloadRapport() {
     const visOpdelingAatd = (erAarsrapport && valgtAar >= aktueltAarNu);
 
     if (visOpdelingAatd) {
-        mainTableWidths = ['*', 96, 76, 62, 65, 55, 65, 55, 76];
+        mainTableWidths = ['*', 92, 76, 62, 65, 55, 65, 55, 76];
         mainTableBody.push([
             { text: 'Medarbejder', bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
             { text: 'Afviklet (år til dato)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
@@ -2859,22 +2861,14 @@ async function downloadRapport() {
             { text: 'Est. tidsforbrug', bold: true, fontSize: 9.5, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true }
         ]);
 
-        // Antal helt overståede måneder i indeværende år (0 i januar, 10 i november osv.)
-        const overstaaedeMaaneder = (valgtAar === aktueltAarNu) ? aktuelMaanedNu : 0;
-
         medarbejderListe.forEach(m => {
             sumTotal += m.total; sumTbc += m.tbc; sumAatd += m.aatd; sumPlanlagt += m.planlagt;
             sumKommentator += m.kommentator; sumReporter += m.reporter;
             sumSportLive += m.sportLive; sumEkstern += m.ekstern; sumMinutter += m.minutter;
 
-            const aftaleInfo = aftaleMap.get(m.navn.toLowerCase());
-            const aatdMaal = (aftaleInfo && overstaaedeMaaneder > 0)
-                ? (aftaleInfo.antalPrMaaned * overstaaedeMaaneder)
-                : null;
-
             mainTableBody.push([
                 { text: m.navn, fontSize: 9.5, bold: true, noWrap: true },
-                { ...formaterAntalMedStatus(m.aatd, 0, aatdMaal, false, 52), fontSize: 9.5 },
+                { text: `${m.aatd}`, fontSize: 9.5, alignment: 'center' },
                 { ...formaterAntalMedStatus(m.planlagt, m.tbc, null, false, 40), fontSize: 9.5 },
                 { text: `${m.total}`, fontSize: 9.5, bold: true, alignment: 'center' },
                 { text: m.kommentator > 0 ? `${m.kommentator}` : '-', fontSize: 9.5, alignment: 'center' },
@@ -2887,7 +2881,7 @@ async function downloadRapport() {
 
         mainTableBody.push([
             { text: `I alt (${medarbejderListe.length} medarbejdere)`, bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
-            { ...formaterAntalMedStatus(sumAatd, 0, null, true, 52), fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
+            { text: `${sumAatd}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { ...formaterAntalMedStatus(sumPlanlagt, sumTbc, null, true, 40), fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumTotal}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumKommentator}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
@@ -2908,16 +2902,14 @@ async function downloadRapport() {
             { text: 'Est. tidsforbrug', bold: true, fontSize: 10, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true }
         ]);
 
-        // For et overstået år ganges månedskvoten med 12, for en enkeltmåned med 1
-        const faktor = erAarsrapport ? 12 : 1;
-
         medarbejderListe.forEach(m => {
             sumTotal += m.total; sumTbc += m.tbc;
             sumKommentator += m.kommentator; sumReporter += m.reporter;
             sumSportLive += m.sportLive; sumEkstern += m.ekstern; sumMinutter += m.minutter;
 
-            const aftaleInfo = aftaleMap.get(m.navn.toLowerCase());
-            const periodeMaal = aftaleInfo ? (aftaleInfo.antalPrMaaned * faktor) : null;
+            // Vis kun aftale-indikator på månedsrapporter (!erAarsrapport)
+            const aftaleInfo = (!erAarsrapport) ? aftaleMap.get(m.navn.toLowerCase()) : null;
+            const periodeMaal = aftaleInfo ? aftaleInfo.antalPrMaaned : null;
 
             mainTableBody.push([
                 { text: m.navn, fontSize: 9.5, bold: true, noWrap: true },
@@ -2997,13 +2989,14 @@ async function downloadRapport() {
                 ]
             };
         },
-        footer: function() {
+footer: function(currentPage, pageCount) {
+            if (currentPage !== pageCount) return null;
             return {
                 text: genereretLinje,
                 italics: true,
                 fontSize: 8.5,
                 color: '#666666',
-                margin: [40, 0, 40, 0]
+                margin: [40, 12, 40, 0]
             };
         },
         content: [
