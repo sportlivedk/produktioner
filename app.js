@@ -2794,29 +2794,23 @@ async function downloadRapport() {
         return a.navn.localeCompare(b.navn, 'da');
     });
 
-    // Hjælper til at formatere tal med evt. aftale-indikator (OK / +X / -X) og sort TBC-angivelse
+    // Hjælper til at formatere tal med sort TBC-angivelse først og aftale-indikator (OK / +X / -X) til sidst
     function formaterAntalMedStatus(antal, tbcAntal = 0, aftaltMaal = null, erFed = false) {
         const dele = [{ text: `${antal}`, bold: erFed }];
+
+        if (tbcAntal > 0) {
+            dele.push({ text: ` (${tbcAntal} TBC)`, color: '#000000', bold: true, fontSize: 8 });
+        }
 
         if (aftaltMaal !== null && aftaltMaal > 0) {
             const diff = antal - aftaltMaal;
             if (diff === 0) {
-                dele.push({ text: ' (', bold: true, fontSize: 8.5, color: '#000000' });
-                dele.push({ text: 'OK', bold: true, fontSize: 8.5, color: '#28a745' });
-                dele.push({ text: ')', bold: true, fontSize: 8.5, color: '#000000' });
+                dele.push({ text: ' OK', bold: true, fontSize: 8.5, color: '#28a745' });
             } else if (diff > 0) {
-                dele.push({ text: ' (', bold: true, fontSize: 8.5, color: '#000000' });
-                dele.push({ text: `+${diff}`, bold: true, fontSize: 8.5, color: '#28a745' });
-                dele.push({ text: ')', bold: true, fontSize: 8.5, color: '#000000' });
+                dele.push({ text: ` +${diff}`, bold: true, fontSize: 8.5, color: '#28a745' });
             } else {
-                dele.push({ text: ' (', bold: true, fontSize: 8.5, color: '#000000' });
-                dele.push({ text: `${diff}`, bold: true, fontSize: 8.5, color: '#dc3545' });
-                dele.push({ text: ')', bold: true, fontSize: 8.5, color: '#000000' });
+                dele.push({ text: ` ${diff}`, bold: true, fontSize: 8.5, color: '#dc3545' });
             }
-        }
-
-        if (tbcAntal > 0) {
-            dele.push({ text: ` (${tbcAntal} TBC)`, color: '#000000', bold: true, fontSize: 8 });
         }
 
         return {
