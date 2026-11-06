@@ -2,7 +2,6 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbwDWxdFBq4WeKLBUZCXA5
         
 let alleProgrammerGlobal = [];
 let kendteBrugereGlobal = [];
-let kendteBrugereGlobal = [];
 let aftalteVagterGlobal = {};
 let sendteVagtplanerGlobal = [];
 let aktuelleProgrammerVist = []; 
@@ -1013,11 +1012,9 @@ async function loadProgrammer(silent = false) {
         // Her kalder vi MCR-vagterne og fodrer dem direkte til din nye popup
         // -----------------------------------------------------------------
 kendteBrugereGlobal = jsonData.brugereNavne || [];
-kendteBrugereGlobal = jsonData.brugereNavne || [];
-aftalteVagterGlobal = jsonData.aftalteVagter || {};
-sendteVagtplanerGlobal = jsonData.sendteVagtplaner || [];
-sendteVagtplanerGlobal = jsonData.sendteVagtplaner || [];        
-renderMcrVagter(jsonData.mcrVagter);
+        aftalteVagterGlobal = jsonData.aftalteVagter || {};
+        sendteVagtplanerGlobal = jsonData.sendteVagtplaner || [];        
+        renderMcrVagter(jsonData.mcrVagter);
 
         opdaterFiltreUI();
         opdaterVisning();
