@@ -2796,7 +2796,7 @@ async function downloadRapport() {
         return a.navn.localeCompare(b.navn, 'da');
     });
 
-    // Hjælper til at låse selve vagttallet i midten af kolonnen med TBC og +/- lige til højre
+    // Hjælper til at låse selve vagttallet i midten af kolonnen med TBC og afvigelse i parentes lige til højre
     function formaterAntalMedStatus(antal, tbcAntal = 0, aftaltMaal = null, erFed = false, venstreBredde = 52) {
         const suffixDele = [];
 
@@ -2806,11 +2806,14 @@ async function downloadRapport() {
 
         if (aftaltMaal !== null && aftaltMaal > 0) {
             const diff = antal - aftaltMaal;
-            const mellemrum = suffixDele.length > 0 ? ' ' : '';
-            if (diff > 0) {
-                suffixDele.push({ text: `${mellemrum}+${diff}`, bold: true, fontSize: 8.5, color: '#28a745' });
-            } else if (diff < 0) {
-                suffixDele.push({ text: `${mellemrum}${diff}`, bold: true, fontSize: 8.5, color: '#dc3545' });
+            if (diff !== 0) {
+                const mellemrum = suffixDele.length > 0 ? ' ' : '';
+                const absDiff = Math.abs(diff);
+                const farve = diff > 0 ? '#28a745' : '#dc3545';
+
+                suffixDele.push({ text: `${mellemrum}(`, bold: true, fontSize: 8.5, color: '#000000' });
+                suffixDele.push({ text: `${absDiff}`, bold: true, fontSize: 8.5, color: farve });
+                suffixDele.push({ text: ')', bold: true, fontSize: 8.5, color: '#000000' });
             }
         }
 
