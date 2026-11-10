@@ -188,8 +188,8 @@ async function genererPDF() {
         const ugeCelle = {
             text: visUgeTekst,
             fontSize: 8.5,
-            bold: true,
-            color: '#b8b8b8',
+            bold: false,
+            color: '#dd5f12',
             alignment: 'right',
             noWrap: true,
             border: [false, false, false, false]
