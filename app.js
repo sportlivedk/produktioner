@@ -2570,6 +2570,7 @@ async function downloadRapport() {
         const pMaaned = parseInt(parts[1], 10) - 1;
         if (pAar !== valgtAar) return false;
         if (!erAarsrapport && pMaaned !== valgtMaaned) return false;
+        if (erAarsrapport && valgtAar === 2026 && pMaaned < 2) return false;
         return true;
     });
 
@@ -2754,8 +2755,8 @@ async function downloadRapport() {
         return;
     }
 
-// Tilføj kun faste medarbejdere med 0 vagter i månedsrapporterne
-    if (!erAarsrapport) {
+// Tilføj faste medarbejdere med 0 vagter i månedsrapporter samt igangværende og afsluttede årsrapporter
+    if (!erAarsrapport || valgtAar <= aktueltAarNu) {
         aftaleMap.forEach((aftaleInfo, lower) => {
             if (!medarbejderMap.has(lower)) {
                 medarbejderMap.set(lower, {
@@ -2804,7 +2805,7 @@ async function downloadRapport() {
             suffixDele.push({ text: `(${tbcAntal} TBC)`, color: '#000000', bold: true, fontSize: 8 });
         }
 
-        if (aftaltMaal !== null && aftaltMaal > 0) {
+        if (aftaltMaal !== null) {
             const diff = antal - aftaltMaal;
             if (diff !== 0) {
                 const mellemrum = suffixDele.length > 0 ? ' ' : '';
@@ -2849,7 +2850,7 @@ async function downloadRapport() {
     const visOpdelingAatd = (erAarsrapport && valgtAar >= aktueltAarNu);
 
     if (visOpdelingAatd) {
-        mainTableWidths = ['*', 92, 76, 62, 65, 55, 65, 55, 76];
+        mainTableWidths = ['*', 100, 76, 62, 65, 55, 65, 55, 76];
         mainTableBody.push([
             { text: 'Medarbejder', bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
             { text: 'Afviklet (år til dato)', bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
@@ -2862,14 +2863,36 @@ async function downloadRapport() {
             { text: 'Est. tidsforbrug', bold: true, fontSize: 9.5, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true }
         ]);
 
+        // Beregn dage i perioden og gåede dage inkl. dags dato (UTC sikrer præcis optælling hen over sommertid og skudår)
+        let dageIPerioden = 0;
+        let gaaedeDage = 0;
+        const antalMaanederIAar = (valgtAar === 2026) ? 10 : 12;
+
+        if (valgtAar === aktueltAarNu) {
+            const startMaanedIndex = (valgtAar === 2026) ? 2 : 0; // 2 = marts i 2026, 0 = januar fra 2027+
+            const periodeStartUTC = Date.UTC(valgtAar, startMaanedIndex, 1);
+            const periodeSlutUTC = Date.UTC(valgtAar, 11, 31);
+            const idagUTC = Date.UTC(aktueltAarNu, aktuelMaanedNu, sysNu.getDate());
+
+            dageIPerioden = Math.round((periodeSlutUTC - periodeStartUTC) / 86400000) + 1;
+            if (idagUTC >= periodeStartUTC) {
+                gaaedeDage = Math.round((idagUTC - periodeStartUTC) / 86400000) + 1;
+            }
+        }
+
         medarbejderListe.forEach(m => {
             sumTotal += m.total; sumTbc += m.tbc; sumAatd += m.aatd; sumPlanlagt += m.planlagt;
             sumKommentator += m.kommentator; sumReporter += m.reporter;
             sumSportLive += m.sportLive; sumEkstern += m.ekstern; sumMinutter += m.minutter;
 
+            const aftaleInfo = aftaleMap.get(m.navn.toLowerCase());
+            const aatdMaal = (aftaleInfo && gaaedeDage > 0 && dageIPerioden > 0)
+                ? Math.round(((aftaleInfo.antalPrMaaned * antalMaanederIAar) / dageIPerioden) * gaaedeDage)
+                : null;
+
             mainTableBody.push([
                 { text: m.navn, fontSize: 9.5, bold: true, noWrap: true },
-                { text: `${m.aatd}`, fontSize: 9.5, alignment: 'center' },
+                { ...formaterAntalMedStatus(m.aatd, 0, aatdMaal, false, 52), fontSize: 9.5 },
                 { ...formaterAntalMedStatus(m.planlagt, m.tbc, null, false, 40), fontSize: 9.5 },
                 { text: `${m.total}`, fontSize: 9.5, bold: true, alignment: 'center' },
                 { text: m.kommentator > 0 ? `${m.kommentator}` : '-', fontSize: 9.5, alignment: 'center' },
@@ -2882,7 +2905,7 @@ async function downloadRapport() {
 
         mainTableBody.push([
             { text: `I alt (${medarbejderListe.length} medarbejdere)`, bold: true, fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true },
-            { text: `${sumAatd}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
+            { ...formaterAntalMedStatus(sumAatd, 0, null, true, 52), fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
             { ...formaterAntalMedStatus(sumPlanlagt, sumTbc, null, true, 40), fontSize: 9.5, fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumTotal}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
             { text: `${sumKommentator}`, bold: true, fontSize: 9.5, alignment: 'center', fillColor: '#e9ecef', border: [false, true, false, true] },
@@ -2903,14 +2926,16 @@ async function downloadRapport() {
             { text: 'Est. tidsforbrug', bold: true, fontSize: 10, alignment: 'right', fillColor: '#e9ecef', border: [false, true, false, true], noWrap: true }
         ]);
 
+        // Månedsrapport = x1 | Afsluttet årsrapport = x10 i 2026 (marts-dec) og x12 fra 2027+
+        const faktor = erAarsrapport ? (valgtAar === 2026 ? 10 : 12) : 1;
+
         medarbejderListe.forEach(m => {
             sumTotal += m.total; sumTbc += m.tbc;
             sumKommentator += m.kommentator; sumReporter += m.reporter;
             sumSportLive += m.sportLive; sumEkstern += m.ekstern; sumMinutter += m.minutter;
 
-            // Vis kun aftale-indikator på månedsrapporter (!erAarsrapport)
-            const aftaleInfo = (!erAarsrapport) ? aftaleMap.get(m.navn.toLowerCase()) : null;
-            const periodeMaal = aftaleInfo ? aftaleInfo.antalPrMaaned : null;
+            const aftaleInfo = aftaleMap.get(m.navn.toLowerCase());
+            const periodeMaal = aftaleInfo ? (aftaleInfo.antalPrMaaned * faktor) : null;
 
             mainTableBody.push([
                 { text: m.navn, fontSize: 9.5, bold: true, noWrap: true },
