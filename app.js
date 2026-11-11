@@ -23,6 +23,7 @@ let kopieretTechOpsaetning = null;
 let pendingTechInfoForNewProgram = null;
 
 let lastAutoSluttidContext = null; // Tilføjet: Holder styr på forrige værdier for auto-sluttid
+let txAutoStyret = true; // Holder styr på, om TX må udfyldes/opdateres automatisk
 
 function hentFormularState() {
     const data = {};
@@ -2320,6 +2321,22 @@ async function gemProgram() {
         }
     }
 
+// Tjek om indtastet TX afviger fra den aftalte optaktsvarighed (kun for SPORT LIVE og kun når TX er udfyldt)
+    if (valgtTX && valgtTid) {
+        const aftaltOptakt = hentAftaltOptaktMinutter(valgtKanal, valgtSportsgren, valgtUnit, valgtProgramtitel);
+        if (aftaltOptakt !== null) {
+            const forventetTX = beregnForventetTX(valgtTid, aftaltOptakt);
+            if (forventetTX && valgtTX.substring(0, 5) !== forventetTX) {
+                const forvKlVisning = forventetTX.replace(':', '.');
+                const bekraeftOptakt = await visCustomDialog(
+                    `Du har indtastet en starttid (TX), som afviger fra den aftalte optaktsvarighed på ${aftaltOptakt} minutter (kl. ${forvKlVisning}) for denne type programmer.\n\nEr du sikker på, at du vil fortsætte?`,
+                    'confirm'
+                );
+                if (!bekraeftOptakt) return;
+            }
+        }
+    }
+
     const sysDato = new Date();
     const idagsDatoStr = sysDato.getFullYear() + "-" + String(sysDato.getMonth() + 1).padStart(2, '0') + "-" + String(sysDato.getDate()).padStart(2, '0');
 
@@ -3313,6 +3330,85 @@ function autoUdfyldSluttid() {
 
 // -----------------------------------------------------------------
 
+// --- REGLER OG AUTO-UDFYLD FOR OPTAKT (TX) ---
+function hentAftaltOptaktMinutter(kanal, sportsgren, unit, titel) {
+    const kanalUpper = String(kanal || '').trim().toUpperCase();
+    if (kanalUpper !== 'SPORT LIVE') return null;
+
+    const sportLower = String(sportsgren || '').trim().toLowerCase();
+    const unitUpper = String(unit || '').trim().toUpperCase();
+    const titelLower = String(titel || '').trim().toLowerCase();
+
+    const obUnits = ["OB", "OB 7", "OB 9", "OB 7+9", "MINITECH", "NOWTEK OB1", "NOWTEK OB2", "SAM OB"];
+    const boksUnits = ["BOKS", "BOKS 1", "BOKS 2", "BOKS 3", "BOKS 4", "BOKS 5", "BOKS 6", "BOKS 7"];
+
+    const optaktRegler = [
+        {
+            match: () => sportLower === "basketball" && obUnits.includes(unitUpper) && titelLower.includes("basketliga"),
+            minutter: 30
+        },
+        {
+            match: () => sportLower === "basketball" && obUnits.includes(unitUpper) && titelLower.includes("danmark"),
+            minutter: 20
+        },
+        {
+            match: () => sportLower === "basketball" && boksUnits.includes(unitUpper) && titelLower.includes("danmark"),
+            minutter: 10
+        }
+    ];
+
+    const aktivRegel = optaktRegler.find(r => r.match());
+    return aktivRegel ? aktivRegel.minutter : null;
+}
+
+function beregnForventetTX(tidStr, optaktMinutter) {
+    if (!tidStr || optaktMinutter === null) return "";
+    const parts = tidStr.trim().split(':');
+    if (parts.length < 2) return "";
+    const timer = parseInt(parts[0], 10);
+    const minutter = parseInt(parts[1], 10);
+    if (isNaN(timer) || isNaN(minutter)) return "";
+
+    let totalMinutter = (timer * 60) + minutter - optaktMinutter;
+    if (totalMinutter < 0) totalMinutter += 24 * 60;
+
+    const nyTimer = Math.floor(totalMinutter / 60) % 24;
+    const nyMinutter = totalMinutter % 60;
+    return String(nyTimer).padStart(2, '0') + ':' + String(nyMinutter).padStart(2, '0');
+}
+
+function initAutoTXState() {
+    const tidEl = document.getElementById('Tid');
+    const txEl = document.getElementById('TX');
+    const kanalEl = document.getElementById('Kanal');
+    const sportEl = document.getElementById('Sportsgren');
+    const unitEl = document.getElementById('Unit');
+    const titelEl = document.getElementById('Programtitel');
+    if (!tidEl || !txEl || !kanalEl || !sportEl || !unitEl || !titelEl) return;
+
+    const aftaltMinutter = hentAftaltOptaktMinutter(kanalEl.value, sportEl.value, unitEl.value, titelEl.value);
+    const forventetTX = beregnForventetTX(tidEl.value, aftaltMinutter);
+    const nuvaerendeTX = txEl.value.trim().substring(0, 5);
+
+    // Tillad kun auto-opdatering, hvis TX er uberørt/følger reglen (beskytter eksisterende manuelle TX-tider ved redigering)
+    txAutoStyret = (nuvaerendeTX === forventetTX);
+}
+
+function autoUdfyldTX() {
+    if (!txAutoStyret) return;
+
+    const tidEl = document.getElementById('Tid');
+    const txEl = document.getElementById('TX');
+    const kanalEl = document.getElementById('Kanal');
+    const sportEl = document.getElementById('Sportsgren');
+    const unitEl = document.getElementById('Unit');
+    const titelEl = document.getElementById('Programtitel');
+    if (!tidEl || !txEl || !kanalEl || !sportEl || !unitEl || !titelEl) return;
+
+    const aftaltMinutter = hentAftaltOptaktMinutter(kanalEl.value, sportEl.value, unitEl.value, titelEl.value);
+    txEl.value = beregnForventetTX(tidEl.value, aftaltMinutter);
+}
+
 window.onload = function() {
     const yearContainer = document.getElementById('yearFilterContainer');
     const aktueltAar = new Date().getFullYear();
@@ -3389,19 +3485,35 @@ window.onload = function() {
     document.getElementById('Tid').addEventListener('input', autoUdfyldSluttid);
     document.getElementById('Unit').addEventListener('input', opdaterProducerLabel);
     document.getElementById('Unit').addEventListener('change', opdaterProducerLabel);
-    document.getElementById('Kanal').addEventListener('input', function() {
+   document.getElementById('Kanal').addEventListener('input', function() {
         if (this.value === 'Optagelse') {
             document.getElementById('group-Premieredato').style.display = 'flex';
             const txGroup = document.getElementById('group-TX');
             if(txGroup) txGroup.style.display = 'none';
-            document.getElementById('TX').value = ''; 
+            document.getElementById('TX').value = '';
+            txAutoStyret = true;
         } else {
             document.getElementById('group-Premieredato').style.display = 'none';
             const txGroup = document.getElementById('group-TX');
             if(txGroup) txGroup.style.display = 'flex';
         }
     });
-    
+
+    // Lyt efter ændringer til auto-udfyldning af TX
+    ['Kanal', 'Sportsgren', 'Unit', 'Programtitel', 'Tid'].forEach(feltId => {
+        const el = document.getElementById(feltId);
+        if (el) {
+            el.addEventListener('input', autoUdfyldTX);
+            el.addEventListener('change', autoUdfyldTX);
+        }
+    });
+
+    // Slå auto-TX fra, så snart brugeren selv taster eller sletter i TX-feltet
+    const txInput = document.getElementById('TX');
+    if (txInput) {
+        txInput.addEventListener('input', () => { txAutoStyret = false; });
+        txInput.addEventListener('change', () => { txAutoStyret = false; });
+    }
 };
 
 var modal = document.getElementById("programModal");
@@ -3417,6 +3529,7 @@ function opdaterProducerLabel() {
 
 function openModal() {
     opdaterProducerLabel();
+    initAutoTXState();
     modal.style.display = "block";
 }
 function closeModal() { modal.style.display = "none"; }
