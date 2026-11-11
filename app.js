@@ -2329,7 +2329,7 @@ async function gemProgram() {
             if (forventetTX && valgtTX.substring(0, 5) !== forventetTX) {
                 const forvKlVisning = forventetTX.replace(':', '.');
                 const bekraeftOptakt = await visCustomDialog(
-                    `Du har indtastet en starttid (TX), som afviger fra den aftalte optakt på ${aftaltOptakt} minutter (kl. ${forvKlVisning}) for denne type program.\n\nEr du sikker på, at du vil fortsætte?`,
+                    `Du har indtastet en starttid (TX), som afviger fra den aftalte optakt på ${aftaltOptakt} minutter (kl. ${forvKlVisning}) for denne programtype.\n\nEr du sikker på, at du vil fortsætte?`,
                     'confirm'
                 );
                 if (!bekraeftOptakt) return;
