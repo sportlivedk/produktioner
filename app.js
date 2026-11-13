@@ -9,6 +9,7 @@ let aktuelDato = new Date();
 let valgtAar = aktuelDato.getFullYear();
 let valgtMaaned = aktuelDato.getMonth();
 let visKunIdag = false;
+let visKunMineVagter = false;
 
 let brugerRolle = ""; 
 let aktuelBruger = "";
@@ -129,7 +130,7 @@ async function genererPDF() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
     let programmerTilPDF = [];
 
-    if (erSportLiveFilter && valgtMaaned !== -1 && !visKunIdag) {
+    if (!visKunMineVagter && erSportLiveFilter && valgtMaaned !== -1 && !visKunIdag) {
         // Bevarer den eksisterende SPORT LIVE-logik (hvor Optagelse bruger Premieredato)
         programmerTilPDF = alleProgrammerGlobal.filter(p => {
             const kanalNavn = String(p["Kanal"] || '');
@@ -174,7 +175,7 @@ async function genererPDF() {
 
     programmerTilPDF.forEach(p => {
         let rawDato = p["NormDato"];
-        if (erSportLiveFilter && String(p["Kanal"]) === 'Optagelse' && p["Premieredato"]) {
+        if (!visKunMineVagter && erSportLiveFilter && String(p["Kanal"]) === 'Optagelse' && p["Premieredato"]) {
             rawDato = p["Premieredato"];
         }
 
@@ -205,7 +206,7 @@ async function genererPDF() {
         let pTid = String(p["Tid"] || '-');
         let pTX = String(p["TX"] || '-');
         
-        if (erSportLiveFilter && String(p["Kanal"]) === 'Optagelse') {
+        if (!visKunMineVagter && erSportLiveFilter && String(p["Kanal"]) === 'Optagelse') {
             pTid = '-';
             pTX = '-';
         } else {
@@ -216,7 +217,7 @@ async function genererPDF() {
             else if (pTX !== '-') pTX = pTX.substring(0, 5);
         }
 
-        let visTid = erSportLiveFilter ? pTX : (pTX !== '-' ? pTX : pTid);
+        let visTid = (!visKunMineVagter && erSportLiveFilter) ? pTX : (pTX !== '-' ? pTX : pTid);
 
         let pSted = p["Lokation"] && String(p["Lokation"]).trim() !== '' ? String(p["Lokation"]).trim() : 'TBA';
         let truncSted = truncateText(pSted, 30);
@@ -271,7 +272,9 @@ async function genererPDF() {
     });
 
     let headerLinje2 = 'Oversigten viser både SPORT LIVE og eksterne modtagere.';
-    if (kategoriFilter === 'sportlive') {
+if (visKunMineVagter) {
+    headerLinje2 = `Oversigten viser kun vagter for ${aktueltNavn}.`;
+} else if (kategoriFilter === 'sportlive') {
         headerLinje2 = 'Se detaljeret programoversigt på sport-live.dk/programoversigt.';
     } else if (kategoriFilter === 'fremtidige') {
         headerLinje2 = 'Oversigten viser kun fremtidige programmer.';
@@ -404,6 +407,8 @@ async function logInd() {
 function afslutLogin() {
     if (document.getElementById('btnDownloadRapport')) document.getElementById('btnDownloadRapport').style.display = "none";
     if (document.getElementById('btnSendVagtplan')) document.getElementById('btnSendVagtplan').style.display = "none";
+    if (document.getElementById('btnMineVagter')) document.getElementById('btnMineVagter').style.display = "none";
+    if (brugerRolle === "Superadmin") visKunMineVagter = false;
     document.getElementById('loginOverlay').style.display = "none";
     document.getElementById('userInfoContainer').style.display = "block";
     document.getElementById('displayUsername').textContent = aktueltNavn;
@@ -424,6 +429,7 @@ function logUd(event) {
     aktueltNavn = "";
     aktuelPassLen = 8;
     aktuelNotifikation = false;
+    visKunMineVagter = false;
     
     alleProgrammerGlobal = [];
     aktuelleProgrammerVist = [];
@@ -696,6 +702,21 @@ function opdaterFiltreUI() {
             vagtplanBtn.style.display = 'none';
         }
     }
+
+// Styr synlighed og aktiv tilstand for "Mine vagter"-knappen (kun Admin og Læser)
+    const mineVagterBtn = document.getElementById('btnMineVagter');
+    if (mineVagterBtn) {
+        if (brugerRolle !== "" && brugerRolle !== "Superadmin") {
+            mineVagterBtn.style.display = 'inline-flex';
+            if (visKunMineVagter) mineVagterBtn.classList.add('active');
+            else mineVagterBtn.classList.remove('active');
+        } else {
+            visKunMineVagter = false;
+            mineVagterBtn.classList.remove('active');
+            mineVagterBtn.style.display = 'none';
+        }
+    }
+
 }
 
 function handterFilterSkift() {
@@ -1060,6 +1081,30 @@ function filtrerIdag() {
     document.querySelector('.table-container').scrollTop = 0;
 }
 
+function toggleMineVagter() {
+    visKunMineVagter = !visKunMineVagter;
+    opdaterFiltreUI();
+    opdaterVisning();
+    const container = document.querySelector('.table-container');
+    if (container) container.scrollTop = 0;
+}
+
+function harBrugerVagtPaaProgram(program) {
+    const brugerNavn = String(aktueltNavn || '').trim().toLowerCase();
+    if (!brugerNavn) return false;
+
+    const vagtFelter = ['Producer', 'Kommentator', 'Reporter'];
+    return vagtFelter.some(felt => {
+        const raaTekst = String(program[felt] || '').trim();
+        if (!raaTekst || raaTekst === '-') return false;
+
+        return raaTekst.split(/[,\/&+]/).some(del => {
+            const renDel = del.replace(/\(.*?\)/g, '').trim().toLowerCase();
+            return renDel === brugerNavn;
+        });
+    });
+}
+
 function handterSogning() {
     const input = document.getElementById('searchInput').value.trim();
     const clearBtn = document.getElementById('clearSearchBtn');
@@ -1115,6 +1160,8 @@ function opdaterVisning() {
         if (kategoriFilter === 'tbc' && (!program["TBC"] || String(program["TBC"]).toUpperCase() !== 'X')) return false;
         if (kategoriFilter === 'bemanding' && !skalViseAdvarsel(program)) return false;
         
+        if (visKunMineVagter && !harBrugerVagtPaaProgram(program)) return false;
+
         if (searchTerm !== '') {
             const alleFelterTekst = Object.values(program).map(v => String(v)).join(' ').toLowerCase();
             if (!alleFelterTekst.includes(searchTerm)) { return false; }

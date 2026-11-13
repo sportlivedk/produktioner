@@ -411,3 +411,28 @@
             border-radius: 2px;
             animation: blink-overlap 2s infinite; 
         }
+
+/* Knap til "Mine vagter" (hvid med mørkegrå ramme som inaktiv, guldfarvet som aktiv) */
+.month-btn.btn-mine-vagter {
+    margin-left: auto;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #5a6268;
+}
+
+.month-btn.btn-mine-vagter:hover {
+    background-color: #f1f3f5;
+}
+
+.month-btn.btn-mine-vagter.active {
+    background-color: #b38600;
+    border-color: #997300;
+    color: #ffffff;
+}
+
+.month-btn.btn-mine-vagter.active:hover {
+    background-color: #997300;
+    border-color: #806000;
+}
