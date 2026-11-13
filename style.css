@@ -412,18 +412,21 @@
             animation: blink-overlap 2s infinite; 
         }
 
-/* Knap til "Mine vagter" (hvid med mørkegrå ramme som inaktiv, guldfarvet som aktiv) */
+/* Knap til "Mine vagter" (hvid med lysegrå ramme som inaktiv, guldfarvet som aktiv) */
 .month-btn.btn-mine-vagter {
     margin-left: auto;
     align-items: center;
     justify-content: center;
     background-color: #ffffff;
     color: #000000;
-    border: 1px solid #5a6268;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 7px 12px;
 }
 
 .month-btn.btn-mine-vagter:hover {
-    background-color: #f1f3f5;
+    background-color: #e9ecef;
 }
 
 .month-btn.btn-mine-vagter.active {
