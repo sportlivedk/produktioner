@@ -2581,7 +2581,7 @@ let liveVindueRef = null;
 function aabenLiveFeed() {
     if (brugerRolle !== "Superadmin") return;
 
-    const url = 'https://playmakertv.dk'; // Ret evt. til 'https://playmaker.tv'
+    const url = 'https://ekstrabladet.dk/sportlive/';
     const bredde = 640;
     const hoejde = 420;
     const venstre = Math.max(0, window.screen.availWidth - bredde - 30);
