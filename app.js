@@ -405,6 +405,7 @@ async function logInd() {
 }
 
 function afslutLogin() {
+    if (document.getElementById('btnLiveFeed')) document.getElementById('btnLiveFeed').style.display = "none";
     if (document.getElementById('btnDownloadRapport')) document.getElementById('btnDownloadRapport').style.display = "none";
     if (document.getElementById('btnSendVagtplan')) document.getElementById('btnSendVagtplan').style.display = "none";
     if (document.getElementById('btnMineVagter')) document.getElementById('btnMineVagter').style.display = "none";
@@ -663,6 +664,12 @@ function opdaterFiltreUI() {
         } else {
             mobileSelect.value = valgtMaaned.toString();
         }
+    }
+
+// Styr synlighed for "LIVE"-testknappen (kun Superadmin)
+    const liveBtn = document.getElementById('btnLiveFeed');
+    if (liveBtn) {
+        liveBtn.style.display = (brugerRolle === "Superadmin") ? 'inline-flex' : 'none';
     }
 
     // Styr synlighed og aktiv/nedtonet tilstand for "Rapport"-knappen
@@ -2567,6 +2574,29 @@ function aabenMcrModal() {
 
 function lukMcrModal() {
     document.getElementById('mcrModal').style.display = "none";
+}
+
+let liveVindueRef = null;
+
+function aabenLiveFeed() {
+    if (brugerRolle !== "Superadmin") return;
+
+    const url = 'https://playmakertv.dk'; // Ret evt. til 'https://playmaker.tv'
+    const bredde = 640;
+    const hoejde = 420;
+    const venstre = Math.max(0, window.screen.availWidth - bredde - 30);
+    const top = 60;
+
+    if (liveVindueRef && !liveVindueRef.closed) {
+        liveVindueRef.focus();
+        return;
+    }
+
+    liveVindueRef = window.open(
+        url,
+        'SportLiveFeed',
+        `width=${bredde},height=${hoejde},left=${venstre},top=${top},resizable=yes,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no`
+    );
 }
 
 function renderMcrVagter(vagter) {
