@@ -2138,9 +2138,6 @@ function tegnTabel(programmer) {
         }
 
         let visUnitRen = String(program["Unit"] || '');
-        if (visUnitRen.toUpperCase() === "OB" || visUnitRen.toUpperCase() === "BOKS") {
-            visUnitRen = "";
-        }
         
         let visUnitKolonne = visUnitRen;
         if (visUnitKolonne.toUpperCase() === "NOWTEK OB1" || visUnitKolonne.toUpperCase() === "NOWTEK OB2") {
