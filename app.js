@@ -1964,8 +1964,8 @@ function tegnTabel(programmer) {
                             // SCENARIE 2: Overlap, og begge har samme Unit - ignorer tomme units, samt "BOKS" og "OB"
                             let rule2 = (unitA !== "" && unitA !== "BOKS" && unitA !== "OB" && unitA === unitB);
 
-                            // SCENARIE 3: Overlap, og den ene er BOKS 3 og den anden er BOKS 4 (eller omvendt)
-                            let rule3 = (unitA === "BOKS 3" || unitA === "BOKS 4") && (unitB === "BOKS 3" || unitB === "BOKS 4");
+                            // SCENARIE 3: Overlap, og den ene er BOKS 1 og den anden er BOKS 3 (eller omvendt)
+                            let rule3 = (unitA === "BOKS 1" || unitA === "BOKS 3") && (unitB === "BOKS 1" || unitB === "BOKS 3");
 
                             // Hvis bare ét af scenarierne er opfyldt, er der et overlap
                             if (rule1 || rule2 || rule3) {
